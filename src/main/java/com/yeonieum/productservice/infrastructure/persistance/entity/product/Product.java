@@ -4,8 +4,12 @@ import com.yeonieum.productservice.infrastructure.persistance.commons.converter.
 import com.yeonieum.productservice.infrastructure.persistance.commons.enums.ActiveStatus;
 import com.yeonieum.productservice.infrastructure.persistance.entity.category.ProductDetailCategory;
 import com.yeonieum.productservice.infrastructure.persistance.entity.customer.Customer;
+import com.yeonieum.productservice.infrastructure.persistance.entity.review.ProductReview;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -65,5 +69,10 @@ public class Product {
     @Column(name = "is_page_visibility", nullable = false)
     @Builder.Default
     private ActiveStatus isPageVisibility = ActiveStatus.ACTIVE;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductReview> productReviewList = new ArrayList<>();
+
 
 }
