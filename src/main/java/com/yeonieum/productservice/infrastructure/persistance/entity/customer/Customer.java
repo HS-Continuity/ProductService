@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -54,5 +56,9 @@ public class Customer {
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private ActiveStatus isDeleted = ActiveStatus.INACTIVE;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CustomerMember> customerMemberList = new ArrayList<>();
 
 }
