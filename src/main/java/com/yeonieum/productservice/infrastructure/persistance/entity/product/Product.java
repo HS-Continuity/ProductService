@@ -74,5 +74,8 @@ public class Product {
     @Builder.Default
     private List<ProductReview> productReviewList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductDetailImage> productDetailImageList = new ArrayList<>();
 
 }
