@@ -86,4 +86,8 @@ public class Product {
     @Builder.Default
     private List<ProductCertification> productCertificationList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductInventory> productInventoryList = new ArrayList<>();
+
 }
