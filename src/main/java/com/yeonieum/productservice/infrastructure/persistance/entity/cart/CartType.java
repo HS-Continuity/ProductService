@@ -16,6 +16,9 @@ public class CartType {
     @Column(name = "cart_type_id")
     private Long cartTypeId;
 
+    @OneToOne(mappedBy = "cartType", fetch = FetchType.LAZY)
+    private CartProduct cartProduct;
+
     @Column(name = "type_name", nullable = false)
     private String typeName;
 
