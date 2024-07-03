@@ -16,6 +16,9 @@ public class SaleType {
     @Column(name = "sale_type_id")
     private Long saleTypeId;
 
+    @OneToOne(mappedBy = "saleType", fetch = FetchType.LAZY)
+    private Product product;
+
     @Column(name = "type_name", nullable = false)
     private String typeName;
 

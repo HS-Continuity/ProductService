@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.infrastructure.persistance.entity.category;
 
+import com.yeonieum.productservice.infrastructure.persistance.entity.product.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,8 @@ public class ProductDetailCategory {
     @Column(name = "shelf_life_day", nullable = false)
     private int shelfLifeDay;
 
-
+    @OneToMany(mappedBy = "productDetailCategory")
+    @Builder.Default
+    private List<Product> productList = new ArrayList<>();
 
 }

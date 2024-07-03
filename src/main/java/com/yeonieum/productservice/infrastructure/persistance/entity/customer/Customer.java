@@ -2,6 +2,7 @@ package com.yeonieum.productservice.infrastructure.persistance.entity.customer;
 
 import com.yeonieum.productservice.infrastructure.persistance.commons.converter.ActiveStatusConverter;
 import com.yeonieum.productservice.infrastructure.persistance.commons.enums.ActiveStatus;
+import com.yeonieum.productservice.infrastructure.persistance.entity.product.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -60,5 +61,9 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<CustomerMember> customerMemberList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Product> productList = new ArrayList<>();
 
 }
