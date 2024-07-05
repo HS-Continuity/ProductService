@@ -10,7 +10,6 @@ import lombok.*;
 @Builder
 @Table(name = "sale_type")
 public class SaleType {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sale_type_id")
@@ -21,5 +20,4 @@ public class SaleType {
 
     @Column(name = "type_name", nullable = false)
     private String typeName;
-
 }
