@@ -1,5 +1,6 @@
-package com.yeonieum.productservice.domain.product.entity;
+package com.yeonieum.productservice.domain.productinventory.entity;
 
+import com.yeonieum.productservice.domain.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
