@@ -1,8 +1,7 @@
 package com.yeonieum.productservice.domain.category.service;
 
-import com.yeonieum.productservice.domain.category.dto.category.ModifyCategoryDto;
-import com.yeonieum.productservice.domain.category.dto.category.RegisterCategoryDto;
-import com.yeonieum.productservice.domain.category.dto.category.RetrieveAllCategoryDto;
+import com.yeonieum.productservice.domain.category.dto.category.ProductCategoryRequest;
+import com.yeonieum.productservice.domain.category.dto.category.ProductCategoryResponse;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
 import jakarta.transaction.Transactional;
@@ -26,12 +25,14 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public ProductCategory registerCategory(RegisterCategoryDto registerCategoryDto) {
+    public boolean registerCategory(ProductCategoryRequest.RegisterCategoryDto registerCategoryDto) {
         ProductCategory productCategory = ProductCategory.builder()
                 .categoryName(registerCategoryDto.getCategoryName())
                 .build();
 
-        return productCategoryRepository.save(productCategory);
+        productCategoryRepository.save(productCategory);
+
+        return true;
     }
 
     /**
@@ -41,12 +42,12 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public List<RetrieveAllCategoryDto> retrieveAllCategoryDtoList() {
+    public List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategoryDtoList() {
         List<ProductCategory> categoryList = productCategoryRepository.findAll();
 
         return categoryList.stream()
                 .map(category ->
-                        new RetrieveAllCategoryDto(
+                        new ProductCategoryResponse.RetrieveAllCategoryDto(
                             category.getProductCategoryId(),
                             category.getCategoryName()
                 ))
@@ -61,16 +62,17 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public ProductCategory modifyCategory(ModifyCategoryDto modifyCategoryDto) {
+    public boolean modifyCategory(ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
         Long productCategoryId = modifyCategoryDto.getProductCategoryId();
 
         ProductCategory existingCategory = productCategoryRepository.findById(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
-        existingCategory.setCategoryName(modifyCategoryDto.getCategoryName());
+        existingCategory.changeCategoryName(modifyCategoryDto.getCategoryName());
 
-        return productCategoryRepository.save(existingCategory);
+        productCategoryRepository.save(existingCategory);
+
+        return true;
     }
-
 
     /**
      * 상품 카테고리 삭제
@@ -80,11 +82,39 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public void deleteCategory(Long productCategoryId) {
+    public boolean deleteCategory(Long productCategoryId) {
         if (productCategoryRepository.existsById(productCategoryId)) {
             productCategoryRepository.deleteById(productCategoryId);
+            return true;
         } else {
             throw new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다.");
         }
+    }
+
+    /**
+     * 상품 카테고리 조회시, 하위 상세카테고리 조회
+     * @param productCategoryId
+     * @exception
+     * @throws
+     * @return
+     */
+    @Transactional
+    public ProductCategoryResponse.RetrieveCategoryWithDetailsDto retrieveCategoryWithDetails(Long productCategoryId) {
+        ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
+
+        List<ProductCategoryResponse.ProductDetailCategoryDto> detailCategoryDtoList = productCategory.getProductDetailCategoryList().stream()
+                .map(detail -> ProductCategoryResponse.ProductDetailCategoryDto.builder()
+                        .productDetailCategoryId(detail.getProductDetailCategoryId())
+                        .categoryDetailName(detail.getCategoryDetailName())
+                        .shelfLifeDay(detail.getShelfLifeDay())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ProductCategoryResponse.RetrieveCategoryWithDetailsDto.builder()
+                .productCategoryId(productCategory.getProductCategoryId())
+                .categoryName(productCategory.getCategoryName())
+                .productDetailCategoryList(detailCategoryDtoList)
+                .build();
     }
 }

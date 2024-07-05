@@ -8,7 +8,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -26,5 +25,9 @@ public class ProductCategory {
     @OneToMany(mappedBy = "productCategory", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductDetailCategory> productDetailCategoryList = new ArrayList<>();
+
+    public void changeCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
 }

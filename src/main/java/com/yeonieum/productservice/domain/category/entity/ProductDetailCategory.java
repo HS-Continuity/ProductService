@@ -9,7 +9,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -35,4 +34,11 @@ public class ProductDetailCategory {
     @Builder.Default
     private List<Product> productList = new ArrayList<>();
 
+    public void changeDetailCategoryName(String categoryDetailName) {
+        this.categoryDetailName = categoryDetailName;
+    }
+
+    public void changeDetailCategoryShelfLifeDay(int shelfLifeDay) {
+        this.shelfLifeDay = shelfLifeDay;
+    }
 }
