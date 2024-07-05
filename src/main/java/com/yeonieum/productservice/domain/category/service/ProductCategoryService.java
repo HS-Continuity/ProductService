@@ -116,5 +116,6 @@ public class ProductCategoryService {
                 .categoryName(productCategory.getCategoryName())
                 .productDetailCategoryList(detailCategoryDtoList)
                 .build();
+
     }
 }

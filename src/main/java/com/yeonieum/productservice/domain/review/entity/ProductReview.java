@@ -37,4 +37,5 @@ public class ProductReview {
 
     @Column(name = "review_score")
     private int reviewScore;
+
 }

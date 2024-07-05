@@ -5,11 +5,10 @@ import lombok.*;
 
 public class ProductCategoryRequest {
     @Getter
-    //@NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     @Builder
     public static class RegisterCategoryDto {
-        private RegisterCategoryDto(){}
         private String categoryName;
     }
 
@@ -18,9 +17,7 @@ public class ProductCategoryRequest {
     @AllArgsConstructor
     @Builder
     public static class ModifyCategoryDto {
-
         private Long productCategoryId;
         private String categoryName;
-
     }
 }
