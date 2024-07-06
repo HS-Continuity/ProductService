@@ -73,10 +73,7 @@ public class ProductInventoryManagementService {
 
         Product product = productInventory.getProduct();
         // 고객권한 찾기
-        productInventory.setQuantity(modifyDto.getQuantity());
-        productInventory.setWarehouseDate(modifyDto.getWarehousingDate());
-        productInventory.setExpirationDate(modifyDto.getExpirationDate());
-
+        productInventory.changeQuantity(modifyDto.getQuantity());
         return true;
     }
 

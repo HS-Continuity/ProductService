@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -33,4 +32,7 @@ public class ProductInventory {
     @Column(name = "expiration_date", nullable = false)
     private LocalDate expirationDate;
 
+    public void changeQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }

@@ -13,7 +13,6 @@ public class ProductDetailCategoryRequest {
         private Long productCategoryId;
         private String categoryDetailName;
         private int shelfLifeDay;
-
     }
 
     @Getter
@@ -22,9 +21,7 @@ public class ProductDetailCategoryRequest {
     @Builder
     public static class ModifyDetailCategoryDto {
 
-        private Long productDetailCategoryId;
         private String categoryDetailName;
         private int shelfLifeDay;
-
     }
 }
