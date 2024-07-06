@@ -1,9 +1,9 @@
-package com.yeonieum.productservice.domain.product.service;
+package com.yeonieum.productservice.domain.product.service.memberservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.RegisterAdvertisementRequestDto;
-import com.yeonieum.productservice.domain.product.dto.RetrieveAdvertisementProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RegisterAdvertisementRequestDto;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveAdvertisementProductResponseDto;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
 import com.yeonieum.productservice.domain.product.repository.ProductAdvertisementServiceRepository;

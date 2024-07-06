@@ -1,12 +1,12 @@
-package com.yeonieum.productservice.domain.product.service;
+package com.yeonieum.productservice.domain.product.service.memberservice;
 
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.ProductManagementRequest;
-import com.yeonieum.productservice.domain.product.dto.ProductManagementResponse;
+import com.yeonieum.productservice.domain.product.dto.memberservice.ProductManagementRequest;
+import com.yeonieum.productservice.domain.product.dto.memberservice.ProductManagementResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductCertification;
 import com.yeonieum.productservice.domain.product.entity.SaleType;

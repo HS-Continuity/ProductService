@@ -1,7 +1,7 @@
-package com.yeonieum.productservice.domain.product.service;
+package com.yeonieum.productservice.domain.product.service.memberservice;
 
-import com.yeonieum.productservice.domain.product.dto.ProductManagementRequest;
-import com.yeonieum.productservice.domain.product.dto.ProductManagementResponse;
+import com.yeonieum.productservice.domain.product.dto.memberservice.ProductManagementRequest;
+import com.yeonieum.productservice.domain.product.dto.memberservice.ProductManagementResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -1,6 +1,5 @@
-package com.yeonieum.productservice.domain.product.dto;
+package com.yeonieum.productservice.domain.product.dto.memberservice;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
