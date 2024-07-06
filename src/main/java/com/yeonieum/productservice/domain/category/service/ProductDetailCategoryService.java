@@ -48,8 +48,8 @@ public class ProductDetailCategoryService {
      * @return
      */
     @Transactional
-    public boolean modifyDetailCategory(ProductDetailCategoryRequest.ModifyDetailCategoryDto modifyDetailCategoryDto) {
-        Long productDetailCategoryId = modifyDetailCategoryDto.getProductDetailCategoryId();
+    public boolean modifyDetailCategory(Long detailCategoryId, ProductDetailCategoryRequest.ModifyDetailCategoryDto modifyDetailCategoryDto) {
+        Long productDetailCategoryId = detailCategoryId;
 
         ProductDetailCategory existingDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상세 카테고리 ID 입니다."));

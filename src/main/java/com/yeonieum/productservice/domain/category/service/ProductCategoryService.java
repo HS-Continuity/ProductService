@@ -62,8 +62,8 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public boolean modifyCategory(ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
-        Long productCategoryId = modifyCategoryDto.getProductCategoryId();
+    public boolean modifyCategory(Long categoryId, ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
+        Long productCategoryId = categoryId;
 
         ProductCategory existingCategory = productCategoryRepository.findById(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
@@ -116,6 +116,5 @@ public class ProductCategoryService {
                 .categoryName(productCategory.getCategoryName())
                 .productDetailCategoryList(detailCategoryDtoList)
                 .build();
-
     }
 }

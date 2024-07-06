@@ -17,7 +17,6 @@ public class ProductCategoryRequest {
     @AllArgsConstructor
     @Builder
     public static class ModifyCategoryDto {
-        private Long productCategoryId;
         private String categoryName;
     }
 }
