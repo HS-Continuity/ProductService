@@ -1,7 +1,7 @@
 package com.yeonieum.productservice.domain.product.repository;
 
-import com.yeonieum.productservice.domain.product.dto.RetrieveAdvertisementProductResponseDto;
-import com.yeonieum.productservice.domain.product.dto.RetrieveTimeSaleProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveAdvertisementProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveTimeSaleProductResponseDto;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

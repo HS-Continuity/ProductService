@@ -1,9 +1,9 @@
-package com.yeonieum.productservice.domain.product.service;
+package com.yeonieum.productservice.domain.product.service.memberservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.RetrieveTimeSaleProductResponseDto;
-import com.yeonieum.productservice.domain.product.dto.TimeSaleRequest;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveTimeSaleProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.memberservice.TimeSaleRequest;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimeSale;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
