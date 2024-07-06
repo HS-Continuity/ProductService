@@ -67,14 +67,14 @@ public class ProductMangementServiceImpl implements ProductManagementService{
             Product product = Product.builder()
                     .saleType(saleType)
                     .customer(customer)
-                    .name(registerRequestDto.getProductName())
-                    .price(registerRequestDto.getPrice())
+                    .productName(registerRequestDto.getProductName())
+                    .productPrice(registerRequestDto.getPrice())
                     .baseDiscountRate(registerRequestDto.getBaseDiscountRate())
                     .regularDiscountRate(registerRequestDto.getRegularDiscountRate())
-                    .personalizeDiscountRate(registerRequestDto.getPersonalizedDiscountRate())
-                    .description(registerRequestDto.getDescription())
-                    .origin(registerRequestDto.getOrigin())
-                    .image(imageUrl) // 이미지 파일명은 고객아이디+상품명
+                    .personalizedDiscountRate(registerRequestDto.getPersonalizedDiscountRate())
+                    .productDescription(registerRequestDto.getDescription())
+                    .productOrigin(registerRequestDto.getOrigin())
+                    .productImage(imageUrl) // 이미지 파일명은 고객아이디+상품명
                     .isPageVisibility(ActiveStatus.fromCode(registerRequestDto.getIsPageVisibility()))
                     .isRegularSale(ActiveStatus.fromCode(registerRequestDto.getIsRegularSale()))
                     .productDetailCategory(productDetailCategory)
@@ -129,15 +129,15 @@ public class ProductMangementServiceImpl implements ProductManagementService{
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
 
-        product.setName(modifyDto.getProductName());
-        product.setDescription(modifyDto.getDescription());
-        product.setOrigin(modifyDto.getOrigin());
-        product.setPrice(modifyDto.getPrice());
-        product.setBaseDiscountRate(modifyDto.getBaseDiscountRate());
-        product.setPersonalizeDiscountRate(modifyDto.getPersonalizedDiscountRate());
-        product.setRegularDiscountRate(modifyDto.getRegularDiscountRate());
-        product.setIsPageVisibility(ActiveStatus.fromCode(modifyDto.getIsPageVisibility()));
-        product.setIsRegularSale(ActiveStatus.fromCode(modifyDto.getIsRegularSale()));
+        product.changeProductName(modifyDto.getProductName());
+        product.changeProductDescription(modifyDto.getDescription());
+        product.changeProductOrigin(modifyDto.getOrigin());
+        product.changeProductPrice(modifyDto.getPrice());
+        product.changeBaseDiscountRate(modifyDto.getBaseDiscountRate());
+        product.changePersonalizedDiscountRate(modifyDto.getPersonalizedDiscountRate());
+        product.changeRegularDiscountRate(modifyDto.getRegularDiscountRate());
+        product.changeIsPageVisibility(ActiveStatus.fromCode(modifyDto.getIsPageVisibility()));
+        product.changeIsRegularSale(ActiveStatus.fromCode(modifyDto.getIsRegularSale()));
         return true;
     }
 
@@ -161,11 +161,11 @@ public class ProductMangementServiceImpl implements ProductManagementService{
                             .mainCategoryName(productCategory.getCategoryName())
                             .subCategoryName(productCategory.getCategoryName())
                             .salesType(product.getSaleType().getTypeName())
-                            .productName(product.getName())
-                            .description(product.getDescription())
-                            .price(product.getPrice())
-                            .origin(product.getOrigin())
-                            .personalizedDiscountRate(product.getPersonalizeDiscountRate())
+                            .productName(product.getProductName())
+                            .description(product.getProductDescription())
+                            .price(product.getProductPrice())
+                            .origin(product.getProductOrigin())
+                            .personalizedDiscountRate(product.getPersonalizedDiscountRate())
                             .baseDiscountRate(product.getBaseDiscountRate())
                             .regularDiscountRate(product.getRegularDiscountRate())
                             .isPageVisibility(product.getIsPageVisibility().getCode())
@@ -188,11 +188,11 @@ public class ProductMangementServiceImpl implements ProductManagementService{
                 .mainCategoryName(productCategory.getCategoryName())
                 .subCategoryName(productCategory.getCategoryName())
                 .salesType(product.getSaleType().getTypeName())
-                .productName(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .origin(product.getOrigin())
-                .personalizedDiscountRate(product.getPersonalizeDiscountRate())
+                .productName(product.getProductName())
+                .description(product.getProductDescription())
+                .price(product.getProductPrice())
+                .origin(product.getProductOrigin())
+                .personalizedDiscountRate(product.getPersonalizedDiscountRate())
                 .baseDiscountRate(product.getBaseDiscountRate())
                 .regularDiscountRate(product.getRegularDiscountRate())
                 .isPageVisibility(product.getIsPageVisibility().getCode())

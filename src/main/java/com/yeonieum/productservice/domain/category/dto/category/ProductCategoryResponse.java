@@ -13,7 +13,6 @@ public class ProductCategoryResponse {
 
         private Long productCategoryId;
         private String categoryName;
-
     }
 
     @Getter
@@ -25,7 +24,6 @@ public class ProductCategoryResponse {
         private Long productCategoryId;
         private String categoryName;
         private List<ProductDetailCategoryDto> productDetailCategoryList;
-
     }
 
     @Getter
@@ -37,6 +35,5 @@ public class ProductCategoryResponse {
         private Long productDetailCategoryId;
         private String categoryDetailName;
         private int shelfLifeDay;
-
     }
 }

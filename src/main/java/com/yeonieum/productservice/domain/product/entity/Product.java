@@ -14,7 +14,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -38,20 +37,20 @@ public class Product {
     @JoinColumn(name = "product_detail_category_id", nullable = false)
     private ProductDetailCategory productDetailCategory;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "product_name", nullable = false)
+    private String productName;
 
-    @Column(nullable = false, length = 900)
-    private String description;
+    @Column(name = "product_description", nullable = false, length = 900)
+    private String productDescription;
 
-    @Column(nullable = false)
-    private String image;
+    @Column(name = "product_image", nullable = false)
+    private String productImage;
 
-    @Column(nullable = false)
-    private String origin;
+    @Column(name = "product_origin", nullable = false)
+    private String productOrigin;
 
-    @Column(nullable = false)
-    private int price;
+    @Column(name = "product_price", nullable = false)
+    private int productPrice;
 
     @Builder.Default
     private int baseDiscountRate = 0;
@@ -60,7 +59,7 @@ public class Product {
     private int regularDiscountRate = 0;
 
     @Builder.Default
-    private int personalizeDiscountRate = 0;
+    private int personalizedDiscountRate = 0;
 
     @Convert(converter = ActiveStatusConverter.class)
     @Column(name = "is_regular_sale", nullable = false)
@@ -96,4 +95,39 @@ public class Product {
     @Builder.Default
     private List<ProductTimeSale> productTimeSaleList = new ArrayList<>();
 
+    public void changeProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public void changeProductDescription(String productDescription) {
+        this.productDescription = productDescription;
+    }
+
+    public void changeProductPrice(int productPrice) {
+        this.productPrice = productPrice;
+    }
+
+    public void changeProductOrigin(String productOrigin) {
+        this.productOrigin = productOrigin;
+    }
+
+    public void changeIsPageVisibility(ActiveStatus isPageVisibility) {
+        this.isPageVisibility = isPageVisibility;
+    }
+
+    public void changeIsRegularSale(ActiveStatus isRegularSale) {
+        this.isRegularSale = isRegularSale;
+    }
+
+    public void changeBaseDiscountRate(int baseDiscountRate) {
+        this.baseDiscountRate = baseDiscountRate;
+    }
+
+    public void changeRegularDiscountRate(int regularDiscountRate) {
+        this.regularDiscountRate = regularDiscountRate;
+    }
+
+    public void changePersonalizedDiscountRate(int personalizedDiscountRate) {
+        this.personalizedDiscountRate = personalizedDiscountRate;
+    }
 }

@@ -71,7 +71,7 @@ public class TimeSaleService {
     @Transactional
     public void modifyTimeSaleStatus(TimeSaleRequest.ModifyStatusDto modifyStatusDto) {
         ProductTimeSale productTimeSale = productTimeSaleRepository.findByProduct_ProductId(modifyStatusDto.getProductId());
-        productTimeSale.setIsCompleted(modifyStatusDto.getIsCompleted());
+        productTimeSale.changeIsCompleted(modifyStatusDto.getIsCompleted());
     }
 
 }

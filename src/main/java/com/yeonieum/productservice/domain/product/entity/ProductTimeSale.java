@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -38,5 +37,9 @@ public class ProductTimeSale {
     @Column(name = "is_completed", nullable = false)
     @Builder.Default
     private ActiveStatus isCompleted = ActiveStatus.INACTIVE;
+
+    public void changeIsCompleted(ActiveStatus isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 
 }
