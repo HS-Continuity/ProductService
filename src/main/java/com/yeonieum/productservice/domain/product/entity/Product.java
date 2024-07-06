@@ -2,6 +2,7 @@ package com.yeonieum.productservice.domain.product.entity;
 
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.customer.entity.Customer;
+import com.yeonieum.productservice.domain.productinventory.entity.ProductInventory;
 import com.yeonieum.productservice.domain.review.entity.ProductReview;
 import com.yeonieum.productservice.global.converter.ActiveStatusConverter;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -52,13 +54,13 @@ public class Product {
     private int price;
 
     @Builder.Default
-    private int base_discount_rate = 0;
+    private int baseDiscountRate = 0;
 
     @Builder.Default
-    private int regular_discount_rate = 0;
+    private int regularDiscountRate = 0;
 
     @Builder.Default
-    private int personalize_discount_rate = 0;
+    private int personalizeDiscountRate = 0;
 
     @Convert(converter = ActiveStatusConverter.class)
     @Column(name = "is_regular_sale", nullable = false)

@@ -26,4 +26,8 @@ public class ProductCategory {
     @Builder.Default
     private List<ProductDetailCategory> productDetailCategoryList = new ArrayList<>();
 
+    public void changeCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
 }
