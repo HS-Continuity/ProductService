@@ -106,7 +106,7 @@ public class ProductCategoryService {
         List<ProductCategoryResponse.ProductDetailCategoryDto> detailCategoryDtoList = productCategory.getProductDetailCategoryList().stream()
                 .map(detail -> ProductCategoryResponse.ProductDetailCategoryDto.builder()
                         .productDetailCategoryId(detail.getProductDetailCategoryId())
-                        .categoryDetailName(detail.getCategoryDetailName())
+                        .categoryDetailName(detail.getDetailCategoryName())
                         .shelfLifeDay(detail.getShelfLifeDay())
                         .build())
                 .collect(Collectors.toList());

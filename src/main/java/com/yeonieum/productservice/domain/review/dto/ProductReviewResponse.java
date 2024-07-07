@@ -7,10 +7,9 @@ import java.time.LocalDateTime;
 public class ProductReviewResponse {
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     @Builder
     public static class RetrieveProductWithReviewsDto {
+        private Long productReviewId;
         private String memberId;
         private LocalDateTime createDate;
         private String reviewContent;

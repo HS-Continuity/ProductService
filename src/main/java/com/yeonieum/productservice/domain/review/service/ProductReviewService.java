@@ -79,6 +79,7 @@ public class ProductReviewService {
 
         List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviewsDtoList = product.getProductReviewList().stream()
                 .map(productReview -> { return ProductReviewResponse.RetrieveProductWithReviewsDto.builder()
+                        .productReviewId(productReview.getProductReviewId())
                         .memberId(productReview.getMemberId())
                         .createDate(productReview.getCreateDate())
                         .reviewContent(productReview.getReviewContent())

@@ -16,8 +16,6 @@ public class ProductCategoryResponse {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     @Builder
     public static class RetrieveCategoryWithDetailsDto {
 
@@ -27,8 +25,6 @@ public class ProductCategoryResponse {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     @Builder
     public static class ProductDetailCategoryDto {
 

@@ -24,8 +24,8 @@ public class ProductDetailCategory {
     @JoinColumn(name = "product_category_id", nullable = false)
     private ProductCategory productCategory;
 
-    @Column(name = "category_detail_name", nullable = false)
-    private String categoryDetailName;
+    @Column(name = "detail_category_name", nullable = false)
+    private String detailCategoryName;
 
     @Column(name = "shelf_life_day", nullable = false)
     private int shelfLifeDay;
@@ -34,8 +34,8 @@ public class ProductDetailCategory {
     @Builder.Default
     private List<Product> productList = new ArrayList<>();
 
-    public void changeDetailCategoryName(String categoryDetailName) {
-        this.categoryDetailName = categoryDetailName;
+    public void changeDetailCategoryName(String detailCategoryName) {
+        this.detailCategoryName = detailCategoryName;
     }
 
     public void changeDetailCategoryShelfLifeDay(int shelfLifeDay) {
