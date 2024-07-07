@@ -6,8 +6,6 @@ import java.util.List;
 
 public class ProductCategoryResponse {
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     @Builder
     public static class RetrieveAllCategoryDto {
 
@@ -16,8 +14,6 @@ public class ProductCategoryResponse {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     @Builder
     public static class RetrieveCategoryWithDetailsDto {
 
@@ -27,8 +23,6 @@ public class ProductCategoryResponse {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     @Builder
     public static class ProductDetailCategoryDto {
 

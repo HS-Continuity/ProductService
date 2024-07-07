@@ -31,7 +31,7 @@ public class ProductDetailCategoryService {
 
         ProductDetailCategory productDetailCategory = ProductDetailCategory.builder()
                 .productCategory(productCategory)
-                .categoryDetailName(registerDetailCategoryDto.getCategoryDetailName())
+                .detailCategoryName(registerDetailCategoryDto.getDetailCategoryName())
                 .shelfLifeDay(registerDetailCategoryDto.getShelfLifeDay())
                 .build();
 
@@ -48,13 +48,13 @@ public class ProductDetailCategoryService {
      * @return
      */
     @Transactional
-    public boolean modifyDetailCategory(ProductDetailCategoryRequest.ModifyDetailCategoryDto modifyDetailCategoryDto) {
-        Long productDetailCategoryId = modifyDetailCategoryDto.getProductDetailCategoryId();
+    public boolean modifyDetailCategory(Long detailCategoryId, ProductDetailCategoryRequest.ModifyDetailCategoryDto modifyDetailCategoryDto) {
+        Long productDetailCategoryId = detailCategoryId;
 
         ProductDetailCategory existingDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상세 카테고리 ID 입니다."));
 
-        existingDetailCategory.changeDetailCategoryName(modifyDetailCategoryDto.getCategoryDetailName());
+        existingDetailCategory.changeDetailCategoryName(modifyDetailCategoryDto.getDetailCategoryName());
         existingDetailCategory.changeDetailCategoryShelfLifeDay(modifyDetailCategoryDto.getShelfLifeDay());
 
         productDetailCategoryRepository.save(existingDetailCategory);

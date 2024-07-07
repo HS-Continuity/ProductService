@@ -4,12 +4,12 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-public class ProductReviewRequest {
+public class ProductReviewResponse {
 
     @Getter
     @Builder
-    public static class RegisterProductReviewDto {
-        private Long productId;
+    public static class RetrieveProductWithReviewsDto {
+        private Long productReviewId;
         private String memberId;
         private LocalDateTime createDate;
         private String reviewContent;

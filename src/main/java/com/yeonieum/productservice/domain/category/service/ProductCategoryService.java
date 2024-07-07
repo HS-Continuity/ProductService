@@ -42,15 +42,15 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategoryDtoList() {
+    public List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategories() {
         List<ProductCategory> categoryList = productCategoryRepository.findAll();
 
         return categoryList.stream()
-                .map(category ->
-                        new ProductCategoryResponse.RetrieveAllCategoryDto(
-                            category.getProductCategoryId(),
-                            category.getCategoryName()
-                ))
+                .map(category -> ProductCategoryResponse.RetrieveAllCategoryDto.builder()
+                        .productCategoryId(category.getProductCategoryId())
+                        .categoryName(category.getCategoryName())
+                        .build()
+                )
                 .collect(Collectors.toList());
     }
 
@@ -62,8 +62,8 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public boolean modifyCategory(ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
-        Long productCategoryId = modifyCategoryDto.getProductCategoryId();
+    public boolean modifyCategory(Long categoryId, ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
+        Long productCategoryId = categoryId;
 
         ProductCategory existingCategory = productCategoryRepository.findById(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
@@ -106,7 +106,7 @@ public class ProductCategoryService {
         List<ProductCategoryResponse.ProductDetailCategoryDto> detailCategoryDtoList = productCategory.getProductDetailCategoryList().stream()
                 .map(detail -> ProductCategoryResponse.ProductDetailCategoryDto.builder()
                         .productDetailCategoryId(detail.getProductDetailCategoryId())
-                        .categoryDetailName(detail.getCategoryDetailName())
+                        .categoryDetailName(detail.getDetailCategoryName())
                         .shelfLifeDay(detail.getShelfLifeDay())
                         .build())
                 .collect(Collectors.toList());
@@ -116,6 +116,5 @@ public class ProductCategoryService {
                 .categoryName(productCategory.getCategoryName())
                 .productDetailCategoryList(detailCategoryDtoList)
                 .build();
-
     }
 }

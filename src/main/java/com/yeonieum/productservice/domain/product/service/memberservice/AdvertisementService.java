@@ -32,7 +32,7 @@ public class AdvertisementService {
                         () -> new IllegalArgumentException("존재하지않는 고객 요청입니다.")
                 );
         List<RetrieveAdvertisementProductResponseDto> advertisementProduct =
-                productRepository.findAllAdvertismentProduct(customerId);
+                productRepository.findAllAdvertisementProduct(customerId);
 
         return advertisementProduct;
     }

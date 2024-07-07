@@ -24,6 +24,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "FROM product_time_sale pts " +
             "JOIN product p ON pts.product_id = p.id " +
             "WHERE p.customer_id = :customerId", nativeQuery = true)
-    List<RetrieveAdvertisementProductResponseDto> findAllAdvertismentProduct(@Param("customerId") Long customerId);
+    List<RetrieveAdvertisementProductResponseDto> findAllAdvertisementProduct(@Param("customerId") Long customerId);
 }
 
