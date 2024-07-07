@@ -42,15 +42,15 @@ public class ProductCategoryService {
      * @return
      */
     @Transactional
-    public List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategoryDtoList() {
+    public List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategories() {
         List<ProductCategory> categoryList = productCategoryRepository.findAll();
 
         return categoryList.stream()
-                .map(category ->
-                        new ProductCategoryResponse.RetrieveAllCategoryDto(
-                            category.getProductCategoryId(),
-                            category.getCategoryName()
-                ))
+                .map(category -> ProductCategoryResponse.RetrieveAllCategoryDto.builder()
+                        .productCategoryId(category.getProductCategoryId())
+                        .categoryName(category.getCategoryName())
+                        .build()
+                )
                 .collect(Collectors.toList());
     }
 

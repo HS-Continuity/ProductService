@@ -73,7 +73,7 @@ public class ProductReviewService {
      * @return
      */
     @Transactional
-    public List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviewsDto(Long productId){
+    public List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviews(Long productId){
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
 
