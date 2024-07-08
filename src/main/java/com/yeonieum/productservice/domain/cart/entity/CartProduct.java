@@ -30,4 +30,8 @@ public class CartProduct {
 
     private int quantity;
 
+    public void changeProductQuantity(int productQuantity) {
+        this.quantity = productQuantity;
+    }
+
 }

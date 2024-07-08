@@ -8,10 +8,13 @@ import com.yeonieum.productservice.domain.cart.repository.CartProductRepository;
 import com.yeonieum.productservice.domain.cart.repository.CartTypeRepository;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +28,10 @@ public class CartProductService {
 
     /**
      * 장바구니에 상품 등록
-     * @param registerProductCartDto
-     * @exception
-     * @throws
-     * @return
+     * @param registerProductCartDto 장바구니에 등록할 상품 정보 DTO
+     * @throws IllegalStateException 존재하지 않는 상품 ID인 경우 발생
+     * @throws IllegalStateException 존재하지 않는 장바구니 타입 ID인 경우 발생
+     * @return 성공여부
      */
     @Transactional
     public boolean registerCartProduct(CartProductRequest.RegisterProductCartDto registerProductCartDto) {
@@ -52,10 +55,9 @@ public class CartProductService {
 
     /**
      * 회원의 장바구니 상품 조회
-     * @param memberId, cartTypeId
-     * @exception
-     * @throws
-     * @return
+     * @param memberId 회원 ID
+     * @param cartTypeId 장바구니 타입 ID
+     * @return 장바구니 상품 목록
      */
     @Transactional
     public List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
@@ -64,8 +66,29 @@ public class CartProductService {
 
         List<CartProductResponse.RetrieveAllCartProduct> cartProductResponseList = new ArrayList<>();
 
+        BigDecimal discountRate;
+        BigDecimal finalPrice;
+
         for (CartProduct cartProduct : cartProductList) {
             Product product = cartProduct.getProduct();
+
+            BigDecimal productPrice = BigDecimal.valueOf(cartProduct.getProduct().getProductPrice());
+
+            if(cartTypeId == 1){
+                discountRate = BigDecimal.valueOf(product.getBaseDiscountRate());
+                BigDecimal discountAmount = productPrice.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                finalPrice = productPrice.subtract(discountAmount);
+            } else if (cartTypeId == 2) {
+
+                // 맞춤회원인지 검사 로직 필요
+
+                discountRate = BigDecimal.valueOf(product.getRegularDiscountRate());
+                BigDecimal discountAmount = productPrice.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                finalPrice = productPrice.subtract(discountAmount);
+            } else {
+                finalPrice = productPrice;
+            }
+
             CartProductResponse.RetrieveAllCartProduct response = CartProductResponse.RetrieveAllCartProduct.builder()
                     .cartProductId(cartProduct.getCartProductId())
                     .customerId(product.getCustomer().getCustomerId())
@@ -74,7 +97,7 @@ public class CartProductService {
                     .productName(product.getProductName())
                     .productDescription(product.getProductDescription())
                     .productImage(product.getProductImage())
-                    .productPrice(product.getProductPrice())
+                    .productPrice(finalPrice.intValue())
                     .quantity(cartProduct.getQuantity())
                     .build();
             cartProductResponseList.add(response);
@@ -82,13 +105,12 @@ public class CartProductService {
         return cartProductResponseList;
     }
 
-
     /**
      * 장바구니 상품 삭제
-     * @param cartProductId
+     * @param cartProductId 장바구니 상품 ID
      * @exception
-     * @throws
-     * @return
+     * @throws IllegalArgumentException 존재하지 않는 장바구니 ID인 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean deleteCartProduct(Long cartProductId) {
@@ -98,5 +120,29 @@ public class CartProductService {
         } else {
             throw new IllegalArgumentException("존재하지 않는 장바구니 ID 입니다.");
         }
+    }
+
+    /**
+     * 장바구니 상품 개수 조절
+     * @param cartProductId 장바구니 상품 ID
+     * @param quantityDelta 수량 증감 값 (양수이면 증가, 음수이면 감소)
+     * @exception IllegalStateException 존재하지 않는 장바구니 ID인 경우
+     * @return 성공 여부
+     */
+    @Transactional
+    public boolean modifyProductQuantity(Long cartProductId, int quantityDelta) {
+        CartProduct cartProduct = cartProductRepository.findById(cartProductId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 장바구니 ID 입니다."));
+
+        int newQuantity = cartProduct.getQuantity() + quantityDelta;
+
+        // 수량이 0 이하가 되지 않도록 제한
+        if (newQuantity < 1) {
+            throw new IllegalStateException("상품 수량은 1개 이상이어야 합니다.");
+        }
+
+        cartProduct.changeProductQuantity(newQuantity);
+        cartProductRepository.save(cartProduct);
+        return true;
     }
 }

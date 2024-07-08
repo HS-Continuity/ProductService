@@ -6,3 +6,4 @@ spring :
   cloud :
     config :
       uri : http://43.201.146.199:8071
+
