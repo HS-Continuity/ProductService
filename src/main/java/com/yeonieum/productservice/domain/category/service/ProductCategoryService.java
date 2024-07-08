@@ -100,7 +100,7 @@ public class ProductCategoryService {
      */
     @Transactional
     public ProductCategoryResponse.RetrieveCategoryWithDetailsDto retrieveCategoryWithDetails(Long productCategoryId) {
-        ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
+        ProductCategory productCategory = productCategoryRepository.findByIdWithDetailCategories(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
 
         List<ProductCategoryResponse.ProductDetailCategoryDto> detailCategoryDtoList = productCategory.getProductDetailCategoryList().stream()
