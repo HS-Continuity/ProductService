@@ -1,8 +1,10 @@
-package com.yeonieum.productservice.domain.cart.controller;
+package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.domain.cart.dto.CartProductRequest;
 import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.cart.service.CartProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,11 @@ public class CartController {
      * @param registerProductCartDto 장바구니에 담을 상품 정보
      * @return 성공 -> 성공 메시지와 200 OK, 실패 -> 실패 메시지와 500 Error
      */
+    @Operation(summary = "장바구니 상품 등록", description = "장바구니에 상품을 등록합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "장바구니 상품 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
     @PostMapping("")
     public ResponseEntity<String> registerCartProduct(@RequestBody CartProductRequest.RegisterProductCartDto registerProductCartDto) {
         boolean isRegistered = cartProductService.registerCartProduct(registerProductCartDto);

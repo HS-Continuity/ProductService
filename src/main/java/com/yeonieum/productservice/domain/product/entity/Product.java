@@ -64,6 +64,15 @@ public class Product {
     @Builder.Default
     private int personalizedDiscountRate = 0;
 
+    @Column(name = "calculated_base_price")
+    private int calculatedBasePrice;
+
+    @Column(name = "calculated_regular_price")
+    private int calculatedRegularPrice;
+
+    @Column(name = "calculated_personalized_price")
+    private int calculatedPersonalizedPrice;
+
     @Convert(converter = ActiveStatusConverter.class)
     @Column(name = "is_regular_sale", nullable = false)
     @Builder.Default
