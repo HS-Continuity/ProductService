@@ -29,5 +29,4 @@ public class ProductCategory {
     public void changeCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-
 }

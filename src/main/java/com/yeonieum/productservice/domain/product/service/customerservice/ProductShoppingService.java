@@ -27,7 +27,7 @@ public class ProductShoppingService {
      */
     @Transactional
     public ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts(Long productDetailCategoryId) {
-        ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
+        ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findByIdWithProducts(productDetailCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상세 카테고리 ID 입니다."));
 
         List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productDetailCategory.getProductList().stream()
@@ -48,4 +48,5 @@ public class ProductShoppingService {
                 .searchProductInformationDtoList(productInformationDtoList)
                 .build();
     }
+
 }

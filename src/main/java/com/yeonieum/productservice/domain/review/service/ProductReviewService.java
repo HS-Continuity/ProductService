@@ -73,21 +73,22 @@ public class ProductReviewService {
      * @return
      */
     @Transactional
-    public List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviews(Long productId){
-        Product product = productRepository.findById(productId)
+    public List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviews(Long productId) {
+        Product product = productRepository.findByIdWithReviews(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
 
         List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviewsDtoList = product.getProductReviewList().stream()
-                .map(productReview -> { return ProductReviewResponse.RetrieveProductWithReviewsDto.builder()
+                .map(productReview -> ProductReviewResponse.RetrieveProductWithReviewsDto.builder()
                         .productReviewId(productReview.getProductReviewId())
                         .memberId(productReview.getMemberId())
                         .createDate(productReview.getCreateDate())
                         .reviewContent(productReview.getReviewContent())
                         .reviewImage(productReview.getReviewImage())
                         .reviewScore(productReview.getReviewScore())
-                        .build();
-        }).collect(Collectors.toList());
+                        .build())
+                .collect(Collectors.toList());
 
         return retrieveProductWithReviewsDtoList;
     }
+
 }

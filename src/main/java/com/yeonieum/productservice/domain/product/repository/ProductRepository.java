@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "SELECT" +
@@ -25,5 +26,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "JOIN product p ON pts.product_id = p.id " +
             "WHERE p.customer_id = :customerId", nativeQuery = true)
     List<RetrieveAdvertisementProductResponseDto> findAllAdvertisementProduct(@Param("customerId") Long customerId);
+
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productReviewList WHERE p.productId = :productId")
+    Optional<Product> findByIdWithReviews(@Param("productId") Long productId);
 }
 
