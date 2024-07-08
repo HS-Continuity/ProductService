@@ -29,7 +29,7 @@ public class Product {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sale_type_id", nullable = false)
     private SaleType saleType;
 
