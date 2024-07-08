@@ -52,12 +52,15 @@ public class Product {
     @Column(name = "product_price", nullable = false)
     private int productPrice;
 
+    @Column(name = "base_discount_rate")
     @Builder.Default
     private int baseDiscountRate = 0;
 
+    @Column(name = "regular_discount_rate")
     @Builder.Default
     private int regularDiscountRate = 0;
 
+    @Column(name = "personalized_discount_rate")
     @Builder.Default
     private int personalizedDiscountRate = 0;
 
