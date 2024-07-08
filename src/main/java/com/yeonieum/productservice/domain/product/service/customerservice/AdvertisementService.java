@@ -1,16 +1,19 @@
-package com.yeonieum.productservice.domain.product.service.memberservice;
+package com.yeonieum.productservice.domain.product.service.customerservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.memberservice.RegisterAdvertisementRequestDto;
-import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveAdvertisementProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.customerservice.RegisterAdvertisementRequestDto;
+import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveAdvertisementProductResponseDto;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
 import com.yeonieum.productservice.domain.product.repository.ProductAdvertisementServiceRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.messaging.message.AdvertisementEventMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,12 +23,14 @@ public class AdvertisementService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final ProductAdvertisementServiceRepository productAdvertisementServiceRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
      * 상당노출신청상품리스트 조회
      * @param customerId
      * @return
      */
+    @Transactional
     public List<RetrieveAdvertisementProductResponseDto> retrieveAppliedProduct(Long customerId) {
         Customer customer =
                 customerRepository.findById(customerId).orElseThrow(
@@ -42,7 +47,8 @@ public class AdvertisementService {
      * @param registerAdvertisementRequestDto
      * @return
      */
-    public boolean registerAdvertisement(RegisterAdvertisementRequestDto registerAdvertisementRequestDto) {
+    @Transactional
+    public void registerAdvertisement(RegisterAdvertisementRequestDto registerAdvertisementRequestDto) {
         Product product = productRepository.findById(registerAdvertisementRequestDto.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
@@ -55,6 +61,12 @@ public class AdvertisementService {
                 .build();
 
        productAdvertisementServiceRepository.save(productAdvertisement);
-       return true;
+       AdvertisementEventMessage advertisementEventMessage = AdvertisementEventMessage.builder()
+                .productId(registerAdvertisementRequestDto.getProductId())
+                .startDate(registerAdvertisementRequestDto.getStartDate())
+                .endDate(registerAdvertisementRequestDto.getEndDate())
+                .build();
+
+       kafkaTemplate.send("advertisement-topic", advertisementEventMessage);
     }
 }

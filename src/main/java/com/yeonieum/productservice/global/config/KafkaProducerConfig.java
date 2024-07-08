@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 //@Configuration
-public class KafkaProductConfig {
+public class KafkaProducerConfig {
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();

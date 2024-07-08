@@ -1,4 +1,4 @@
-package com.yeonieum.productservice.domain.product.dto.memberservice;
+package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 
