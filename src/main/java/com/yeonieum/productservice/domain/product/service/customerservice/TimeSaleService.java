@@ -1,14 +1,15 @@
-package com.yeonieum.productservice.domain.product.service.memberservice;
+package com.yeonieum.productservice.domain.product.service.customerservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveTimeSaleProductResponseDto;
-import com.yeonieum.productservice.domain.product.dto.memberservice.TimeSaleRequest;
+import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.customerservice.TimeSaleRequest;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimeSale;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductTimeSaleRepository;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.messaging.message.TimeSaleEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class TimeSaleService {
      * @return
      */
     @Transactional
-    public boolean registerTimeSale(TimeSaleRequest.RegisterDto registerDto) {
+    public void registerTimeSale(TimeSaleRequest.RegisterDto registerDto) {
         Product product = productRepository.findById(registerDto.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
@@ -60,8 +61,14 @@ public class TimeSaleService {
                 .build();
 
         productTimeSaleRepository.save(productTimeSale);
-        kafkaTemplate.send("testTopic", "");
-        return true;
+
+        TimeSaleEventMessage timeSaleEventMessage = TimeSaleEventMessage.builder()
+                        .startDateTime(registerDto.getStartTime())
+                        .endDateTime(registerDto.getEndTime())
+                        .productId(registerDto.getProductId())
+                        .build();
+
+        kafkaTemplate.send("timesale-topic", timeSaleEventMessage);
     }
 
     /**
