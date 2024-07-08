@@ -66,27 +66,19 @@ public class CartProductService {
 
         List<CartProductResponse.RetrieveAllCartProduct> cartProductResponseList = new ArrayList<>();
 
-        BigDecimal discountRate;
-        BigDecimal finalPrice;
-
         for (CartProduct cartProduct : cartProductList) {
             Product product = cartProduct.getProduct();
 
-            BigDecimal productPrice = BigDecimal.valueOf(cartProduct.getProduct().getProductPrice());
+            int finalPrice;
 
             if(cartTypeId == 1){
-                discountRate = BigDecimal.valueOf(product.getBaseDiscountRate());
-                BigDecimal discountAmount = productPrice.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-                finalPrice = productPrice.subtract(discountAmount);
+                finalPrice = product.getCalculatedBasePrice();
             } else if (cartTypeId == 2) {
+                //맞춤고객 로직 필요
 
-                // 맞춤회원인지 검사 로직 필요
-
-                discountRate = BigDecimal.valueOf(product.getRegularDiscountRate());
-                BigDecimal discountAmount = productPrice.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-                finalPrice = productPrice.subtract(discountAmount);
+                finalPrice = product.getCalculatedRegularPrice();
             } else {
-                finalPrice = productPrice;
+                finalPrice = product.getProductPrice();
             }
 
             CartProductResponse.RetrieveAllCartProduct response = CartProductResponse.RetrieveAllCartProduct.builder()
@@ -97,7 +89,7 @@ public class CartProductService {
                     .productName(product.getProductName())
                     .productDescription(product.getProductDescription())
                     .productImage(product.getProductImage())
-                    .productPrice(finalPrice.intValue())
+                    .productPrice(finalPrice)
                     .quantity(cartProduct.getQuantity())
                     .build();
             cartProductResponseList.add(response);
