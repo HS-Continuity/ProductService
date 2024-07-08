@@ -3,6 +3,9 @@ package com.yeonieum.productservice.domain.cart.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,8 +19,9 @@ public class CartType {
     @Column(name = "cart_type_id")
     private Long cartTypeId;
 
-    @OneToOne(mappedBy = "cartType", fetch = FetchType.LAZY)
-    private CartProduct cartProduct;
+    @OneToMany(mappedBy = "cartType")
+    @Builder.Default
+    private List<CartProduct> cartProduct = new ArrayList<>();
 
     @Column(name = "type_name", nullable = false)
     private String typeName;
