@@ -1,10 +1,8 @@
-package com.yeonieum.productservice.domain.product.service.customerservice;
+package com.yeonieum.productservice.domain.product.service.memberservice;
 
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.category.repository.ProductDetailCategoryRepository;
-import com.yeonieum.productservice.domain.product.dto.customerservice.ProductShoppingResponse;
-import com.yeonieum.productservice.domain.product.repository.ProductRepository;
-import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

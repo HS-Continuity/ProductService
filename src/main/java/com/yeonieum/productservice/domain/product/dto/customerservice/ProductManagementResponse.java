@@ -1,4 +1,4 @@
-package com.yeonieum.productservice.domain.product.dto.memberservice;
+package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import lombok.Builder;
 

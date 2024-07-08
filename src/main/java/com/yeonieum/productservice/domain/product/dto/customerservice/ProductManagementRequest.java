@@ -1,4 +1,4 @@
-package com.yeonieum.productservice.domain.product.dto.memberservice;
+package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -107,6 +107,8 @@ public class ProductManagementRequest {
         // ~자 이내, 정규식
         String imageName;
     }
+
+
 
     public static interface CertifiedProduct {}
 

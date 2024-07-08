@@ -1,16 +1,19 @@
-package com.yeonieum.productservice.domain.product.service.memberservice;
+package com.yeonieum.productservice.domain.product.service.customerservice;
 
+import com.yeonieum.productservice.domain.S3Upload.S3UploadService;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.memberservice.ProductManagementRequest;
-import com.yeonieum.productservice.domain.product.dto.memberservice.ProductManagementResponse;
+import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementRequest;
+import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductCertification;
+import com.yeonieum.productservice.domain.product.entity.ProductDetailImage;
 import com.yeonieum.productservice.domain.product.entity.SaleType;
 import com.yeonieum.productservice.domain.product.repository.ProductCertificationRepository;
+import com.yeonieum.productservice.domain.product.repository.ProductDetailImageRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.SaleTypeRepository;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
@@ -30,7 +33,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     private final CustomerRepository customerRepository;
     private final ProductCategoryRepository productCategoryRepository;
     private final SaleTypeRepository saleTypeRepository;
-
+    private final ProductDetailImageRepository productDetailImageRepository;
     /**
      * 고객의 상품 등록(일반상품, 친환경상품 공통 메서드)
      *
@@ -141,6 +144,11 @@ public class ProductMangementServiceImpl implements ProductManagementService{
         return true;
     }
 
+    /**
+     * 고객이 등록한 상품리스트 조회
+     * @param customerId
+     * @return
+     */
     @Override
     public List<ProductManagementResponse.RetrieveDto> retrieveCustomersProducts(Long customerId) {
         Customer customer =
@@ -176,6 +184,11 @@ public class ProductMangementServiceImpl implements ProductManagementService{
         return productList;
     }
 
+    /**
+     * 고객의 상품 상세 조회
+     * @param productId
+     * @return
+     */
     @Override
     public ProductManagementResponse.RetrieveDto retrieveProductDetail(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(
@@ -202,19 +215,95 @@ public class ProductMangementServiceImpl implements ProductManagementService{
         return productDto;
     }
 
+    /**
+     * 기존 등록된 상품의 기본이미지 url변경
+     * @param productId
+     * @param imageUrl
+     * @return
+     */
     @Override
-    public boolean uploadProductImage(Long productId, MultipartFile imageFile) {
-        return false;
+    public boolean uploadProductImageUrl(Long productId, String imageUrl) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
+        );
+
+        ProductDetailImage productDetailImage = productDetailImageRepository.findByProductId(productId);
+        if(productDetailImage != null) {
+            // 등록된 기본이미지가 있을 경우 덮어쓰기
+            productDetailImage.changeImageDetailName(imageUrl);
+        } else {
+            // 등록된 기본이미지가 없을 경우 생성
+            productDetailImage = ProductDetailImage.builder()
+                    .product(product)
+                    .imageDetailName(imageUrl)
+                    .build();
+        }
+
+        productDetailImageRepository.save(productDetailImage);
+        return true;
     }
 
+    /**
+     * 상품상세이미지등록
+     * @param productId
+     * @param imageUrl
+     * @return
+     */
     @Override
-    public boolean uploadProductDetailImages(Long productId, MultipartFile imageFile) {
-        return false;
+    public boolean uploadProductDetailImages(Long productId, String imageUrl) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
+        );
+
+        ProductDetailImage productDetailImage = ProductDetailImage.builder()
+                .imageDetailName(imageUrl)
+                .product(product)
+                .build();
+
+        productDetailImageRepository.save(productDetailImage);
+        return true;
     }
 
+
+    public boolean deleteProductDetailImage(Long productDetailImageId) {
+        ProductDetailImage productDetailImage = productDetailImageRepository.findById(productDetailImageId).orElseThrow(
+                () -> new IllegalArgumentException("해당하는 상세이미지가 존재하지 않습니다.")
+        );
+
+        productDetailImageRepository.deleteById(productDetailImageId);
+        return true;
+    }
+
+
+    /**
+     * 인증서 이미지 등록
+     * @param productId
+     * @param imageUrl
+     * @param certification
+     * @return
+     */
     @Override
-    public boolean uploadCertificationImage(Long productId, MultipartFile imageFile) {
-        return false;
+    public boolean uploadCertificationImage(Long productId, String imageUrl, ProductManagementRequest.Certification certification) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
+        );
+
+        ProductCertification productCertification = productCertificationRepository.findByProductId(productId);
+        if(productCertification != null) {
+            // 이미 등록된 경우 덮어 쓰기
+            productCertification.changeCertificationImage(imageUrl);
+        } else {
+            // 등록된 인증서가 없는경우 생성
+            productCertification = ProductCertification.builder()
+                    .product(product)
+                    .certificationName(certification.getName())
+                    .certificationNumber(certification.getSerialNumber())
+                    .certificationImage(imageUrl)
+                    .build();
+        }
+
+        productCertificationRepository.save(productCertification);
+        return true;
     }
 
     public void registerCertificationOf(Product product, ProductManagementRequest.RegisterDto registerRequestDto) {
