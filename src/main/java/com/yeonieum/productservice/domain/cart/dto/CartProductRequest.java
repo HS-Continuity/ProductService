@@ -10,7 +10,7 @@ public class CartProductRequest {
     public static class RegisterProductCartDto{
 
         private Long productId;
-        private Long productCartId;
+        private Long cartTypeId;
         private String memberId;
         private int quantity;
     }

@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface CartProductRepository extends JpaRepository<CartProduct, Long> {
 
-    @Query("SELECT cp FROM CartProduct cp JOIN FETCH cp.product WHERE cp.memberId = :memberId")
-    List<CartProduct> findByMemberIdWithProduct(@Param("memberId") String memberId);
+    @Query("SELECT cp FROM CartProduct cp JOIN FETCH cp.product WHERE cp.memberId = :memberId AND cp.cartType.cartTypeId = :cartTypeId")
+    List<CartProduct> findByMemberIdAndCartTypeIdWithProduct(@Param("memberId") String memberId, @Param("cartTypeId") Long cartTypeId);
+
 }

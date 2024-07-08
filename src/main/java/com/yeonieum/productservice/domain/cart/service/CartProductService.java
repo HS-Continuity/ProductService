@@ -36,7 +36,7 @@ public class CartProductService {
         Product product = productRepository.findById(registerProductCartDto.getProductId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 상품 ID 입니다."));
 
-        CartType cartType = cartTypeRepository.findById(registerProductCartDto.getProductCartId())
+        CartType cartType = cartTypeRepository.findById(registerProductCartDto.getCartTypeId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 장바구니타입 ID 입니다."));
 
         CartProduct cartProduct = CartProduct.builder()
@@ -52,15 +52,15 @@ public class CartProductService {
 
     /**
      * 회원의 장바구니 상품 조회
-     * @param
+     * @param memberId, cartTypeId
      * @exception
      * @throws
      * @return
      */
     @Transactional
-    public List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts(String memberId){
+    public List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
 
-        List<CartProduct> cartProductList = cartProductRepository.findByMemberIdWithProduct(memberId);
+        List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(memberId, cartTypeId);
 
         List<CartProductResponse.RetrieveAllCartProduct> cartProductResponseList = new ArrayList<>();
 
@@ -81,6 +81,7 @@ public class CartProductService {
         }
         return cartProductResponseList;
     }
+
 
     /**
      * 장바구니 상품 삭제
