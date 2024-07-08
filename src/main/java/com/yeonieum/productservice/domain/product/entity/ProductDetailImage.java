@@ -22,4 +22,8 @@ public class ProductDetailImage {
 
     @Column(name = "image_detail_name", length = 450)
     private String imageDetailName;
+
+    public void changeImageDetailName(String imageDetailName) {
+        this.imageDetailName = imageDetailName;
+    }
 }

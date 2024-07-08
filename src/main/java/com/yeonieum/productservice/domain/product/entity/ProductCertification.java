@@ -28,5 +28,9 @@ public class ProductCertification {
 
     @Column(name = "certification_image", nullable = false)
     private String certificationImage;
+
+    public void changeCertificationImage(String certificationImage) {
+        this.certificationImage = certificationImage;
+    }
 }
 
