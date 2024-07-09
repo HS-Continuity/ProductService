@@ -85,4 +85,23 @@ public class CategoryController {
                 .successCode(SuccessCode.DELETE_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    @Operation(summary = "하위 카테고리 조회", description = "상품 카테고리를 조회시, 하위 카테고리도 같이 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 하위 카테고리 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 하위 카테고리 조회 실패")
+    })
+    @GetMapping("/{productCategoryId}/detail")
+    public ResponseEntity<ApiResponse> RetrieveCategoryWithDetails(@PathVariable Long productCategoryId) {
+
+        ProductCategoryResponse.RetrieveCategoryWithDetailsDto retrieveCategoryWithDetails = productCategoryService.retrieveCategoryWithDetails(productCategoryId);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(retrieveCategoryWithDetails)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
+
+
+
 }
