@@ -16,7 +16,7 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 public class S3UploadService {
 
@@ -27,12 +27,12 @@ public class S3UploadService {
 
     /**
      * 이미지 업로드
-     * @param id
+     *
      * @param image
      * @return
      * @throws IOException
      */
-    public String uploadImage(Long id, MultipartFile image) throws IOException {
+    public String uploadImage(MultipartFile image) throws IOException {
         //[STEP1]이미지 검증
         if (image == null || image.isEmpty()) {
             return null;
