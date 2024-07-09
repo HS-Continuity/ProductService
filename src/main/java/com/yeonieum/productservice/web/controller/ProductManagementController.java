@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/product-management")
+@RequestMapping("/api/management")
 @RequiredArgsConstructor
-public class ProductManagementRestController {
+public class ProductManagementController {
     private final ProductManagementService productManagementService;
     S3UploadService s3UploadService;
     /**
@@ -56,7 +56,7 @@ public class ProductManagementRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "친환경상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @PostMapping("product/eco-friend")
+    @PostMapping("/product/eco-friend")
     public ResponseEntity<ApiResponse> createEcoFriendlyProduct(ProductManagementRequest.RegisterDto ecoFriendlyProduct,
                                                                 @RequestPart MultipartFile defaultImage,
                                                                 @RequestPart MultipartFile certificationImage) throws IOException {
