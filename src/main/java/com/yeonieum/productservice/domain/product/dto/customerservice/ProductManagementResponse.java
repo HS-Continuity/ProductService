@@ -1,6 +1,7 @@
 package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import lombok.Builder;
+import lombok.Getter;
 
 public class ProductManagementResponse {
     @Builder
@@ -27,5 +28,14 @@ public class ProductManagementResponse {
         int regularDiscountRate;
         // 0 ~ 99사
         int personalizedDiscountRate;
+    }
+
+
+    @Getter
+    @Builder
+    public static class RetrieveDetailImage {
+        Long productDetailImageId;
+        Long productId;
+        String imageName;
     }
 }
