@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class ProductReviewRequest {
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class RegisterProductReviewDto {
         private Long productId;
         private String memberId;

@@ -40,7 +40,6 @@ public class ProductCategoryService {
 
     /**
      * 상품 카테고리 조회
-     * @throws IllegalStateException 이미 존재하는 상품 카테고리 이름일 경우
      * @return 카테고리 정보
      */
     @Transactional
@@ -61,6 +60,7 @@ public class ProductCategoryService {
      * @param categoryId 상품 카테고리 ID
      * @param modifyCategoryDto 상품 카테고리에 수정할 정보 DTO
      * @throws IllegalStateException 존재하지 않는 카테고리 ID인 경우
+     * @throws IllegalStateException 이미 존재하는 상품 카테고리 이름인 경우
      * @return 성공 여부
      */
     @Transactional
@@ -76,7 +76,6 @@ public class ProductCategoryService {
         existingCategory.changeCategoryName(modifyCategoryDto.getCategoryName());
 
         productCategoryRepository.save(existingCategory);
-
         return true;
     }
 
