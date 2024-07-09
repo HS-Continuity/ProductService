@@ -19,7 +19,7 @@ public class ProductCategory {
     @Column(name = "product_category_id")
     private Long productCategoryId;
 
-    @Column(name = "category_name", nullable = false)
+    @Column(name = "category_name", unique = true, nullable = false)
     private String categoryName;
 
     @OneToMany(mappedBy = "productCategory", cascade = CascadeType.ALL, orphanRemoval = true)

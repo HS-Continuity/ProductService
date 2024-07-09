@@ -20,19 +20,21 @@ public class ProductCategoryService {
 
     /**
      * 상품 카테고리 등록
-     * @param registerCategoryDto
-     * @exception
-     * @throws
-     * @return
+     * @param registerCategoryDto 상품 카테고리에 등록할 카테고리 정보 DTO
+     * @throws IllegalStateException 이미 존재하는 상품 카테고리 이름일 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean registerCategory(ProductCategoryRequest.RegisterCategoryDto registerCategoryDto) {
+        if (productCategoryRepository.existsByCategoryName(registerCategoryDto.getCategoryName())) {
+            throw new IllegalStateException("이미 존재하는 상품 카테고리 이름입니다.");
+        }
+
         ProductCategory productCategory = ProductCategory.builder()
                 .categoryName(registerCategoryDto.getCategoryName())
                 .build();
 
         productCategoryRepository.save(productCategory);
-
         return true;
     }
 
@@ -45,6 +47,7 @@ public class ProductCategoryService {
     @Transactional
     public List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategories() {
         List<ProductCategory> categoryList = productCategoryRepository.findAll();
+
 
         return categoryList.stream()
                 .map(category -> ProductCategoryResponse.RetrieveAllCategoryDto.builder()
@@ -68,6 +71,11 @@ public class ProductCategoryService {
 
         ProductCategory existingCategory = productCategoryRepository.findById(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
+
+        if (productCategoryRepository.existsByCategoryName(modifyCategoryDto.getCategoryName())) {
+            throw new IllegalStateException("이미 존재하는 상품 카테고리 이름입니다.");
+        }
+
         existingCategory.changeCategoryName(modifyCategoryDto.getCategoryName());
 
         productCategoryRepository.save(existingCategory);

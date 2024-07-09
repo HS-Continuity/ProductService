@@ -23,4 +23,6 @@ public class SwaggerExample {
                 .successCode(SuccessCode.INSERT_SUCCESS) // SuccessCode Enum타입 담기
                 .build(), HttpStatus.CREATED); // HttpStatus 상태코드 담기
     }
+
+
 }
