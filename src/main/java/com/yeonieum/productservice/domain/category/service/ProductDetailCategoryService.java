@@ -71,7 +71,7 @@ public class ProductDetailCategoryService {
 
     /**
      * 상품 상세 카테고리 삭제
-     * @param productDetailCategoryId 상품 카테고리 ID
+     * @param productDetailCategoryId 상품 상세 카테고리 ID
      * @throws IllegalArgumentException 존재하지 않는 상세 카테고리 ID인 경우
      * @return 성공 여부
      */
