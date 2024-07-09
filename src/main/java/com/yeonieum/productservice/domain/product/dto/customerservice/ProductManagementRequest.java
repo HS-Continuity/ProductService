@@ -2,9 +2,11 @@ package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class ProductManagementRequest {
     @Getter
+    @NoArgsConstructor
     public static class RegisterNormalProduct
             extends RegisterDto implements NormalProduct {
         @Builder
@@ -15,7 +17,7 @@ public class ProductManagementRequest {
     }
 
     @Getter
-
+    @NoArgsConstructor
     public static class RegisterEcoFriendlyProductDto
             extends RegisterDto implements CertifiedProduct {
         Certification certification;
@@ -27,6 +29,7 @@ public class ProductManagementRequest {
     }
 
     @Getter
+    @NoArgsConstructor
     public static abstract class RegisterDto {
         // 판매타입도 넣어야함.
 
@@ -74,7 +77,7 @@ public class ProductManagementRequest {
     }
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class ModifyDto {
         // ~자 이내, 정규식
         String productName;
@@ -99,13 +102,16 @@ public class ProductManagementRequest {
     }
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class Certification {
         // ~자 이내, 정규식
         String name;
         String serialNumber;
         // ~자 이내, 정규식
         String imageName;
+        public void changeImageName(String imageName) {
+            this.imageName = imageName;
+        }
     }
 
 
