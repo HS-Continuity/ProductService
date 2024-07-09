@@ -1,8 +1,9 @@
 package com.yeonieum.productservice.domain.product.repository;
 
 import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveAdvertisementProductResponseDto;
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,7 +18,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "FROM product_time_sale pts " +
             "JOIN product p ON pts.product_id = p.id " +
             "WHERE p.customer_id = :customerId", nativeQuery = true)
-    List<RetrieveTimeSaleProductResponseDto> findAllTimeSaleProduct(@Param("customerId") Long customerId);
+    List<RetrieveTimeSaleResponse> findAllTimeSaleByCustomerId(@Param("customerId") Long customerId);
+
+    @Query(value = "SELECT" +
+            "new com.yeonieum.productservice.domain.product.dto.RetrieveTimeSaleProductResponseDto" +
+            "(p.product_id, p.product_name, p.price, pts.discount_rate, pts.start_datetime, pts.end_datetime, pts.is_completed)" +
+            "FROM product_time_sale pts " +
+            "JOIN product p ON pts.product_id = p.id ", nativeQuery = true)
+    List<RetrieveTimeSaleResponse> findAllTimeSaleProduct(Pageable pageable);
+
 
     @Query(value = "SELECT" +
             "new com.yeonieum.productservice.domain.product.dto.RetrieveAdvertisementProductResponseDto" +
