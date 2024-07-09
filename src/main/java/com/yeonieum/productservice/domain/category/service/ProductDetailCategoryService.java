@@ -18,16 +18,20 @@ public class ProductDetailCategoryService {
 
     /**
      * 상품 상세 카테고리 등록
-     * @param registerDetailCategoryDto
-     * @exception
-     * @throws
-     * @return
+     * @param registerDetailCategoryDto 상품 카테고리에 등록할 카테고리 정보 DTO
+     * @throws IllegalArgumentException 존재하지 않는 상품 카테고리 ID인 경우
+     * @throws IllegalStateException 이미 존재하는 상품 카테고리 이름일 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean registerProductDetailCategory(ProductDetailCategoryRequest.RegisterDetailCategoryDto registerDetailCategoryDto) {
-        Long productCategoryId = registerDetailCategoryDto.getProductCategoryId();
-        ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
+
+        ProductCategory productCategory = productCategoryRepository.findById(registerDetailCategoryDto.getProductCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
+
+        if (productDetailCategoryRepository.existsByDetailCategoryName(registerDetailCategoryDto.getDetailCategoryName())) {
+            throw new IllegalStateException("이미 존재하는 상품 상세 카테고리 이름입니다.");
+        }
 
         ProductDetailCategory productDetailCategory = ProductDetailCategory.builder()
                 .productCategory(productCategory)
@@ -41,18 +45,21 @@ public class ProductDetailCategoryService {
     }
 
     /**
-     * 상품 상세 카테고리 수정
-     * @param modifyDetailCategoryDto
-     * @exception
-     * @throws
-     * @return
+     * 상품 카테고리 수정
+     * @param detailCategoryId 상품 상세 카테고리 ID
+     * @param modifyDetailCategoryDto 상품 상세 카테고리에 수정할 정보 DTO
+     * @throws IllegalArgumentException 존재하지 않는 상세 카테고리 ID인 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean modifyDetailCategory(Long detailCategoryId, ProductDetailCategoryRequest.ModifyDetailCategoryDto modifyDetailCategoryDto) {
-        Long productDetailCategoryId = detailCategoryId;
 
-        ProductDetailCategory existingDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
+        ProductDetailCategory existingDetailCategory = productDetailCategoryRepository.findById(detailCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상세 카테고리 ID 입니다."));
+
+        if (productDetailCategoryRepository.existsByDetailCategoryName(modifyDetailCategoryDto.getDetailCategoryName())) {
+            throw new IllegalStateException("이미 존재하는 상품 상세 카테고리 이름입니다.");
+        }
 
         existingDetailCategory.changeDetailCategoryName(modifyDetailCategoryDto.getDetailCategoryName());
         existingDetailCategory.changeDetailCategoryShelfLifeDay(modifyDetailCategoryDto.getShelfLifeDay());
@@ -64,10 +71,9 @@ public class ProductDetailCategoryService {
 
     /**
      * 상품 상세 카테고리 삭제
-     * @param productDetailCategoryId
-     * @exception
-     * @throws
-     * @return
+     * @param productDetailCategoryId 상품 카테고리 ID
+     * @throws IllegalArgumentException 존재하지 않는 상세 카테고리 ID인 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean deleteDetailCategory(Long productDetailCategoryId){

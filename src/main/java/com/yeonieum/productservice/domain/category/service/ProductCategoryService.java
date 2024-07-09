@@ -39,15 +39,13 @@ public class ProductCategoryService {
     }
 
     /**
-     * 상품 카테고리 전체 조회
-     * @exception
-     * @throws
-     * @return
+     * 상품 카테고리 조회
+     * @throws IllegalStateException 이미 존재하는 상품 카테고리 이름일 경우
+     * @return 카테고리 정보
      */
     @Transactional
     public List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategories() {
         List<ProductCategory> categoryList = productCategoryRepository.findAll();
-
 
         return categoryList.stream()
                 .map(category -> ProductCategoryResponse.RetrieveAllCategoryDto.builder()
@@ -60,16 +58,15 @@ public class ProductCategoryService {
 
     /**
      * 상품 카테고리 수정
-     * @param modifyCategoryDto
-     * @exception
-     * @throws
-     * @return
+     * @param categoryId 상품 카테고리 ID
+     * @param modifyCategoryDto 상품 카테고리에 수정할 정보 DTO
+     * @throws IllegalStateException 존재하지 않는 카테고리 ID인 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean modifyCategory(Long categoryId, ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
-        Long productCategoryId = categoryId;
 
-        ProductCategory existingCategory = productCategoryRepository.findById(productCategoryId)
+        ProductCategory existingCategory = productCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID 입니다."));
 
         if (productCategoryRepository.existsByCategoryName(modifyCategoryDto.getCategoryName())) {
@@ -85,10 +82,9 @@ public class ProductCategoryService {
 
     /**
      * 상품 카테고리 삭제
-     * @param productCategoryId
-     * @exception
-     * @throws
-     * @return
+     * @param productCategoryId 상품 카테고리 ID
+     * @throws IllegalArgumentException 존재하지 않는 카테고리 ID인 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean deleteCategory(Long productCategoryId) {
@@ -102,10 +98,9 @@ public class ProductCategoryService {
 
     /**
      * 상품 카테고리 조회시, 하위 상세카테고리 조회
-     * @param productCategoryId
-     * @exception
-     * @throws
-     * @return
+     * @param productCategoryId 상품 카테고리 ID
+     * @throws IllegalArgumentException 존재하지 않는 카테고리 ID
+     * @return 하위 카테고리 정보
      */
     @Transactional
     public ProductCategoryResponse.RetrieveCategoryWithDetailsDto retrieveCategoryWithDetails(Long productCategoryId) {

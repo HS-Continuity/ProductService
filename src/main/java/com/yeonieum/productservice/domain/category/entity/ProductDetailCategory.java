@@ -24,7 +24,7 @@ public class ProductDetailCategory {
     @JoinColumn(name = "product_category_id", nullable = false)
     private ProductCategory productCategory;
 
-    @Column(name = "detail_category_name", nullable = false)
+    @Column(name = "detail_category_name", unique = true, nullable = false)
     private String detailCategoryName;
 
     @Column(name = "shelf_life_day", nullable = false)

@@ -1,11 +1,12 @@
 package com.yeonieum.productservice.domain.category.dto.detailcategory;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class ProductDetailCategoryRequest {
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class RegisterDetailCategoryDto {
 
         private Long productCategoryId;
@@ -14,7 +15,7 @@ public class ProductDetailCategoryRequest {
     }
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class ModifyDetailCategoryDto {
 
         private String detailCategoryName;
