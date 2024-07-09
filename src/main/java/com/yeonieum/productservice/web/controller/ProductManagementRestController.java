@@ -1,4 +1,4 @@
-package com.yeonieum.productservice.web;
+package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.domain.S3Upload.S3UploadService;
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementRequest;
@@ -60,7 +60,6 @@ public class ProductManagementRestController {
     public ResponseEntity<ApiResponse> createEcoFriendlyProduct(ProductManagementRequest.RegisterDto ecoFriendlyProduct,
                                                                 @RequestPart MultipartFile defaultImage,
                                                                 @RequestPart MultipartFile certificationImage) throws IOException {
-
         String defaultImageUrl = s3UploadService.uploadImage(defaultImage);
         String certificationImageUrl = s3UploadService.uploadImage(certificationImage);
 
@@ -96,7 +95,7 @@ public class ProductManagementRestController {
                 .build(), HttpStatus.OK);
     }
 
-    @Operation(summary = "고객의 상품리스트 조", description = "고객(seller)의 상품을 조회합니다.")
+    @Operation(summary = "고객의 상품리스트 조회", description = "고객(seller)의 상품을 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
@@ -155,8 +154,7 @@ public class ProductManagementRestController {
     @PostMapping("/product/{productId}/default-image")
     public ResponseEntity<ApiResponse> uploadDefaultImage(@PathVariable Long productId,
                                                           @RequestPart  MultipartFile defaultImage) throws IOException {
-
-            String imageUrl = s3UploadService.uploadImage(defaultImage);
+        String imageUrl = s3UploadService.uploadImage(defaultImage);
         try {
             productManagementService.uploadProductImageUrl(productId, imageUrl);
         } catch (RuntimeException e) {

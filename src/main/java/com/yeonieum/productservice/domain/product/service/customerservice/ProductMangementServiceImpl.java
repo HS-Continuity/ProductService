@@ -67,7 +67,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
                             () -> new IllegalArgumentException("존재하지않는 대분류 카테고리입니다.")
                     );
 
-            // productCategory가 가진 하위 카테고리에 아이디가 있는지 체크
+            // []
             List<ProductDetailCategory> productDetailCategoryList = productCategory.getProductDetailCategoryList();
             ProductDetailCategory productDetailCategory = productDetailCategoryList.stream()
                     .filter(detailCategory -> detailCategory.getProductDetailCategoryId() == registerRequestDto.getSubCategoryId())
@@ -77,7 +77,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
 
             SaleType saleType = saleTypeRepository.findById(1L).orElseThrow();
 
-            // 고객의 상품 생성 및 등록
+            // [상품생성]
             Product product = Product.builder()
                     .saleType(saleType)
                     .customer(customer)
@@ -94,12 +94,25 @@ public class ProductMangementServiceImpl implements ProductManagementService{
                     .productDetailCategory(productDetailCategory)
                     .build();
 
-            productRepository.save(product);
-
-            // 친환경상품이면 인증서 필수 등록
+            // 친환경상품이면 [상품의 인증서 여부 T로 변경, 인증서 등록]
             if(registerRequestDto instanceof ProductManagementRequest.RegisterEcoFriendlyProductDto) {
-                registerCertificationOf(product, registerRequestDto);
+                product.setIsCertification(ActiveStatus.ACTIVE);
+                productRepository.save(product);
+
+                ProductManagementRequest.Certification certification
+                        = ((ProductManagementRequest.RegisterEcoFriendlyProductDto) registerRequestDto).getCertification();
+
+                ProductCertification productCertification = ProductCertification.builder()
+                        .product(product)
+                        .certificationImage(certification.getImageName())
+                        .certificationName(certification.getName())
+                        .certificationNumber(certification.getSerialNumber())
+                        .build();
+
+                productCertificationRepository.save(productCertification);
             }
+
+            productRepository.save(product);
             return true;
         }catch (Exception e) {
             e.printStackTrace();
