@@ -42,6 +42,18 @@ public class CartProductService {
         CartType cartType = cartTypeRepository.findById(registerProductCartDto.getCartTypeId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 장바구니타입 ID 입니다."));
 
+        List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(registerProductCartDto.getMemberId(), registerProductCartDto.getCartTypeId());
+
+        for (CartProduct existingCartProduct : cartProductList) {
+            if (existingCartProduct.getProduct().getProductId().equals(registerProductCartDto.getProductId())) {
+                // 같은 상품이 있으면 수량 추가
+                existingCartProduct.changeProductQuantity(existingCartProduct.getQuantity() + registerProductCartDto.getQuantity());
+                cartProductRepository.save(existingCartProduct);
+                return true;
+            }
+        }
+
+        // 장바구니에 같은 상품이 없으면 상품 등록
         CartProduct cartProduct = CartProduct.builder()
                 .product(product)
                 .cartType(cartType)

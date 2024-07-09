@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.category.dto.category.ProductCategoryR
 import com.yeonieum.productservice.domain.category.dto.category.ProductCategoryResponse;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
+import com.yeonieum.productservice.domain.product.entity.Product;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

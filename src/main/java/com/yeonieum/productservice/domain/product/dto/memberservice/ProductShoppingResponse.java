@@ -19,6 +19,15 @@ public class ProductShoppingResponse {
 
     @Getter
     @Builder
+    public static class RetrieveCategoryWithProductsDto {
+
+        private Long productCategoryId;
+        private String categoryName;
+        private List<SearchProductInformationDto> searchProductInformationDtoList;
+    }
+
+    @Getter
+    @Builder
     public static class SearchProductInformationDto {
 
         private Long productId;
