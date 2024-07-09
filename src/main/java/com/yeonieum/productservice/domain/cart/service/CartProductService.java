@@ -112,7 +112,6 @@ public class CartProductService {
     /**
      * 장바구니 상품 삭제
      * @param cartProductId 장바구니 상품 ID
-     * @exception
      * @throws IllegalArgumentException 존재하지 않는 장바구니 ID인 경우
      * @return 성공 여부
      */
@@ -130,7 +129,7 @@ public class CartProductService {
      * 장바구니 상품 개수 조절
      * @param cartProductId 장바구니 상품 ID
      * @param quantityDelta 수량 증감 값 (양수이면 증가, 음수이면 감소)
-     * @exception IllegalStateException 존재하지 않는 장바구니 ID인 경우
+     * @throws IllegalStateException 존재하지 않는 장바구니 ID인 경우
      * @return 성공 여부
      */
     @Transactional

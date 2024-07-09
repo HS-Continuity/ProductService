@@ -54,7 +54,7 @@ public class ProductShoppingService {
     }
 
     /**
-     * 선택한 카테고리 조회시, 해당 카테고리의 상품 조회
+     * 선택한 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
      * @param productCategoryId
      * @exception
      * @throws

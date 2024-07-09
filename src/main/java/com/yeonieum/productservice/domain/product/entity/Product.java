@@ -74,6 +74,11 @@ public class Product {
     private int calculatedPersonalizedPrice;
 
     @Convert(converter = ActiveStatusConverter.class)
+    @Column(name = "is_certification")
+    @Builder.Default
+    private ActiveStatus isCertification = ActiveStatus.INACTIVE;
+
+    @Convert(converter = ActiveStatusConverter.class)
     @Column(name = "is_regular_sale", nullable = false)
     @Builder.Default
     private ActiveStatus isRegularSale = ActiveStatus.ACTIVE;

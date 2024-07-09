@@ -12,5 +12,7 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
 
     @Query("SELECT c FROM ProductCategory c LEFT JOIN FETCH c.productDetailCategoryList WHERE c.productCategoryId = :productCategoryId")
     Optional<ProductCategory> findByIdWithDetailCategories(@Param("productCategoryId") Long productCategoryId);
+
+    boolean existsByCategoryName(String categoryName);
 }
 

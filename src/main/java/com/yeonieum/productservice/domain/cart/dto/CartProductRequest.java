@@ -1,12 +1,12 @@
 package com.yeonieum.productservice.domain.cart.dto;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class CartProductRequest {
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class RegisterProductCartDto{
 
         private Long productId;
