@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AdvertisementService {
+public class AdvertisementManagementService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final ProductAdvertisementServiceRepository productAdvertisementServiceRepository;

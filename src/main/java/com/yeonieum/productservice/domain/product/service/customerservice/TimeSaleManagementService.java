@@ -3,7 +3,7 @@ package com.yeonieum.productservice.domain.product.service.customerservice;
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
 import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleResponse;
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleProductResponse;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveTimeSaleProductResponse;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimeSaleRequest;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimeSale;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TimeSaleService {
+public class TimeSaleManagementService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final ProductTimeSaleRepository productTimeSaleRepository;
@@ -117,16 +117,4 @@ public class TimeSaleService {
 
         return timeSaleProductList;
     }
-}
-
-
-class SearchCriteria {
-    private String keyword;
-    private String category;
-    private String sort;
-    private String order;
-    private int pageNumber;
-    private int pageSize;
-    private String searchType;
-    private String searchKeyword;
 }

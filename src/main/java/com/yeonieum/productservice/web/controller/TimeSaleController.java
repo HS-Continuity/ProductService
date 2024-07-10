@@ -1,9 +1,9 @@
 package com.yeonieum.productservice.web.controller;
 
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleProductResponse;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveTimeSaleProductResponse;
 import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleResponse;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimeSaleRequest;
-import com.yeonieum.productservice.domain.product.service.customerservice.TimeSaleService;
+import com.yeonieum.productservice.domain.product.service.customerservice.TimeSaleManagementService;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/time-sale")
 @RequiredArgsConstructor
 public class TimeSaleController {
-    private final TimeSaleService timeSaleService;
+    private final TimeSaleManagementService timeSaleManagementService;
 
     // TimeSaleService의 메서드를 바탕으로 타임세일 조회, 등록, 타임세일 상품 조회를 구현해주세요.
     // 타임세일 조회, 등록, 타임세일 상품 조회를 위한 API를 구현해주세요.
@@ -28,7 +28,7 @@ public class TimeSaleController {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse> getTimeSale() {
         Long customerId = 1L;
-        List<RetrieveTimeSaleResponse> customersTimeSaleList = timeSaleService.retrieveTimeSaleProducts(customerId);
+        List<RetrieveTimeSaleResponse> customersTimeSaleList = timeSaleManagementService.retrieveTimeSaleProducts(customerId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(customersTimeSaleList)
@@ -39,7 +39,7 @@ public class TimeSaleController {
     // 타임세일 등록
     @PostMapping
     public ResponseEntity<ApiResponse> registerTimeSale(@RequestBody TimeSaleRequest.RegisterDto registerDto) {
-        timeSaleService.registerTimeSale(registerDto);
+        timeSaleManagementService.registerTimeSale(registerDto);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -50,7 +50,7 @@ public class TimeSaleController {
     // 타임세일 상품 조회
     @GetMapping("/{timeSaleId}")
     public ResponseEntity<ApiResponse> getTimeSaleProduct(@PathVariable Long timeSaleId) {
-        RetrieveTimeSaleResponse timeSaleRespone = timeSaleService.retrieveCustomersTimeSale(timeSaleId);
+        RetrieveTimeSaleResponse timeSaleRespone = timeSaleManagementService.retrieveCustomersTimeSale(timeSaleId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(timeSaleRespone)
@@ -61,7 +61,7 @@ public class TimeSaleController {
     @PatchMapping("/{timesaleId}")
     public ResponseEntity<ApiResponse> updateTimeSaleProduct(@PathVariable Long timesaleId, TimeSaleRequest.ModifyStatusDto modifyStatusDto) {
         // 타임세일 상품 수정
-        timeSaleService.modifyTimeSaleStatus(modifyStatusDto);
+        timeSaleManagementService.modifyTimeSaleStatus(modifyStatusDto);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.UPDATE_SUCCESS)
@@ -73,7 +73,7 @@ public class TimeSaleController {
     public ResponseEntity<ApiResponse> getTimeSaleProductList(@RequestParam int pageNumber,
                                                               @RequestParam int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<RetrieveTimeSaleProductResponse> timeSaleProductResponseList = timeSaleService.retrieveTimeSaleProducts(pageable);
+        List<RetrieveTimeSaleProductResponse> timeSaleProductResponseList = timeSaleManagementService.retrieveTimeSaleProducts(pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(timeSaleProductResponseList)
