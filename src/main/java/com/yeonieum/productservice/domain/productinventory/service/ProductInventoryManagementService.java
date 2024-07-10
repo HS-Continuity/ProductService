@@ -81,49 +81,10 @@ public class ProductInventoryManagementService {
         return true;
     }
 
-    @Transactional(readOnly = true)
-    public int retrieveProductInventoryAmount(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
-        );
-
-        // 당일출고 기준시간 (조회해야함)
-        int shippingCutoffTime = 14;
-
-        //[STEP1. 배송도착시 남아있어야하는 소비자의 최소 소비 기간을 조회해서 가져온다.]
-        int lifeDay = product.getProductDetailCategory().getShelfLifeDay();
-
-        //[STEP2. 오늘 날짜 및 현재 시각을 조회한다.]
-        LocalDate todayDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        int additionalShippingDay = calculateAdditionalShippingDays(shippingCutoffTime, todayDate);
-
-        //[STEP3. 리드타임 (배송-> 도착 기간)]
-        int leadTime = 2;
-
-        //[STEP4. 쿼리 기준일을 구한다. 오늘날짜 + 배송평균일 + 추가배송기간 + 사용자의 소비 기간]
-        LocalDate queryDate = todayDate.plusDays((long)(lifeDay + leadTime + additionalShippingDay));
-
-        int availableProductQuantity = productInventoryRepository.findAvailableInventoryQuantityByProductIdAndExpirationDate(productId, queryDate);
-        return availableProductQuantity;
-    }
-
-    public int calculateAdditionalShippingDays(int shippingCutoffTime , LocalDate today) {
-        int currentHour = LocalTime.now().getHour();
-        int additionalShippingDays = 0;
-
-        additionalShippingDays = switch (today.getDayOfWeek()) {
-            case SATURDAY -> 2;
-            case SUNDAY -> 1;
-            case MONDAY, TUESDAY, WEDNESDAY, THURSDAY ->
-                    currentHour >= shippingCutoffTime ? 1 : 0;
-            case FRIDAY ->
-                    currentHour >= shippingCutoffTime ? 3 : 0;
-            default -> 0;
-        };
-
-        return additionalShippingDays;
-    }
-
+    /**
+     * 상품재고 폐기
+     * @param productInventoryId
+     */
     @Transactional
     public void disposeProductInventory(Long productInventoryId) {
         ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
