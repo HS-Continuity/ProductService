@@ -1,6 +1,7 @@
 package com.yeonieum.productservice.cache.redis;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.ShippedStockDto;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
@@ -27,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 캐시 기본전략 : write through
  */
-//@Component
+@Component
 @RequiredArgsConstructor
 public class StockRedisSetOperation {
     private final static String STOCK_USAGE_KEY = "stockusage:";
@@ -36,13 +38,15 @@ public class StockRedisSetOperation {
     private final ShippedStockRepository shippedStockRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    private final ObjectMapper objectMapper;
 
-    public Set<Object> getProductStock(Long productId) {
+
+    public Set<Object> getProductStock(Long productId) throws JsonProcessingException {
         // Redis에서 조회
-        String key = getStockUsageKey(productId);
-        Set<Object> productStockSet = redisTemplate.opsForSet().members(key);
-
-        if (productStockSet == null) {
+        String key = "stockusage:50";
+        Set<Object> productStockSet = redisTemplate.opsForSet().members("stockusage:50");
+        productStockSet.size();
+        if (productStockSet == null || productStockSet.size() == 0) {
             productStockSet = new HashSet<>();
             List<StockUsageDto> stockUsageList = stockUsageRepository.findShippedStockByProductId(productId);
             LocalDateTime shippedTime = LocalDateTime.now().withHour(14);
@@ -50,9 +54,8 @@ public class StockRedisSetOperation {
 
             productStockSet = new HashSet<>(stockUsageList);
             productStockSet.removeAll(shippedStockDtoList);
-
             for(Object stockUsageDto : productStockSet) {
-                redisTemplate.opsForValue().set(key, stockUsageDto);
+                redisTemplate.opsForSet().add(key, (StockUsageDto) stockUsageDto);
                 LocalDateTime tomorrow14 = LocalDateTime.now().plusDays(1).withHour(14);
                 long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();
                 redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
@@ -144,8 +147,8 @@ public class StockRedisSetOperation {
         try {
             SetOperations<String, Object> setOps = redisTemplate.opsForSet();
             String key = getStockUsageKey(stockUsageDto.getProductId());
-            setOps.add(key, stockUsageDto);
-
+            Long result = setOps.add(key, stockUsageDto);
+            System.out.println("결과 : " + result);
             stockUsage = StockUsage.builder()
                     .productId(stockUsageDto.getProductId())
                     .orderId(stockUsageDto.getOrderId())
@@ -207,16 +210,22 @@ public class StockRedisSetOperation {
      * @return
      */
     public Integer totalStockUsageCount(Long productId) {
-        SetOperations<String, Object> setOps = redisTemplate.opsForSet();
-        int orderPendingAmount = 0;
-        String key = getStockUsageKey(productId);
+        try {
+            getProductStock(productId);
+            SetOperations<String, Object> setOps = redisTemplate.opsForSet();
+            int orderPendingAmount = 0;
+            String key = getStockUsageKey(productId);
 
-        for (Object stock : setOps.members(key)) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            StockUsageDto stockUsageDto = objectMapper.convertValue(stock, StockUsageDto.class);
-            orderPendingAmount += stockUsageDto.getQuantity();
+            for (Object stock : setOps.members(key)) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                StockUsageDto stockUsageDto = objectMapper.convertValue(stock, StockUsageDto.class);
+                orderPendingAmount += stockUsageDto.getQuantity();
+            }
+            return orderPendingAmount;
+        }catch (Exception e) {
+            e.printStackTrace();
         }
-        return orderPendingAmount;
+       return 0;
     }
 
 

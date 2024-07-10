@@ -4,7 +4,6 @@ import com.yeonieum.productservice.cache.redis.StockRedisSetOperation;
 import com.yeonieum.productservice.domain.productinventory.dto.ShippedStockDto;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 
 //@Service

@@ -5,17 +5,29 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-//@Configuration
+@Configuration
 public class RedisConfig {
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Value("${spring.redis.host}")
+    private String hostname;
+
+    @Value("${spring.redis.port}")
+    private int port;
+
+    @Value("${spring.redis.password}")
+    private String password;
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
@@ -28,14 +40,19 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory("localhost",6379);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(hostname, port);
+        config.setPassword(password);
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config);
         return connectionFactory;
     }
 
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://localhost:6379");
+        config.useSingleServer()
+                .setAddress("redis://" + hostname + ":" + port)
+                .setPassword(password); // 비밀번호 설정 (클라우드 환경에 따라 필요)
+
         return Redisson.create(config);
     }
 }
