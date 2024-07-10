@@ -3,6 +3,7 @@ package com.yeonieum.productservice.domain.review.service;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
+import com.yeonieum.productservice.domain.productinventory.service.ProductInventoryAvailabilityService;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewRequest;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewResponse;
 import com.yeonieum.productservice.domain.review.entity.ProductReview;
@@ -63,6 +64,8 @@ public class ProductReviewService {
      */
     @Transactional
     public boolean deleteProductReview(Long productReviewId){
+
+
         if (productReviewRepository.existsById(productReviewId)) {
             productReviewRepository.deleteById(productReviewId);
             return true;

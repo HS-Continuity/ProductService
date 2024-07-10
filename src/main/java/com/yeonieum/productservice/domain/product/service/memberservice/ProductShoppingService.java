@@ -7,8 +7,11 @@ import com.yeonieum.productservice.domain.category.repository.ProductDetailCateg
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
+import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,64 +26,92 @@ public class ProductShoppingService {
     private final ProductRepository productRepository;
 
     /**
-     * 선택한 상세 카테고리 조회시, 해당 카테고리의 상품 조회
-     * @param productDetailCategoryId
-     * @exception
-     * @throws
-     * @return
+     * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
+     * @param productCategoryId 상품 카테고리 ID
+     * @throws IllegalArgumentException 존재하지 않는 상품 카테고리 ID인 경우
+     * @throws IllegalArgumentException 해당 카테고리에 등록된 상품이 없는 경우
+     * @return 카테고리에 포함되는 상품들의 정보
      */
     @Transactional
-    public ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts(Long productDetailCategoryId) {
-        ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findByIdWithProducts(productDetailCategoryId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상세 카테고리 ID 입니다."));
-
-        List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productDetailCategory.getProductList().stream()
-                .map(product -> ProductShoppingResponse.SearchProductInformationDto.builder()
-                        .productId(product.getProductId())
-                        .productName(product.getProductName())
-                        .productDescription(product.getProductDescription())
-                        .productImage(product.getProductImage())
-                        .productPrice(product.getProductPrice())
-                        .isRegularSale(product.getIsRegularSale().getCode())
-                        .build())
-                .collect(Collectors.toList());
-
-        return ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto.builder()
-                .productDetailCategoryId(productDetailCategory.getProductDetailCategoryId())
-                .detailCategoryName(productDetailCategory.getDetailCategoryName())
-                .shelfLifeDay(productDetailCategory.getShelfLifeDay())
-                .searchProductInformationDtoList(productInformationDtoList)
-                .build();
-    }
-
-    /**
-     * 선택한 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
-     * @param productCategoryId
-     * @exception
-     * @throws
-     * @return
-     */
-    @Transactional
-    public ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts(Long productCategoryId) {
+    public ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
         ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 카테고리 ID 입니다."));
 
-        List<Product> products = productRepository.findProductsByCategory(productCategoryId);
-        List<ProductShoppingResponse.SearchProductInformationDto> productDtos = products.stream().map(product ->
+        Page<Product> productsPage = productRepository.findActiveProductsByCategory(productCategoryId, isCertification, pageable);
+
+        if (productsPage.isEmpty()) {
+            throw new IllegalArgumentException("해당 카테고리에 내의 상품이 없습니다.");
+        }
+
+        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product ->
                 ProductShoppingResponse.SearchProductInformationDto.builder()
                         .productId(product.getProductId())
                         .productName(product.getProductName())
                         .productDescription(product.getProductDescription())
                         .productImage(product.getProductImage())
+                        .baseDiscountRate(product.getBaseDiscountRate())
+                        .regularDiscountRate(product.getRegularDiscountRate())
                         .productPrice(product.getProductPrice())
+                        .calculatedBasePrice(product.getCalculatedBasePrice())
                         .isRegularSale(product.getIsRegularSale().getCode())
                         .build()
         ).collect(Collectors.toList());
 
         return ProductShoppingResponse.RetrieveCategoryWithProductsDto.builder()
-                .productCategoryId(productCategory.getProductCategoryId())
+                .productCategoryId(productCategoryId)
                 .categoryName(productCategory.getCategoryName())
-                .searchProductInformationDtoList(productDtos)
+                .searchProductInformationDtoList(searchProductInformationDtoList)
+                .totalItems((int) productsPage.getTotalElements())
+                .totalPages(productsPage.getTotalPages())
+                .lastPage(productsPage.isLast())
+                .build();
+    }
+
+
+    /**
+     * 상세 카테고리 조회시, 해당 카테고리의 상품 조회
+     * @param productDetailCategoryId 상세 카테고리 ID
+     * @throws IllegalArgumentException 존재하지 않는 상세 카테고리 ID인 경우
+     * @throws IllegalArgumentException 해당 상세 카테고리에 등록된 상품이 없는 경우
+     * @return 상세 카테고리에 포함되는 상품들의 정보
+     */
+    @Transactional
+    public ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts(Long productDetailCategoryId, ActiveStatus isCertification, Pageable pageable) {
+
+        ProductDetailCategory checkDetailCategoryId = productDetailCategoryRepository.findById(productDetailCategoryId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 상세 카테고리 ID 입니다."));
+
+        Page<ProductDetailCategory> productDetailCategoryPage = productDetailCategoryRepository.findByIdWithProducts(productDetailCategoryId, isCertification, pageable);
+
+        if (productDetailCategoryPage.isEmpty()) {
+            throw new IllegalArgumentException("해당 상세 카테고리에 내의 상품이 없습니다.");
+        }
+
+        List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productDetailCategoryPage.getContent().stream()
+                .flatMap(category -> category.getProductList().stream())
+                .map(product -> ProductShoppingResponse.SearchProductInformationDto.builder()
+                        .productId(product.getProductId())
+                        .productName(product.getProductName())
+                        .productDescription(product.getProductDescription())
+                        .productImage(product.getProductImage())
+                        .baseDiscountRate(product.getBaseDiscountRate())
+                        .regularDiscountRate(product.getRegularDiscountRate())
+                        .productPrice(product.getProductPrice())
+                        .calculatedBasePrice(product.getCalculatedBasePrice())
+                        .isRegularSale(product.getIsRegularSale().getCode())
+                        .build())
+                .collect(Collectors.toList());
+
+        ProductDetailCategory productDetailCategory = productDetailCategoryPage.getContent().get(0);
+
+        return ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto.builder()
+                .productDetailCategoryId(productDetailCategoryId)
+                .detailCategoryName(productDetailCategory.getDetailCategoryName())
+                .shelfLifeDay(productDetailCategory.getShelfLifeDay())
+                .searchProductInformationDtoList(productInformationDtoList)
+                .totalItems((int) productDetailCategoryPage.getTotalElements())
+                .totalPages(productDetailCategoryPage.getTotalPages())
+                .lastPage(productDetailCategoryPage.isLast())
                 .build();
     }
 }

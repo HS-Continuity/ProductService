@@ -15,6 +15,9 @@ public class ProductShoppingResponse {
         private String detailCategoryName;
         private int shelfLifeDay;
         private List<SearchProductInformationDto> searchProductInformationDtoList;
+        private int totalItems;
+        private int totalPages;
+        private boolean lastPage;
     }
 
     @Getter
@@ -24,6 +27,9 @@ public class ProductShoppingResponse {
         private Long productCategoryId;
         private String categoryName;
         private List<SearchProductInformationDto> searchProductInformationDtoList;
+        private int totalItems;
+        private int totalPages;
+        private boolean lastPage;
     }
 
     @Getter
@@ -34,7 +40,10 @@ public class ProductShoppingResponse {
         private String productName;
         private String productDescription;
         private String productImage;
+        private int baseDiscountRate;
+        private int regularDiscountRate;
         private int productPrice;
+        private int calculatedBasePrice;
         private char isRegularSale;
     }
 }
