@@ -11,18 +11,17 @@ import org.springframework.kafka.annotation.KafkaListener;
 @RequiredArgsConstructor
 public class KafkaConsumerService {
     private final StockRedisSetOperation stockRedisSetOperation;
-    private final RedisTemplate<String, Object> redisTemplate;
 
     @KafkaListener(groupId = "shippedstock_group", topics = "shippedstock-topic", containerFactory = "shippedStockKafkaListenerContainerFactory")
     public void listen(ShippedStockDto shippedStockDto) {
         //System.out.println(shippedStockDto);
-        stockRedisSetOperation.addShippedStock(redisTemplate, shippedStockDto);
+        stockRedisSetOperation.addShippedStock(shippedStockDto);
     }
 
 
     @KafkaListener(groupId = "stockusage_group", topics = "stockusage-topic", containerFactory = "stockUsageKafkaListenerContainerFactory")
     public void listen(StockUsageDto stockUsageDto) {
         //System.out.println(shippedStockDto);
-        stockRedisSetOperation.removeStockUsage(redisTemplate, stockUsageDto);
+        stockRedisSetOperation.removeStockUsage(stockUsageDto);
     }
 }
