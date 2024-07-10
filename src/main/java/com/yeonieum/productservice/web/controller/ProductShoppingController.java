@@ -32,8 +32,11 @@ public class ProductShoppingController {
     public ResponseEntity<ApiResponse> retrieveCategoryWithProducts(@PathVariable Long categoryId,
                                                                     @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
                                                                     @RequestParam(defaultValue = "0") int startPage,
-                                                                    @RequestParam(defaultValue = "10") int pageSize) {
-        Pageable pageable = PageRequest.of(startPage, pageSize);
+                                                                    @RequestParam(defaultValue = "10") int pageSize,
+                                                                    @RequestParam(defaultValue = "productName") String sort,
+                                                                    @RequestParam(defaultValue = "asc") String direction) {
+
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts =
                 productShoppingService.retrieveCategoryWithProducts(categoryId, isCertification, pageable);
@@ -95,6 +98,7 @@ public class ProductShoppingController {
                                                                     @RequestParam(defaultValue = "asc") String direction) {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
+
         ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts =
                 productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
 
