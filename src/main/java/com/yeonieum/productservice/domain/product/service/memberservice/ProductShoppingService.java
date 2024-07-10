@@ -129,4 +129,40 @@ public class ProductShoppingService {
                 .lastPage(productDetailCategoryPage.isLast())
                 .build();
     }
+
+    /**
+     * 상세 상품 조회
+     * @param productId 상품 ID
+     * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
+     * @return 상품의 정보
+     */
+    @Transactional
+    public ProductShoppingResponse.DetailProductInformationDto detailProductInformationDto(Long productId){
+        Product targetProduct = productRepository.findByIdAndIsActive(productId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
+
+        int reviewCount = productReviewRepository.countByProductId(productId);
+        double averageScore = productReviewRepository.findAverageScoreByProductId(productId);
+
+        return ProductShoppingResponse.DetailProductInformationDto.builder()
+                .productId(targetProduct.getProductId())
+                .productName(targetProduct.getProductName())
+                .productDescription(targetProduct.getProductDescription())
+                .productImage(targetProduct.getProductImage())
+                .origin(targetProduct.getProductOrigin())
+                .baseDiscountRate(targetProduct.getBaseDiscountRate())
+                .regularDiscountRate(targetProduct.getRegularDiscountRate())
+                .personalizedDiscountRate(targetProduct.getPersonalizedDiscountRate())
+                .productPrice(targetProduct.getProductPrice())
+                .calculatedBasePrice(targetProduct.getCalculatedBasePrice())
+                .calculatedRegularPrice(targetProduct.getCalculatedRegularPrice())
+                .calculatedPersonalizedPrice(targetProduct.getCalculatedPersonalizedPrice())
+                .isRegularSale((char) (targetProduct.getIsRegularSale() == ActiveStatus.ACTIVE ? 'T' : 'F'))
+                .isCertification((char) (targetProduct.getIsCertification() == ActiveStatus.ACTIVE ? 'T' : 'F'))
+                .reviewCount(reviewCount)
+                .averageScore(averageScore)
+                .build();
+    }
 }
+
+

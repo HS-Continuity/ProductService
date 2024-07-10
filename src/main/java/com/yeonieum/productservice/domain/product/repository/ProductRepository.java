@@ -49,4 +49,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "AND (:isCertification IS NULL OR p.isCertification = :isCertification)")
     Page<Product> findActiveProductsByCategory(@Param("categoryId") Long categoryId, @Param("isCertification") ActiveStatus isCertification, Pageable pageable);
 
+    @Query("SELECT p FROM Product p WHERE p.productId = :productId AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
+    Optional<Product> findByIdAndIsActive(@Param("productId") Long productId);
+
 }

@@ -1,6 +1,7 @@
 package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
+import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.responses.ApiResponse;
@@ -64,5 +65,19 @@ public class ProductShoppingController {
                 .build(), HttpStatus.OK);
     }
 
+    @Operation(summary = "상세 상품 조회", description = "선택한 상품의 정보를 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 정보 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 정보 조회 실패")
+    })
+    @GetMapping("/{productId}")
+    public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
 
+        ProductShoppingResponse.DetailProductInformationDto detailProductInformation = productShoppingService.detailProductInformationDto(productId);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(detailProductInformation)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }

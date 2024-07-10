@@ -48,4 +48,26 @@ public class ProductShoppingResponse {
         private int reviewCount;
         private double averageScore;
     }
+
+    @Getter
+    @Builder
+    public static class DetailProductInformationDto {
+
+        private Long productId;
+        private String productName;
+        private String productDescription;
+        private String productImage;
+        private String origin;
+        private int baseDiscountRate;
+        private int regularDiscountRate;
+        private int personalizedDiscountRate;
+        private int productPrice;
+        private int calculatedBasePrice;
+        private int calculatedRegularPrice;
+        private int calculatedPersonalizedPrice;
+        private char isRegularSale;
+        private char isCertification;
+        private int reviewCount;
+        private double averageScore;
+    }
 }
