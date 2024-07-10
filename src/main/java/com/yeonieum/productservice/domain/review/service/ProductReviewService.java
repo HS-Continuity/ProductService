@@ -65,7 +65,6 @@ public class ProductReviewService {
     @Transactional
     public boolean deleteProductReview(Long productReviewId){
 
-
         if (productReviewRepository.existsById(productReviewId)) {
             productReviewRepository.deleteById(productReviewId);
             return true;
