@@ -7,6 +7,8 @@ import com.yeonieum.productservice.domain.category.repository.ProductDetailCateg
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
+import com.yeonieum.productservice.domain.review.entity.ProductReview;
+import com.yeonieum.productservice.domain.review.repository.ProductReviewRepository;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class ProductShoppingService {
     private final ProductCategoryRepository productCategoryRepository;
     private final ProductDetailCategoryRepository productDetailCategoryRepository;
     private final ProductRepository productRepository;
+    private final ProductReviewRepository productReviewRepository;
 
     /**
      * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
@@ -40,22 +43,27 @@ public class ProductShoppingService {
         Page<Product> productsPage = productRepository.findActiveProductsByCategory(productCategoryId, isCertification, pageable);
 
         if (productsPage.isEmpty()) {
-            throw new IllegalArgumentException("해당 카테고리에 내의 상품이 없습니다.");
+            throw new IllegalArgumentException("해당 카테고리 내의 상품이 없습니다.");
         }
 
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product ->
-                ProductShoppingResponse.SearchProductInformationDto.builder()
-                        .productId(product.getProductId())
-                        .productName(product.getProductName())
-                        .productDescription(product.getProductDescription())
-                        .productImage(product.getProductImage())
-                        .baseDiscountRate(product.getBaseDiscountRate())
-                        .regularDiscountRate(product.getRegularDiscountRate())
-                        .productPrice(product.getProductPrice())
-                        .calculatedBasePrice(product.getCalculatedBasePrice())
-                        .isRegularSale(product.getIsRegularSale().getCode())
-                        .build()
-        ).collect(Collectors.toList());
+        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
+            int reviewCount = productReviewRepository.countByProductId(product.getProductId());
+            double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
+
+            return ProductShoppingResponse.SearchProductInformationDto.builder()
+                    .productId(product.getProductId())
+                    .productName(product.getProductName())
+                    .productDescription(product.getProductDescription())
+                    .productImage(product.getProductImage())
+                    .baseDiscountRate(product.getBaseDiscountRate())
+                    .regularDiscountRate(product.getRegularDiscountRate())
+                    .productPrice(product.getProductPrice())
+                    .calculatedBasePrice(product.getCalculatedBasePrice())
+                    .isRegularSale(product.getIsRegularSale().getCode())
+                    .reviewCount(reviewCount)
+                    .averageScore(averageScore)
+                    .build();
+        }).collect(Collectors.toList());
 
         return ProductShoppingResponse.RetrieveCategoryWithProductsDto.builder()
                 .productCategoryId(productCategoryId)
@@ -66,6 +74,7 @@ public class ProductShoppingService {
                 .lastPage(productsPage.isLast())
                 .build();
     }
+
 
 
     /**
@@ -89,18 +98,24 @@ public class ProductShoppingService {
 
         List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productDetailCategoryPage.getContent().stream()
                 .flatMap(category -> category.getProductList().stream())
-                .map(product -> ProductShoppingResponse.SearchProductInformationDto.builder()
-                        .productId(product.getProductId())
-                        .productName(product.getProductName())
-                        .productDescription(product.getProductDescription())
-                        .productImage(product.getProductImage())
-                        .baseDiscountRate(product.getBaseDiscountRate())
-                        .regularDiscountRate(product.getRegularDiscountRate())
-                        .productPrice(product.getProductPrice())
-                        .calculatedBasePrice(product.getCalculatedBasePrice())
-                        .isRegularSale(product.getIsRegularSale().getCode())
-                        .build())
-                .collect(Collectors.toList());
+                .map(product -> {
+                    int reviewCount = productReviewRepository.countByProductId(product.getProductId());
+                    double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
+
+                    return ProductShoppingResponse.SearchProductInformationDto.builder()
+                            .productId(product.getProductId())
+                            .productName(product.getProductName())
+                            .productDescription(product.getProductDescription())
+                            .productImage(product.getProductImage())
+                            .baseDiscountRate(product.getBaseDiscountRate())
+                            .regularDiscountRate(product.getRegularDiscountRate())
+                            .productPrice(product.getProductPrice())
+                            .calculatedBasePrice(product.getCalculatedBasePrice())
+                            .isRegularSale(product.getIsRegularSale().getCode())
+                            .reviewCount(reviewCount)
+                            .averageScore(averageScore)
+                            .build();
+                }).collect(Collectors.toList());
 
         ProductDetailCategory productDetailCategory = productDetailCategoryPage.getContent().get(0);
 

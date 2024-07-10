@@ -45,5 +45,7 @@ public class ProductShoppingResponse {
         private int productPrice;
         private int calculatedBasePrice;
         private char isRegularSale;
+        private int reviewCount;
+        private double averageScore;
     }
 }
