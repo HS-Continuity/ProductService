@@ -24,6 +24,10 @@ public class ProductTimeSale {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "add_service_status_id", nullable = false)
+    private AddServiceStatus addServiceStatus;
+
     @Column(name = "start_datetime", nullable = false)
     private LocalDateTime startDatetime;
 
