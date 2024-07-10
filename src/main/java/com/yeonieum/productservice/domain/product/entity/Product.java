@@ -147,4 +147,10 @@ public class Product {
     public void changePersonalizedDiscountRate(int personalizedDiscountRate) {
         this.personalizedDiscountRate = personalizedDiscountRate;
     }
+    public void changeProductImage(String productImage) {
+        this.productImage = productImage;
+    }
+    public void setIsCertification(ActiveStatus isCertification) {
+        this.isCertification = isCertification;
+    }
 }

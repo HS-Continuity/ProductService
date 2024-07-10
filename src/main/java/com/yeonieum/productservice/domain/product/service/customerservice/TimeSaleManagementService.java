@@ -2,7 +2,8 @@ package com.yeonieum.productservice.domain.product.service.customerservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleResponse;
+import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveTimeSaleProductResponse;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimeSaleRequest;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimeSale;
@@ -11,15 +12,17 @@ import com.yeonieum.productservice.domain.product.repository.ProductTimeSaleRepo
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.messaging.message.TimeSaleEventMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TimeSaleService {
+public class TimeSaleManagementService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final ProductTimeSaleRepository productTimeSaleRepository;
@@ -31,15 +34,27 @@ public class TimeSaleService {
      * @return
      */
     @Transactional
-    public List<RetrieveTimeSaleProductResponseDto> retrieveTimeSaleProducts(Long customerId) {
+    public List<RetrieveTimeSaleResponse> retrieveTimeSaleProducts(Long customerId) {
         Customer customer =
                 customerRepository.findById(customerId).orElseThrow(
                         () -> new IllegalArgumentException("존재하지않는 고객 요청입니다.")
                 );
 
-        List<RetrieveTimeSaleProductResponseDto> productTimeSaleList = productRepository.findAllTimeSaleProduct(customerId);
+        List<RetrieveTimeSaleResponse> productTimeSaleList = productRepository.findAllTimeSaleByCustomerId(customerId);
         return productTimeSaleList;
     }
+
+    /**
+     * 등록타임세일 상세 조회
+     * @param
+     * @return
+     */
+    @Transactional
+    public RetrieveTimeSaleResponse retrieveCustomersTimeSale(Long timeSaleId) {
+        RetrieveTimeSaleResponse retrieveTimeSaleResponse = productTimeSaleRepository.findTimeSaleProduct(timeSaleId);
+        return retrieveTimeSaleResponse;
+    }
+
 
     /**
      * 고객의 타임세일 등록
@@ -81,4 +96,25 @@ public class TimeSaleService {
         productTimeSale.changeIsCompleted(modifyStatusDto.getIsCompleted());
     }
 
+
+    // 타임세일 중인 상품리스트 조회
+    @Transactional
+    public List<RetrieveTimeSaleProductResponse> retrieveTimeSaleProducts(Pageable pageable) {
+        List<RetrieveTimeSaleResponse> timeSaleList = productRepository.findAllTimeSaleProduct(pageable);
+        /**
+         * ==========================================================================================
+         *                       리뷰 레포지토리 주입받아서 리뷰 정보 조회 후 응답데이터 구성 예정
+         * ==========================================================================================
+         */
+
+        List<RetrieveTimeSaleProductResponse> timeSaleProductList = timeSaleList.stream().map(
+                timeSale -> RetrieveTimeSaleProductResponse.builder()
+                        .retrieveTimeSaleResponse(timeSale)
+                        .averageRating(4.5)
+                        .reviewCount(1000)
+                        .build())
+                .collect(Collectors.toList());
+
+        return timeSaleProductList;
+    }
 }
