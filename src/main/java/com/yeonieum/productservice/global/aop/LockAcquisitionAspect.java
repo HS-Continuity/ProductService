@@ -1,7 +1,9 @@
 package com.yeonieum.productservice.global.aop;
 
+import com.yeonieum.productservice.cache.redis.StockRedisSetOperation;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
+import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import com.yeonieum.productservice.global.lock.Lock;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -20,6 +22,9 @@ import java.lang.reflect.Method;
 public class LockAcquisitionAspect {
 
     private final RedissonClient redissonClient;
+    private final StockSystemService stockSystemService;
+    private final StockRedisSetOperation stockRedisSetOperation;
+
 
     @Around("@annotation(com.yeonieum.productservice.global.lock.Lock)")
     public Object distributionLock(final ProceedingJoinPoint joinPoint) throws Throwable {
@@ -27,11 +32,21 @@ public class LockAcquisitionAspect {
         Method method = signature.getMethod();
         Lock lock = method.getAnnotation(Lock.class);
 
-        String key_prefix = lock.keyPrefix();
-        //Long productId = increaseStockUsageDto.getProductId();
-        AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto = (AvailableProductInventoryRequest.IncreaseStockUsageDto) joinPoint.getArgs()[0];
 
-        String key = "stockusage:" + 50;
+        AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto =
+                (AvailableProductInventoryRequest.IncreaseStockUsageDto) joinPoint.getArgs()[0];
+        String keyPrefix = lock.keyPrefix();
+        Long productId = increaseStockUsageDto.getProductId();
+
+        int stockUsageCount = stockRedisSetOperation.totalStockUsageCount(increaseStockUsageDto.getProductId());
+        int stock = stockSystemService.retrieveProductStockAmount(increaseStockUsageDto.getProductId());
+
+        if(stock < stockUsageCount + increaseStockUsageDto.getQuantity()) {
+            return failResponse(increaseStockUsageDto);
+        }
+
+
+        String key = keyPrefix + productId;
         RLock rLock = redissonClient.getLock(key);
         String lockName = rLock.getName();
         try {
@@ -41,24 +56,25 @@ public class LockAcquisitionAspect {
                             lock.leaseTime(),
                             lock.timeUnit());
             if (!available) {
-                System.out.println("락획득실패");
-
                 return failResponse(increaseStockUsageDto);
             }
-            System.out.println("락성공");
             return joinPoint.proceed();
         } catch (InterruptedException e) {
+
             e.printStackTrace();
-            System.out.println("인터럽션");
             return failResponse(increaseStockUsageDto);
-        } finally {
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        } finally{
             try {
-                System.out.println("락해제");
+
                 rLock.unlock();
             } catch (IllegalMonitorStateException e) {
-                System.out.println("이미 해제됨");
+
                 e.printStackTrace();
             }
+            return null;
         }
     }
 

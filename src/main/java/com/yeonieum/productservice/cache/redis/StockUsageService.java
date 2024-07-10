@@ -12,7 +12,7 @@ public class StockUsageService {
     private final StockRedisSetOperation stockRedisSetOperation;
 
     public void test(int available, Long productId, Long orderId, int quantity) {
-        if (available > stockRedisSetOperation.totalStockUsageCount(productId)) {
+        if (available >= stockRedisSetOperation.totalStockUsageCount(productId) + quantity) {
             stockRedisSetOperation.addStockUsage(new StockUsageDto(productId, orderId, quantity));
         }
     }
@@ -48,7 +48,7 @@ public class StockUsageService {
             totalStockUsageCount = 0;
         }
 
-        if (available > totalStockUsageCount) {
+        if (available >= totalStockUsageCount + stockUsageDto.getQuantity()) {
             stockRedisSetOperation.addStockUsage(stockUsageDto);
             return true;
         } else {

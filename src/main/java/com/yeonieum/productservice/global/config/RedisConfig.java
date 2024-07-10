@@ -13,6 +13,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -29,12 +30,20 @@ public class RedisConfig {
     @Value("${spring.redis.password}")
     private String password;
 
+    @Value("${spring.redisson.server}")
+    private String redissonServer;
+
+    @Value("${spring.redisson.password}")
+    private String redissonPassword;
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        //redisTemplate.setDefaultSerializer(RedisSerializer.string());
+
         return redisTemplate;
     }
 
@@ -50,8 +59,8 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://" + hostname + ":" + port)
-                .setPassword(password); // 비밀번호 설정 (클라우드 환경에 따라 필요)
+                .setAddress(redissonServer)
+                .setPassword(redissonPassword); // 비밀번호 설정 (클라우드 환경에 따라 필요)
 
         return Redisson.create(config);
     }

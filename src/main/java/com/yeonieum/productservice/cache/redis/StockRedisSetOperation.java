@@ -3,7 +3,6 @@ package com.yeonieum.productservice.cache.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.ShippedStockDto;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
 import com.yeonieum.productservice.domain.productinventory.entity.ShippedStock;
@@ -11,25 +10,25 @@ import com.yeonieum.productservice.domain.productinventory.entity.StockUsage;
 import com.yeonieum.productservice.domain.productinventory.repository.ShippedStockRepository;
 import com.yeonieum.productservice.domain.productinventory.repository.StockUsageRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 캐시 기본전략 : write through
  */
-@Component
+@Service
 @RequiredArgsConstructor
 public class StockRedisSetOperation {
     private final static String STOCK_USAGE_KEY = "stockusage:";
@@ -40,22 +39,25 @@ public class StockRedisSetOperation {
 
     private final ObjectMapper objectMapper;
 
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Set<Object> getProductStock(Long productId) throws JsonProcessingException {
         // Redis에서 조회
-        String key = "stockusage:50";
-        Set<Object> productStockSet = redisTemplate.opsForSet().members("stockusage:50");
+        String key = getStockUsageKey(productId);
+
+        Set<Object> productStockSet = redisTemplate.opsForSet().members(key);
         productStockSet.size();
         if (productStockSet == null || productStockSet.size() == 0) {
-            productStockSet = new HashSet<>();
+
             List<StockUsageDto> stockUsageList = stockUsageRepository.findShippedStockByProductId(productId);
             LocalDateTime shippedTime = LocalDateTime.now().withHour(14);
             List<StockUsageDto> shippedStockDtoList = shippedStockRepository.findShippedStockBeforeTodayShippedTime(productId, shippedTime);
 
             productStockSet = new HashSet<>(stockUsageList);
             productStockSet.removeAll(shippedStockDtoList);
+
             for(Object stockUsageDto : productStockSet) {
-                redisTemplate.opsForSet().add(key, (StockUsageDto) stockUsageDto);
+
+                redisTemplate.opsForSet().add(key, objectMapper.writeValueAsString(stockUsageDto));
                 LocalDateTime tomorrow14 = LocalDateTime.now().plusDays(1).withHour(14);
                 long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();
                 redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
@@ -72,20 +74,15 @@ public class StockRedisSetOperation {
         Set<Object> shippedStockSet = redisTemplate.opsForSet().members(key);
 
         if (shippedStockSet == null) {
-            shippedStockSet = new HashSet<>();
             LocalDateTime shippedTime = LocalDateTime.now().withHour(14);
             getShippedStock(productId);
             List<ShippedStockDto> shippedStockList = shippedStockRepository.findShippedStockAfterTodayShippedTime(productId, shippedTime);
             // 캐시에서 조회로 변경해야함
 
-
             shippedStockSet = new HashSet<>(shippedStockList);
             for(Object shippedStockDto : shippedStockSet) {
-                redisTemplate.opsForValue().set(key, shippedStockDto);
-                LocalDateTime tomorrow14 = LocalDateTime.now().plusDays(1).withHour(14);
-                long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();
 
-                redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
+                redisTemplate.opsForSet().add(key, shippedStockDto);
             }
         }
         return shippedStockSet;
@@ -145,10 +142,12 @@ public class StockRedisSetOperation {
     public void addStockUsage(StockUsageDto stockUsageDto) {
         StockUsage stockUsage = null;
         try {
-            SetOperations<String, Object> setOps = redisTemplate.opsForSet();
             String key = getStockUsageKey(stockUsageDto.getProductId());
-            Long result = setOps.add(key, stockUsageDto);
-            System.out.println("결과 : " + result);
+            Long result = redisTemplate.opsForSet().add(key, objectMapper.writeValueAsString(stockUsageDto));
+
+            LocalDateTime tomorrow14 = LocalDateTime.now().plusSeconds(60);
+            long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();
+            redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
             stockUsage = StockUsage.builder()
                     .productId(stockUsageDto.getProductId())
                     .orderId(stockUsageDto.getOrderId())
@@ -224,8 +223,8 @@ public class StockRedisSetOperation {
             return orderPendingAmount;
         }catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-       return 0;
     }
 
 

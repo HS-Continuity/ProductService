@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
 @Builder
-@RedisHash("shippedstock")
-public class ShippedStockDto {
+public class ShippedStockDto implements Serializable {
     private Long productId;
     private Long orderId;
     private int quantity;
