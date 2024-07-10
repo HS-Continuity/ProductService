@@ -84,17 +84,16 @@ public class ProductShoppingService {
     @Transactional
     public ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts(Long productDetailCategoryId, ActiveStatus isCertification, Pageable pageable) {
 
-        ProductDetailCategory checkDetailCategoryId = productDetailCategoryRepository.findById(productDetailCategoryId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 상세 카테고리 ID 입니다."));
+       ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
+               .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 상세 카테고리 ID 입니다."));
 
-        Page<ProductDetailCategory> productDetailCategoryPage = productDetailCategoryRepository.findByIdWithProducts(productDetailCategoryId, isCertification, pageable);
+        Page<Product> productsPage = productRepository.findActiveProductsByDetailCategoryId(productDetailCategoryId, isCertification, pageable);
 
-        if (productDetailCategoryPage.isEmpty()) {
+        if (productsPage.isEmpty()) {
             throw new IllegalArgumentException("해당 상세 카테고리에 내의 상품이 없습니다.");
         }
 
-        List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productDetailCategoryPage.getContent().stream()
-                .flatMap(category -> category.getProductList().stream())
+        List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productsPage.getContent().stream()
                 .map(product -> {
                     int reviewCount = productReviewRepository.countByProductId(product.getProductId());
                     double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
@@ -114,18 +113,17 @@ public class ProductShoppingService {
                             .build();
                 }).collect(Collectors.toList());
 
-        ProductDetailCategory productDetailCategory = productDetailCategoryPage.getContent().get(0);
-
         return ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto.builder()
                 .productDetailCategoryId(productDetailCategoryId)
                 .detailCategoryName(productDetailCategory.getDetailCategoryName())
                 .shelfLifeDay(productDetailCategory.getShelfLifeDay())
                 .searchProductInformationDtoList(productInformationDtoList)
-                .totalItems((int) productDetailCategoryPage.getTotalElements())
-                .totalPages(productDetailCategoryPage.getTotalPages())
-                .lastPage(productDetailCategoryPage.isLast())
+                .totalItems((int) productsPage.getTotalElements())
+                .totalPages(productsPage.getTotalPages())
+                .lastPage(productsPage.isLast())
                 .build();
     }
+
 
     /**
      * 상세 상품 조회

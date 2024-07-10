@@ -57,8 +57,11 @@ public class ProductShoppingController {
     public ResponseEntity<ApiResponse> retrieveDetailCategoryWithProducts(@PathVariable Long detailCategoryId,
                                                                           @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
                                                                           @RequestParam(defaultValue = "0") int startPage,
-                                                                          @RequestParam(defaultValue = "10") int pageSize) {
-        Pageable pageable = PageRequest.of(startPage, pageSize);
+                                                                          @RequestParam(defaultValue = "10") int pageSize,
+                                                                          @RequestParam(defaultValue = "productName") String sort,
+                                                                          @RequestParam(defaultValue = "asc") String direction) {
+
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts =
                 productShoppingService.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
@@ -68,6 +71,7 @@ public class ProductShoppingController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
 
     @Operation(summary = "상세 상품 조회", description = "선택한 상품의 정보를 조회하는 기능입니다.")
     @ApiResponses({
