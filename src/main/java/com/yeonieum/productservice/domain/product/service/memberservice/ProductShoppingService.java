@@ -7,7 +7,6 @@ import com.yeonieum.productservice.domain.category.repository.ProductDetailCateg
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
-import com.yeonieum.productservice.domain.review.entity.ProductReview;
 import com.yeonieum.productservice.domain.review.repository.ProductReviewRepository;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.transaction.Transactional;
@@ -74,8 +73,6 @@ public class ProductShoppingService {
                 .lastPage(productsPage.isLast())
                 .build();
     }
-
-
 
     /**
      * 상세 카테고리 조회시, 해당 카테고리의 상품 조회
@@ -163,6 +160,44 @@ public class ProductShoppingService {
                 .averageScore(averageScore)
                 .build();
     }
-}
 
+    /**
+     * 키워드로 상품 조회
+     * @param keyword 상품 키워드(이름)
+     * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
+     * @return 상품의 정보
+     */
+    @Transactional
+    public ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProductsDto(String keyword, Pageable pageable){
+
+        Page<Product> productsPage = productRepository.findByProductNameContainingAndIsActive(keyword, pageable);
+
+        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
+            int reviewCount = productReviewRepository.countByProductId(product.getProductId());
+            double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
+
+            return ProductShoppingResponse.SearchProductInformationDto.builder()
+                    .productId(product.getProductId())
+                    .productName(product.getProductName())
+                    .productDescription(product.getProductDescription())
+                    .productImage(product.getProductImage())
+                    .baseDiscountRate(product.getBaseDiscountRate())
+                    .regularDiscountRate(product.getRegularDiscountRate())
+                    .productPrice(product.getProductPrice())
+                    .calculatedBasePrice(product.getCalculatedBasePrice())
+                    .isRegularSale(product.getIsRegularSale().getCode())
+                    .reviewCount(reviewCount)
+                    .averageScore(averageScore)
+                    .build();
+        }).collect(Collectors.toList());
+
+        return ProductShoppingResponse.RetrieveKeywordWithProductsDto.builder()
+                .totalItems((int) productsPage.getTotalElements())
+                .totalPages(productsPage.getTotalPages())
+                .lastPage(productsPage.isLast())
+                .searchProductInformationDtoList(searchProductInformationDtoList)
+                .build();
+
+    }
+}
 

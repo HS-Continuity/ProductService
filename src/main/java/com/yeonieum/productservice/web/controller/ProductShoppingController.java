@@ -80,4 +80,24 @@ public class ProductShoppingController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    @Operation(summary = "키워드로 상품 조회", description = "입력한 키워드를 가진 상품을 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "키워드 상품 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "키워드 상품 조회 실패")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> retrieveSearchKeywordProduct(@RequestParam("keyword") String keyword,
+                                                                    @RequestParam(defaultValue = "0") int startPage,
+                                                                    @RequestParam(defaultValue = "10") int pageSize) {
+
+        Pageable pageable = PageRequest.of(startPage, pageSize);
+
+        ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword,pageable);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(retrieveKeywordWithProducts)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }
