@@ -7,6 +7,7 @@ public class AvailableProductInventoryResponse {
     Long orderId;
     Long productId;
     int quantity;
+    @Builder.Default
     boolean isAvailableOrder = false;
 
 

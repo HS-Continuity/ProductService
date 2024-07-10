@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductInventoryRepository extends JpaRepository<ProductInventory, Long> {
     @Query(value = "SELECT" +
@@ -21,6 +22,6 @@ public interface ProductInventoryRepository extends JpaRepository<ProductInvento
     List<RetrieveProductInventoryResponse> findAllbyProductId(@Param("productId") Long productId , Pageable pageable);
 
     @Query(value = "SELECT SUM(pi.quantity) FROM product_inventory pi WHERE pi.product_id = :productId AND pi.expiration_date > :expirationDate", nativeQuery = true)
-    int findAvailableInventoryQuantityByProductIdAndExpirationDate(@Param("productId") Long productId, @Param("expirationDate") LocalDate expirationDate);
+    Optional<Integer> findAvailableInventoryQuantityByProductIdAndExpirationDate(@Param("productId") Long productId, @Param("expirationDate") LocalDate expirationDate);
 
 }
