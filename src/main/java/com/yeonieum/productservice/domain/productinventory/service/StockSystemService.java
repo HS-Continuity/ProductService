@@ -37,35 +37,36 @@ public class StockSystemService {
     @Lock(keyPrefix = "stockusage:", leaseTime = 1)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AvailableProductInventoryResponse processProductInventory(AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto) {
-            // [STEP1] [받아온 주문서의 상품들을 기준으로 구매가 가능한지 체크하고, 가능하다면 재고사용량을 증가시킨다.]
-            Long productId = increaseStockUsageDto.getProductId();
-            Long orderId = increaseStockUsageDto.getOrderId();
-            int quantity = increaseStockUsageDto.getQuantity();
+        // [STEP1] [받아온 주문서의 상품들을 기준으로 구매가 가능한지 체크하고, 가능하다면 재고사용량을 증가시킨다.]
+        Long productId = increaseStockUsageDto.getProductId();
+        Long orderId = increaseStockUsageDto.getOrderId();
+        int quantity = increaseStockUsageDto.getQuantity();
 
-            //[STEP2] [응답객체에 주문서 상 상품에 대한 주문 가능여부를 담는다. -> 주문서비스는 주문 가능여부를 바탕으로 경합상황에서 주문서를 안전하게 생성할 수 있다.]
-            AvailableProductInventoryResponse availableProductInventoryResponse = AvailableProductInventoryResponse.builder()
-                                                            .productId(productId)
-                                                            .orderId(orderId)
-                                                            .quantity(quantity)
-                                                            .build();
+        System.out.println(productId + " " + orderId + " " + quantity);
+
+        //[STEP2] [응답객체에 주문서 상 상품에 대한 주문 가능여부를 담는다. -> 주문서비스는 주문 가능여부를 바탕으로 경합상황에서 주문서를 안전하게 생성할 수 있다.]
+        AvailableProductInventoryResponse availableProductInventoryResponse = AvailableProductInventoryResponse.builder()
+                                                        .productId(productId)
+                                                        .orderId(orderId)
+                                                        .quantity(quantity)
+                                                        .build();
 
 
-            //[STEP3] [주문가능 여부 로직 체크 : 총 출고 가능량 과 재고 사용량 비교 -> 주문가능여부 반환]
-            int availableStockAmount = retrieveProductStockAmount(productId);
-            boolean available = stockUsageService.increaseStockUsage(new StockUsageDto(productId, orderId, quantity), availableStockAmount);
-            //[STEP4] [주문이 가능할 경우 재고사용량을 증가시키고, 주문가능여부 true로 설정한 응답객체 리스트에 추가]
-            StockUsageDto stockUsageDto = StockUsageDto.builder()
-                            .productId(increaseStockUsageDto.getProductId())
-                            .orderId(increaseStockUsageDto.getOrderId())
-                            .quantity(increaseStockUsageDto.getQuantity())
-                            .build();
-
-            if(available) {
-                availableProductInventoryResponse.changeIsAvailableOrder(true);
-            }
-
-            return availableProductInventoryResponse;
+        //[STEP3] [주문가능 여부 로직 체크 : 총 출고 가능량 과 재고 사용량 비교 -> 주문가능여부 반환]
+        int availableStockAmount = retrieveProductStockAmount(productId);
+        boolean available = stockUsageService.increaseStockUsage(new StockUsageDto(productId, orderId, quantity), availableStockAmount);
+        //[STEP4] [주문이 가능할 경우 재고사용량을 증가시키고, 주문가능여부 true로 설정한 응답객체 리스트에 추가]
+        StockUsageDto stockUsageDto = StockUsageDto.builder()
+                        .productId(increaseStockUsageDto.getProductId())
+                        .orderId(increaseStockUsageDto.getOrderId())
+                        .quantity(increaseStockUsageDto.getQuantity())
+                        .build();
+        if(available) {
+            availableProductInventoryResponse.changeIsAvailableOrder(true);
         }
+
+        return availableProductInventoryResponse;
+    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean checkAvailableOrderProduct(Long productId) {
