@@ -1,7 +1,9 @@
 package com.yeonieum.productservice.cache.redis;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.ShippedStockDto;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
 import com.yeonieum.productservice.domain.productinventory.entity.ShippedStock;
@@ -9,9 +11,12 @@ import com.yeonieum.productservice.domain.productinventory.entity.StockUsage;
 import com.yeonieum.productservice.domain.productinventory.repository.ShippedStockRepository;
 import com.yeonieum.productservice.domain.productinventory.repository.StockUsageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
@@ -24,29 +29,24 @@ import java.util.concurrent.TimeUnit;
 /**
  * 캐시 기본전략 : write through
  */
-//@Component
+@Component
 @RequiredArgsConstructor
 public class StockRedisSetOperation {
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final static String STOCK_USAGE_KEY = "stockusage:";
+    private final static String SHIPPED_STOCK_KEY = "shippedstock:";
     private final StockUsageRepository stockUsageRepository;
     private final ShippedStockRepository shippedStockRepository;
-    private final String STOCK_USAGE_KEY = "stockusage:";
-    private final String SHIPPED_STOCK_KEY = "shippedstock:";
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private final ObjectMapper objectMapper;
 
 
-
-    public void test(int available, Long productId, Long orderId, int quantity) {
-        if (available > totalStockUsageCount(redisTemplate, productId)) {
-            addStockUsage(redisTemplate, new StockUsageDto(productId, orderId, quantity));
-        }
-    }
-
-    public Set<Object> getProductStock(Long productId) {
+    public Set<Object> getProductStock(Long productId) throws JsonProcessingException {
         // Redis에서 조회
-        String key = getStockUsageKey(productId);
-        Set<Object> productStockSet = redisTemplate.opsForSet().members(key);
-
-        if (productStockSet == null) {
+        String key = "stockusage:50";
+        Set<Object> productStockSet = redisTemplate.opsForSet().members("stockusage:50");
+        productStockSet.size();
+        if (productStockSet == null || productStockSet.size() == 0) {
             productStockSet = new HashSet<>();
             List<StockUsageDto> stockUsageList = stockUsageRepository.findShippedStockByProductId(productId);
             LocalDateTime shippedTime = LocalDateTime.now().withHour(14);
@@ -54,9 +54,8 @@ public class StockRedisSetOperation {
 
             productStockSet = new HashSet<>(stockUsageList);
             productStockSet.removeAll(shippedStockDtoList);
-
             for(Object stockUsageDto : productStockSet) {
-                redisTemplate.opsForValue().set(key, stockUsageDto);
+                redisTemplate.opsForSet().add(key, (StockUsageDto) stockUsageDto);
                 LocalDateTime tomorrow14 = LocalDateTime.now().plusDays(1).withHour(14);
                 long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();
                 redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
@@ -95,14 +94,14 @@ public class StockRedisSetOperation {
 
     /**
      * ShippedStock SADD연산
-     * @param redisOperations
+     *
      * @param shippedStockDto
      */
     @Transactional(rollbackFor = {Exception.class})
-    public void addShippedStock(RedisOperations<String, Object> redisOperations, ShippedStockDto shippedStockDto) {
+    public void addShippedStock(ShippedStockDto shippedStockDto) {
         ShippedStock savedEntity = null;
         try {
-            SetOperations<String, Object> setOps = redisOperations.opsForSet();
+            SetOperations<String, Object> setOps = redisTemplate.opsForSet();
             String key = getShippedStockKey(shippedStockDto.getProductId());
             setOps.add(key, shippedStockDto);
 
@@ -117,7 +116,7 @@ public class StockRedisSetOperation {
             // 캐시 삭제 및 데이터 삭제 + 메시지발행
             if(savedEntity != null) {
                 shippedStockRepository.deleteById(savedEntity.getOrderId());
-                removeShippedStock(redisOperations, shippedStockDto);
+                removeShippedStock(shippedStockDto);
                 // 메시지 발행
             }
         }
@@ -125,12 +124,12 @@ public class StockRedisSetOperation {
 
     /**
      * ShippedStock SREM 연산
-     * @param redisOperations
+     *
      * @param shippedStockDto
      * @return
      */
-    public Long removeShippedStock(RedisOperations<String, Object> redisOperations, ShippedStockDto shippedStockDto) {
-        SetOperations<String, Object> setOps = redisOperations.opsForSet();
+    public Long removeShippedStock(ShippedStockDto shippedStockDto) {
+        SetOperations<String, Object> setOps = redisTemplate.opsForSet();
         String key = getShippedStockKey(shippedStockDto.getProductId());
         Long popCnt = setOps.remove(key, shippedStockDto);
         return popCnt;
@@ -139,17 +138,17 @@ public class StockRedisSetOperation {
 
     /**
      * StockUsage SADD 연산
-     * @param redisOperations
+     *
      * @param stockUsageDto
      */
     @Transactional(rollbackFor = {Exception.class})
-    public void addStockUsage(RedisOperations<String, Object> redisOperations, StockUsageDto stockUsageDto) {
+    public void addStockUsage(StockUsageDto stockUsageDto) {
         StockUsage stockUsage = null;
         try {
-            SetOperations<String, Object> setOps = redisOperations.opsForSet();
+            SetOperations<String, Object> setOps = redisTemplate.opsForSet();
             String key = getStockUsageKey(stockUsageDto.getProductId());
-            setOps.add(key, stockUsageDto);
-
+            Long result = setOps.add(key, stockUsageDto);
+            System.out.println("결과 : " + result);
             stockUsage = StockUsage.builder()
                     .productId(stockUsageDto.getProductId())
                     .orderId(stockUsageDto.getOrderId())
@@ -161,20 +160,20 @@ public class StockRedisSetOperation {
             if(stockUsage != null) {
                 stockUsageRepository.deleteById(stockUsage.getOrderId());
             }
-            removeStockUsageOnlyForRedis(redisOperations, stockUsageDto);
+            removeStockUsageOnlyForRedis(stockUsageDto);
         }
     }
 
     /**
      * StockUsage SREM 연산
-     * @param redisOperations
+     *
      * @param stockUsageDto
      * @return
      */
     @Transactional(rollbackFor = {Exception.class})
-    public Long removeStockUsage(RedisOperations<String, Object> redisOperations, StockUsageDto stockUsageDto) {
+    public Long removeStockUsage(StockUsageDto stockUsageDto) {
         try {
-            SetOperations<String, Object> setOps = redisOperations.opsForSet();
+            SetOperations<String, Object> setOps = redisTemplate.opsForSet();
             String key = getStockUsageKey(stockUsageDto.getProductId());
             Long popCnt = setOps.remove(key, stockUsageDto);
 
@@ -192,12 +191,12 @@ public class StockRedisSetOperation {
 
     /**
      * StockUsage SREM 연산
-     * @param redisOperations
+     *
      * @param stockUsageDto
      * @return
      */
-    public Long removeStockUsageOnlyForRedis(RedisOperations<String, Object> redisOperations, StockUsageDto stockUsageDto) {
-        SetOperations<String, Object> setOps = redisOperations.opsForSet();
+    public Long removeStockUsageOnlyForRedis(StockUsageDto stockUsageDto) {
+        SetOperations<String, Object> setOps = redisTemplate.opsForSet();
         String key = getStockUsageKey(stockUsageDto.getProductId());
         Long popCnt = setOps.remove(key, stockUsageDto);
         // 레포지토리 저장하기
@@ -206,22 +205,30 @@ public class StockRedisSetOperation {
 
     /**
      * StockUsage 총 사용량 반환
-     * @param redisOperations
+     *
      * @param productId
      * @return
      */
-    public Integer totalStockUsageCount(RedisOperations<String, Object> redisOperations, Long productId) {
-        SetOperations<String, Object> setOps = redisOperations.opsForSet();
-        int orderPendingAmount = 0;
-        String key = getStockUsageKey(productId);
+    public Integer totalStockUsageCount(Long productId) {
+        try {
+            getProductStock(productId);
+            SetOperations<String, Object> setOps = redisTemplate.opsForSet();
+            int orderPendingAmount = 0;
+            String key = getStockUsageKey(productId);
 
-        for (Object stock : setOps.members(key)) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            StockUsageDto stockUsageDto = objectMapper.convertValue(stock, StockUsageDto.class);
-            orderPendingAmount += stockUsageDto.getQuantity();
+            for (Object stock : setOps.members(key)) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                StockUsageDto stockUsageDto = objectMapper.convertValue(stock, StockUsageDto.class);
+                orderPendingAmount += stockUsageDto.getQuantity();
+            }
+            return orderPendingAmount;
+        }catch (Exception e) {
+            e.printStackTrace();
         }
-        return orderPendingAmount;
+       return 0;
     }
+
+
 
     public String getStockUsageKey(Long productId) {
         return STOCK_USAGE_KEY + "" + productId;
