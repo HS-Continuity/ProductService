@@ -59,7 +59,7 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 조회 실패")
     })
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse> retrieveProductReviewList(@PathVariable Long productId) {
+    public ResponseEntity<ApiResponse> retrieveProductReviews(@PathVariable Long productId) {
 
         List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviews = productReviewService.retrieveProductWithReviews(productId);
 

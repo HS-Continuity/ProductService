@@ -3,10 +3,12 @@ package com.yeonieum.productservice.domain.product.repository;
 import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveAdvertisementProductResponseDto;
 import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.yeonieum.productservice.global.enums.ActiveStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +44,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p " +
             "JOIN FETCH p.productDetailCategory pdc " +
             "JOIN FETCH pdc.productCategory pc " +
-            "WHERE pc.productCategoryId = :categoryId")
-    List<Product> findProductsByCategory(@Param("categoryId") Long categoryId);
+            "WHERE pc.productCategoryId = :categoryId " +
+            "AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE " +
+            "AND (:isCertification IS NULL OR p.isCertification = :isCertification)")
+    Page<Product> findActiveProductsByCategory(@Param("categoryId") Long categoryId, @Param("isCertification") ActiveStatus isCertification, Pageable pageable);
+
 }
