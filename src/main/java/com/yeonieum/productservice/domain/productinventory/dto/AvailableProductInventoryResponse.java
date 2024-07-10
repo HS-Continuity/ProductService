@@ -7,7 +7,7 @@ public class AvailableProductInventoryResponse {
     Long orderId;
     Long productId;
     int quantity;
-    boolean isAvailableOrder;
+    boolean isAvailableOrder = false;
 
 
     public void changeIsAvailableOrder(boolean status){
