@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShopp
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.global.paging.PageableUtil;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,11 +90,13 @@ public class ProductShoppingController {
     @GetMapping("/search")
     public ResponseEntity<ApiResponse> retrieveSearchKeywordProduct(@RequestParam("keyword") String keyword,
                                                                     @RequestParam(defaultValue = "0") int startPage,
-                                                                    @RequestParam(defaultValue = "10") int pageSize) {
+                                                                    @RequestParam(defaultValue = "10") int pageSize,
+                                                                    @RequestParam(defaultValue = "productName") String sort,
+                                                                    @RequestParam(defaultValue = "asc") String direction) {
 
-        Pageable pageable = PageRequest.of(startPage, pageSize);
-
-        ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword,pageable);
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
+        ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts =
+                productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveKeywordWithProducts)

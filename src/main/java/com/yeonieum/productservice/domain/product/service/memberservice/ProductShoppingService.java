@@ -164,8 +164,7 @@ public class ProductShoppingService {
     /**
      * 키워드로 상품 조회
      * @param keyword 상품 키워드(이름)
-     * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
-     * @return 상품의 정보
+     * @return 해당 키워드의 상품들 정보
      */
     @Transactional
     public ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProductsDto(String keyword, Pageable pageable){
