@@ -23,7 +23,7 @@ public class ProductInventory {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "warehousing _date", nullable = false)
+    @Column(name = "warehousing_date", nullable = false)
     private LocalDate warehouseDate;
 
     @Column(name = "quantity", nullable = false)
