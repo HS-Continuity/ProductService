@@ -3,6 +3,7 @@ package com.yeonieum.productservice.web.controller;
 import com.yeonieum.productservice.domain.cart.dto.CartProductRequest;
 import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.cart.service.CartProductService;
+import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingFacade;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import java.util.List;
 public class CartController {
 
     private final CartProductService cartProductService;
+    private final ProductShoppingFacade productShoppingFacade;
 
     @Operation(summary = "장바구니 상품 등록", description = "회원의 장바구니에 상품을 등록하는 기능입니다.")
     @ApiResponses({
@@ -47,7 +49,7 @@ public class CartController {
             @RequestParam("memberId") String memberId,
             @RequestParam("cartTypeId") Long cartTypeId) {
 
-        List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts = cartProductService.retrieveAllCartProducts(memberId, cartTypeId);
+        List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts = productShoppingFacade.retrieveAllCartProducts(memberId, cartTypeId);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveAllCartProducts)
                 .successCode(SuccessCode.SELECT_SUCCESS)

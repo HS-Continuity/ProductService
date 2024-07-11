@@ -18,5 +18,13 @@ public class CartProductResponse {
         private String productImage;
         private int productPrice;
         private int quantity;
+        @Builder.Default
+        private boolean isSoldOut = false;
+
+        public void changeIsSoldOut(boolean isSoldOut){
+            this.isSoldOut = isSoldOut;
+        }
     }
+
+
 }

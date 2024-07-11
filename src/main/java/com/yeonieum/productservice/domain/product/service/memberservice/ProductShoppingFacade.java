@@ -1,5 +1,7 @@
 package com.yeonieum.productservice.domain.product.service.memberservice;
 
+import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
+import com.yeonieum.productservice.domain.cart.service.CartProductService;
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
@@ -15,6 +17,7 @@ public class ProductShoppingFacade {
 
     private final StockSystemService stockSystemService;
     private final ProductShoppingService productShoppingService;
+    private final CartProductService cartProductService;
 
     /**
      * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
@@ -89,5 +92,23 @@ public class ProductShoppingFacade {
             searchProductInformationDto.changeIsSoldOut(!isSoldOut);
         }
         return retrieveCustomerWithProducts;
+    }
+
+    /**
+     * 장바구니 상품 조회
+     * @param memberId 회원 ID
+     * @param cartTypeId 장바구니 타입 ID
+     * @return 장바구니 상품 정보
+     */
+    public List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
+
+        List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts = cartProductService.retrieveAllCartProducts(memberId, cartTypeId);
+
+        for(CartProductResponse.RetrieveAllCartProduct cartProduct : retrieveAllCartProducts) {
+            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(cartProduct.getProductId());
+            cartProduct.changeIsSoldOut(!isSoldOut);
+        }
+
+        return retrieveAllCartProducts;
     }
 }

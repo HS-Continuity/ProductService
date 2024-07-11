@@ -83,8 +83,6 @@ public class CartProductService {
 
             int finalPrice;
 
-            //품절인 경우 로직 추가
-
             if(cartTypeId == 1){
                 finalPrice = product.getCalculatedBasePrice();
             } else if (cartTypeId == 2) {
