@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShopp
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.global.paging.PageableUtil;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,8 +32,11 @@ public class ProductShoppingController {
     public ResponseEntity<ApiResponse> retrieveCategoryWithProducts(@PathVariable Long categoryId,
                                                                     @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
                                                                     @RequestParam(defaultValue = "0") int startPage,
-                                                                    @RequestParam(defaultValue = "10") int pageSize) {
-        Pageable pageable = PageRequest.of(startPage, pageSize);
+                                                                    @RequestParam(defaultValue = "10") int pageSize,
+                                                                    @RequestParam(defaultValue = "productName") String sort,
+                                                                    @RequestParam(defaultValue = "asc") String direction) {
+
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts =
                 productShoppingService.retrieveCategoryWithProducts(categoryId, isCertification, pageable);
@@ -53,8 +57,11 @@ public class ProductShoppingController {
     public ResponseEntity<ApiResponse> retrieveDetailCategoryWithProducts(@PathVariable Long detailCategoryId,
                                                                           @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
                                                                           @RequestParam(defaultValue = "0") int startPage,
-                                                                          @RequestParam(defaultValue = "10") int pageSize) {
-        Pageable pageable = PageRequest.of(startPage, pageSize);
+                                                                          @RequestParam(defaultValue = "10") int pageSize,
+                                                                          @RequestParam(defaultValue = "productName") String sort,
+                                                                          @RequestParam(defaultValue = "asc") String direction) {
+
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts =
                 productShoppingService.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
@@ -64,6 +71,7 @@ public class ProductShoppingController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
 
     @Operation(summary = "상세 상품 조회", description = "선택한 상품의 정보를 조회하는 기능입니다.")
     @ApiResponses({
@@ -77,6 +85,29 @@ public class ProductShoppingController {
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(detailProductInformation)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "키워드로 상품 조회", description = "입력한 키워드를 가진 상품을 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "키워드 상품 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "키워드 상품 조회 실패")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> retrieveSearchKeywordProduct(@RequestParam("keyword") String keyword,
+                                                                    @RequestParam(defaultValue = "0") int startPage,
+                                                                    @RequestParam(defaultValue = "10") int pageSize,
+                                                                    @RequestParam(defaultValue = "productName") String sort,
+                                                                    @RequestParam(defaultValue = "asc") String direction) {
+
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
+
+        ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts =
+                productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(retrieveKeywordWithProducts)
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }

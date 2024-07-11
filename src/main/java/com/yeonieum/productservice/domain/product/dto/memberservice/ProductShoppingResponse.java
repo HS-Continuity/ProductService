@@ -34,6 +34,16 @@ public class ProductShoppingResponse {
 
     @Getter
     @Builder
+    public static class RetrieveKeywordWithProductsDto {
+
+        private int totalItems;
+        private int totalPages;
+        private boolean lastPage;
+        private List<SearchProductInformationDto> searchProductInformationDtoList;
+    }
+
+    @Getter
+    @Builder
     public static class SearchProductInformationDto {
 
         private Long productId;
