@@ -54,10 +54,21 @@ public class ProductShoppingFacade {
         return retrieveDetailCategoryWithProducts;
     }
 
+    /**
+     * 키워드로 상품 조회
+     * @param keyword 상품 키워드(이름)
+     * @param pageable 페이징 정보
+     * @return 해당 키워드의 상품들 정보
+     */
+    public ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts(String keyword, Pageable pageable) {
 
+        ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
+        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveKeywordWithProducts.getSearchProductInformationDtoList();
 
-
-
-
-
+        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
+            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+        }
+        return retrieveKeywordWithProducts;
+    }
 }

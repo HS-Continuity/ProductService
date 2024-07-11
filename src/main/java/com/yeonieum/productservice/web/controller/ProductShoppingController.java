@@ -83,7 +83,8 @@ public class ProductShoppingController {
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
 
-        ProductShoppingResponse.DetailProductInformationDto detailProductInformation = productShoppingService.detailProductInformationDto(productId);
+        ProductShoppingResponse.DetailProductInformationDto detailProductInformation =
+                productShoppingService.detailProductInformationDto(productId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(detailProductInformation)
@@ -106,7 +107,7 @@ public class ProductShoppingController {
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts =
-                productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
+                productShoppingFacade.retrieveKeywordWithProducts(keyword, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveKeywordWithProducts)
