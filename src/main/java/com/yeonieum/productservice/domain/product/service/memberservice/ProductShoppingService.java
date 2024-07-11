@@ -177,8 +177,13 @@ public class ProductShoppingService {
      */
     @Transactional
     public ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProductsDto(String keyword, Pageable pageable){
+        Page<Product> productsPage;
 
-        Page<Product> productsPage = productRepository.findByProductNameContainingAndIsActive(keyword, pageable);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            productsPage = productRepository.findAllByIsActive(pageable);
+        } else {
+            productsPage = productRepository.findByProductNameContainingAndIsActive(keyword, pageable);
+        }
 
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
             int reviewCount = productReviewRepository.countByProductId(product.getProductId());
