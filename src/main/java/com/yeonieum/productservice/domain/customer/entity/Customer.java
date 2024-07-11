@@ -41,7 +41,7 @@ public class Customer {
     @Column(name = "store_name", nullable = false)
     private String storeName;
 
-    @Column(name = "store_image", nullable = false)
+    @Column(name = "store_image", length = 900)
     private String storeImage;
 
     @Column(name = "store_business_number", nullable = false)

@@ -60,10 +60,10 @@ public class ProductShoppingResponse {
         private int reviewCount;
         private double averageScore;
         @Builder.Default
-        private boolean IsSoldOut = false;
+        private boolean isSoldOut = false;
 
         public void changeIsSoldOut(boolean isSoldOut){
-            this.IsSoldOut = isSoldOut;
+            this.isSoldOut = isSoldOut;
         }
     }
 
