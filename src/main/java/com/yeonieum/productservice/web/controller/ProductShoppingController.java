@@ -47,7 +47,6 @@ public class ProductShoppingController {
                 .build(), HttpStatus.OK);
     }
 
-
     @Operation(summary = "상세 카테고리 상품 조회", description = "선택한 상세 카테고리의 상품들을 조회하는 기능입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상세 카테고리 상품 조회 성공"),
@@ -96,7 +95,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "키워드 상품 조회 실패")
     })
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse> retrieveSearchKeywordProduct(@RequestParam("keyword") String keyword,
+    public ResponseEntity<ApiResponse> retrieveSearchKeywordProduct(@RequestParam(required = false) String keyword,
                                                                     @RequestParam(defaultValue = "0") int startPage,
                                                                     @RequestParam(defaultValue = "10") int pageSize,
                                                                     @RequestParam(defaultValue = "productName") String sort,
