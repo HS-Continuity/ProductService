@@ -1,8 +1,10 @@
 package com.yeonieum.productservice.domain.productinventory.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class AvailableProductInventoryResponse {
     Long orderId;
     Long productId;
@@ -10,8 +12,10 @@ public class AvailableProductInventoryResponse {
     @Builder.Default
     boolean isAvailableOrder = false;
 
-
     public void changeIsAvailableOrder(boolean status){
         this.isAvailableOrder = status;
+    }
+    public boolean getIsAvailableOrder(){
+        return this.isAvailableOrder;
     }
 }
