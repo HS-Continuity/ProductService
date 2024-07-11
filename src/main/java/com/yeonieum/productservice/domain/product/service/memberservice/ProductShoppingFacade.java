@@ -60,9 +60,9 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보
      * @return 해당 키워드의 상품들 정보
      */
-    public ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts(String keyword, Pageable pageable) {
+    public ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts(String keyword, Pageable pageable) {
 
-        ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
+        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveKeywordWithProducts.getSearchProductInformationDtoList();
 
         for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
@@ -70,5 +70,24 @@ public class ProductShoppingFacade {
             searchProductInformationDto.changeIsSoldOut(!isSoldOut);
         }
         return retrieveKeywordWithProducts;
+    }
+
+    /**
+     * 업체별 상품 조회
+     * @param customerId 고객 ID
+     * @param detailCategoryId 상세 카테고리 ID
+     * @param pageable 페이징 정보
+     * @return 업체 상품들의 정보
+     */
+    public ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
+
+        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
+        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveCustomerWithProducts.getSearchProductInformationDtoList();
+
+        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
+            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+        }
+        return retrieveCustomerWithProducts;
     }
 }

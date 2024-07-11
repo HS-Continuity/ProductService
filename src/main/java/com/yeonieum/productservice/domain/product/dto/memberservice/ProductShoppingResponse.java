@@ -34,7 +34,7 @@ public class ProductShoppingResponse {
 
     @Getter
     @Builder
-    public static class RetrieveKeywordWithProductsDto {
+    public static class RetrieveSearchWithProductsDto {
 
         private int totalItems;
         private int totalPages;
@@ -47,6 +47,8 @@ public class ProductShoppingResponse {
     public static class SearchProductInformationDto {
 
         private Long productId;
+        private Long customerId;
+        private Long detailCategoryId;
         private String productName;
         private String productDescription;
         private String productImage;
@@ -70,6 +72,8 @@ public class ProductShoppingResponse {
     public static class DetailProductInformationDto {
 
         private Long productId;
+        private Long customerId;
+        private Long detailCategoryId;
         private String productName;
         private String productDescription;
         private String productImage;
