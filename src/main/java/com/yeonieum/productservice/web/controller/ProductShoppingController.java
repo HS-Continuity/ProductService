@@ -2,6 +2,7 @@ package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingFacade;
 import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.paging.PageableUtil;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductShoppingController {
 
     private final ProductShoppingService productShoppingService;
+    private final ProductShoppingFacade productShoppingFacade;
 
     @Operation(summary = "카테고리 상품 조회", description = "선택한 카테고리의 상품들을 조회하는 기능입니다.")
     @ApiResponses({
@@ -39,7 +41,7 @@ public class ProductShoppingController {
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts =
-                productShoppingService.retrieveCategoryWithProducts(categoryId, isCertification, pageable);
+                productShoppingFacade.retrieveCategoryWithProducts(categoryId, isCertification, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveCategoryWithProducts)
@@ -64,7 +66,7 @@ public class ProductShoppingController {
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts =
-                productShoppingService.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
+                productShoppingFacade.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveDetailCategoryWithProducts)
@@ -81,7 +83,8 @@ public class ProductShoppingController {
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
 
-        ProductShoppingResponse.DetailProductInformationDto detailProductInformation = productShoppingService.detailProductInformationDto(productId);
+        ProductShoppingResponse.DetailProductInformationDto detailProductInformation =
+                productShoppingService.detailProductInformationDto(productId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(detailProductInformation)
@@ -104,7 +107,7 @@ public class ProductShoppingController {
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts =
-                productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
+                productShoppingFacade.retrieveKeywordWithProducts(keyword, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveKeywordWithProducts)

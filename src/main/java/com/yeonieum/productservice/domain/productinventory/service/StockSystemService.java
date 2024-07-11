@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -98,12 +99,18 @@ public class StockSystemService {
             //[STEP4. 쿼리 기준일을 구한다. 오늘날짜 + 배송평균일 + 추가배송기간 + 사용자의 소비 기간]
             LocalDate queryDate = todayDate.plusDays((long)(lifeDay + leadTime + additionalShippingDay));
 
-            productInventoryRepository.findAvailableInventoryQuantityByProductIdAndExpirationDate(productId, queryDate);
+            Optional<Integer> result = productInventoryRepository.findAvailableInventoryQuantityByProductIdAndExpirationDate(productId, queryDate);
             /**
              * null 처리 하기
              */
+            Integer resp = null;
+            if(result.get() == null) {
+                resp = 0;
+            } else {
+                resp = result.get();
+            }
 
-            return 100;
+            return resp;
         } catch (Exception e) {
             e.printStackTrace();
             return 0;

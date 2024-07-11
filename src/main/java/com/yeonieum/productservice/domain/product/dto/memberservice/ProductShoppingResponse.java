@@ -57,6 +57,12 @@ public class ProductShoppingResponse {
         private char isRegularSale;
         private int reviewCount;
         private double averageScore;
+        @Builder.Default
+        private boolean IsSoldOut = false;
+
+        public void changeIsSoldOut(boolean isSoldOut){
+            this.IsSoldOut = isSoldOut;
+        }
     }
 
     @Getter
