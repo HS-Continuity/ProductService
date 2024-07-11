@@ -106,10 +106,13 @@ public class StockSystemService {
             Integer resp = null;
             if(result.get() == null) {
                 resp = 0;
+            } else {
+                resp = result.get();
             }
 
             return resp;
         } catch (Exception e) {
+            e.printStackTrace();
             return 0;
         }
     }

@@ -62,7 +62,7 @@ public class StockRedisSetOperation {
                 long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();
                 redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
             }
-            if(productStockSet.size() == 0) {
+            if(stockUsageList.size() == 0) {
                 redisTemplate.opsForSet().add(key, objectMapper.writeValueAsString(new StockUsageDto(productId, null, 0)));
                 LocalDateTime tomorrow14 = LocalDateTime.now().plusDays(1).withHour(14);
                 long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();

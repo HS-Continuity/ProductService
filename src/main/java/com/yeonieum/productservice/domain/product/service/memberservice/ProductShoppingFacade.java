@@ -16,6 +16,13 @@ public class ProductShoppingFacade {
     private final StockSystemService stockSystemService;
     private final ProductShoppingService productShoppingService;
 
+    /**
+     * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
+     * @param productCategoryId 상품 카테고리 ID
+     * @param isCertification 인증서 여부
+     * @param pageable 페이징 값
+     * @return 카테고리에 포함되는 상품들의 정보
+     */
     public ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
 
         ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts = productShoppingService.retrieveCategoryWithProducts(productCategoryId, isCertification, pageable);
@@ -26,6 +33,25 @@ public class ProductShoppingFacade {
             searchProductInformationDto.changeIsSoldOut(!isSoldOut);
         }
         return retrieveCategoryWithProducts;
+    }
+
+    /**
+     * 상세 카테고리 조회시, 해당 카테고리의 상품 조회
+     * @param productDetailCategoryId 상세 카테고리 ID
+     * @param isCertification 인증서 여부
+     * @param pageable 페이징 값
+     * @return 상세 카테고리에 포함되는 상품들의 정보
+     */
+    public ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts(Long productDetailCategoryId, ActiveStatus isCertification, Pageable pageable) {
+
+        ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts = productShoppingService.retrieveDetailCategoryWithProducts(productDetailCategoryId, isCertification, pageable);
+        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveDetailCategoryWithProducts.getSearchProductInformationDtoList();
+
+        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
+            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+        }
+        return retrieveDetailCategoryWithProducts;
     }
 
 

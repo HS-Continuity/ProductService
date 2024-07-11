@@ -66,7 +66,7 @@ public class ProductShoppingController {
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts =
-                productShoppingService.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
+                productShoppingFacade.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveDetailCategoryWithProducts)

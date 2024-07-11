@@ -30,6 +30,8 @@ public class ProductShoppingService {
     /**
      * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
      * @param productCategoryId 상품 카테고리 ID
+     * @param isCertification 인증서 여부
+     * @param pageable 페이징 값
      * @throws IllegalArgumentException 존재하지 않는 상품 카테고리 ID인 경우
      * @throws IllegalArgumentException 해당 카테고리에 등록된 상품이 없는 경우
      * @return 카테고리에 포함되는 상품들의 정보
@@ -77,6 +79,8 @@ public class ProductShoppingService {
     /**
      * 상세 카테고리 조회시, 해당 카테고리의 상품 조회
      * @param productDetailCategoryId 상세 카테고리 ID
+     * @param isCertification 인증서 여부
+     * @param pageable 페이징 값
      * @throws IllegalArgumentException 존재하지 않는 상세 카테고리 ID인 경우
      * @throws IllegalArgumentException 해당 상세 카테고리에 등록된 상품이 없는 경우
      * @return 상세 카테고리에 포함되는 상품들의 정보
