@@ -59,8 +59,8 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress(redissonServer)
-                .setPassword(redissonPassword); // 비밀번호 설정 (클라우드 환경에 따라 필요)
+                .setAddress("redis://" + hostname+":"+port)
+                .setPassword(password); // 비밀번호 설정 (클라우드 환경에 따라 필요)
 
         return Redisson.create(config);
     }

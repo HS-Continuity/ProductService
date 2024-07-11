@@ -34,7 +34,7 @@ public class StockSystemService {
      * @return
      */
     // AOP 프록시 객체 락 획득 시 트랜잭션 범위 안으로 편입되므로 트랜잭션 애너테이션 제거
-    @Lock(keyPrefix = "stockusage:", leaseTime = 1)
+    @Lock(keyPrefix = "lock:", leaseTime = 1)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AvailableProductInventoryResponse processProductInventory(AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto) {
         // [STEP1] [받아온 주문서의 상품들을 기준으로 구매가 가능한지 체크하고, 가능하다면 재고사용량을 증가시킨다.]
