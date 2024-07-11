@@ -64,4 +64,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                        Pageable pageable);
 
 
+    @Query("SELECT p FROM Product p " +
+            "WHERE p.customer.customerId = :customerId " +
+            "AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE " +
+            "AND (:detailCategoryId IS NULL OR p.productDetailCategory.productDetailCategoryId = :detailCategoryId)")
+    Page<Product> findByCustomerIdAndIsActiveAndCategoryId(@Param("customerId") Long customerId,
+                                                           @Param("detailCategoryId") Long detailCategoryId,
+                                                           Pageable pageable);
+
+
+
+
 }

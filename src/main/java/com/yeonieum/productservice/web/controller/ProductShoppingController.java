@@ -1,7 +1,6 @@
 package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
-import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingFacade;
 import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
@@ -11,7 +10,6 @@ import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -106,11 +104,35 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        ProductShoppingResponse.RetrieveKeywordWithProductsDto retrieveKeywordWithProducts =
+        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts =
                 productShoppingFacade.retrieveKeywordWithProducts(keyword, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveKeywordWithProducts)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "업체 상품 조회", description = "선택한 업체의 상품들을 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 상품 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 상품 조회 실패")
+    })
+    @GetMapping("/search/customer/{customerId}")
+    public ResponseEntity<ApiResponse> retrieveSearchCustomerProduct(@PathVariable Long customerId,
+                                                                     @RequestParam(required = false) Long detailCategoryId,
+                                                                     @RequestParam(defaultValue = "0") int startPage,
+                                                                     @RequestParam(defaultValue = "10") int pageSize,
+                                                                     @RequestParam(defaultValue = "productName") String sort,
+                                                                     @RequestParam(defaultValue = "asc") String direction) {
+
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
+
+        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProducts =
+                productShoppingFacade.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(retrieveCustomerWithProducts)
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
