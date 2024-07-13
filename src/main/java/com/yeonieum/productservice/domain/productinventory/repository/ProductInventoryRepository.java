@@ -21,7 +21,7 @@ public interface ProductInventoryRepository extends JpaRepository<ProductInvento
             nativeQuery = true)
     List<RetrieveProductInventoryResponse> findAllbyProductId(@Param("productId") Long productId , Pageable pageable);
 
-    @Query(value = "SELECT SUM(pi.quantity) FROM product_inventory pi WHERE pi.product_id = :productId AND pi.expiration_date > :expirationDate", nativeQuery = true)
-    Optional<Integer> findAvailableInventoryQuantityByProductIdAndExpirationDate(@Param("productId") Long productId, @Param("expirationDate") LocalDate expirationDate);
+    @Query(value = "SELECT COALESCE(SUM(pi.quantity), 0) FROM product_inventory pi WHERE pi.product_id = :productId AND pi.expiration_date > :expirationDate", nativeQuery = true)
+    int findAvailableInventoryQuantityByProductIdAndExpirationDate(@Param("productId") Long productId, @Param("expirationDate") LocalDate expirationDate);
 
 }

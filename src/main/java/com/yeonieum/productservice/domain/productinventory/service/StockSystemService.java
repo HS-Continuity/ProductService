@@ -7,6 +7,7 @@ import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
+import com.yeonieum.productservice.domain.productinventory.repository.Cache;
 import com.yeonieum.productservice.domain.productinventory.repository.ProductInventoryRepository;
 import com.yeonieum.productservice.global.lock.Lock;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class StockSystemService {
+    private final Cache cache;
 
     private final StockUsageService stockUsageService;
     private final StockRedisSetOperation stockRedisSetOperation;
@@ -82,12 +83,11 @@ public class StockSystemService {
             Product product = productRepository.findById(productId).orElseThrow(
                     () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
             );
-
             // 당일출고 기준시간 (조회해야함)
             int shippingCutoffTime = 14;
 
             //[STEP1. 배송도착시 남아있어야하는 소비자의 최소 소비 기간을 조회해서 가져온다.]
-            int lifeDay = product.getProductDetailCategory().getShelfLifeDay();
+            int lifeDay = cache.cache(product);
 
             //[STEP2. 오늘 날짜 및 현재 시각을 조회한다.]
             LocalDate todayDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
@@ -99,15 +99,15 @@ public class StockSystemService {
             //[STEP4. 쿼리 기준일을 구한다. 오늘날짜 + 배송평균일 + 추가배송기간 + 사용자의 소비 기간]
             LocalDate queryDate = todayDate.plusDays((long)(lifeDay + leadTime + additionalShippingDay));
 
-            Optional<Integer> result = productInventoryRepository.findAvailableInventoryQuantityByProductIdAndExpirationDate(productId, queryDate);
+            Integer result = productInventoryRepository.findAvailableInventoryQuantityByProductIdAndExpirationDate(productId, queryDate);
             /**
              * null 처리 하기
              */
             Integer resp = null;
-            if(result.get() == null) {
+            if(result == null) {
                 resp = 0;
             } else {
-                resp = result.get();
+                resp = result;
             }
 
             return resp;
