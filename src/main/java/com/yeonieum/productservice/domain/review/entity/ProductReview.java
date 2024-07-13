@@ -36,6 +36,6 @@ public class ProductReview {
     private String reviewImage;
 
     @Column(name = "review_score")
-    private int reviewScore;
+    private double reviewScore;
 
 }

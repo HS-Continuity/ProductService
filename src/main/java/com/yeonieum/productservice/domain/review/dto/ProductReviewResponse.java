@@ -14,6 +14,6 @@ public class ProductReviewResponse {
         private LocalDateTime createDate;
         private String reviewContent;
         private String reviewImage;
-        private int reviewScore;
+        private double reviewScore;
     }
 }

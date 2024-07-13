@@ -25,6 +25,4 @@ public class CartProductResponse {
             this.isSoldOut = isSoldOut;
         }
     }
-
-
 }
