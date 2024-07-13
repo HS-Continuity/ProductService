@@ -48,8 +48,6 @@ public class ProductShoppingService {
         }
 
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
-            int reviewCount = productReviewRepository.countByProductId(product.getProductId());
-            double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
 
             return ProductShoppingResponse.SearchProductInformationDto.builder()
                     .productId(product.getProductId())
@@ -63,8 +61,8 @@ public class ProductShoppingService {
                     .productPrice(product.getProductPrice())
                     .calculatedBasePrice(product.getCalculatedBasePrice())
                     .isRegularSale(product.getIsRegularSale().getCode())
-                    .reviewCount(reviewCount)
-                    .averageScore(averageScore)
+                    .reviewCount(product.getReviewCount())
+                    .averageScore(product.getAverageScore())
                     .build();
         }).collect(Collectors.toList());
 
@@ -101,8 +99,6 @@ public class ProductShoppingService {
 
         List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productsPage.getContent().stream()
                 .map(product -> {
-                    int reviewCount = productReviewRepository.countByProductId(product.getProductId());
-                    double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
 
                     return ProductShoppingResponse.SearchProductInformationDto.builder()
                             .productId(product.getProductId())
@@ -116,8 +112,8 @@ public class ProductShoppingService {
                             .productPrice(product.getProductPrice())
                             .calculatedBasePrice(product.getCalculatedBasePrice())
                             .isRegularSale(product.getIsRegularSale().getCode())
-                            .reviewCount(reviewCount)
-                            .averageScore(averageScore)
+                            .reviewCount(product.getReviewCount())
+                            .averageScore(product.getAverageScore())
                             .build();
                 }).collect(Collectors.toList());
 
@@ -144,9 +140,6 @@ public class ProductShoppingService {
         Product targetProduct = productRepository.findByIdAndIsActive(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
 
-        int reviewCount = productReviewRepository.countByProductId(productId);
-        double averageScore = productReviewRepository.findAverageScoreByProductId(productId);
-
         return ProductShoppingResponse.DetailProductInformationDto.builder()
                 .productId(targetProduct.getProductId())
                 .customerId(targetProduct.getCustomer().getCustomerId())
@@ -164,8 +157,8 @@ public class ProductShoppingService {
                 .calculatedPersonalizedPrice(targetProduct.getCalculatedPersonalizedPrice())
                 .isRegularSale((char) (targetProduct.getIsRegularSale() == ActiveStatus.ACTIVE ? 'T' : 'F'))
                 .isCertification((char) (targetProduct.getIsCertification() == ActiveStatus.ACTIVE ? 'T' : 'F'))
-                .reviewCount(reviewCount)
-                .averageScore(averageScore)
+                .reviewCount(targetProduct.getReviewCount())
+                .averageScore(targetProduct.getAverageScore())
                 .build();
     }
 
@@ -186,8 +179,6 @@ public class ProductShoppingService {
         }
 
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
-            int reviewCount = productReviewRepository.countByProductId(product.getProductId());
-            double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
 
             return ProductShoppingResponse.SearchProductInformationDto.builder()
                     .productId(product.getProductId())
@@ -201,8 +192,8 @@ public class ProductShoppingService {
                     .productPrice(product.getProductPrice())
                     .calculatedBasePrice(product.getCalculatedBasePrice())
                     .isRegularSale(product.getIsRegularSale().getCode())
-                    .reviewCount(reviewCount)
-                    .averageScore(averageScore)
+                    .reviewCount(product.getReviewCount())
+                    .averageScore(product.getAverageScore())
                     .build();
         }).collect(Collectors.toList());
 
@@ -227,8 +218,6 @@ public class ProductShoppingService {
         Page<Product> productsPage = productRepository.findByCustomerIdAndIsActiveAndCategoryId(customerId, detailCategoryId ,pageable);
 
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
-            int reviewCount = productReviewRepository.countByProductId(product.getProductId());
-            double averageScore = productReviewRepository.findAverageScoreByProductId(product.getProductId());
 
             return ProductShoppingResponse.SearchProductInformationDto.builder()
                     .productId(product.getProductId())
@@ -242,8 +231,8 @@ public class ProductShoppingService {
                     .productPrice(product.getProductPrice())
                     .calculatedBasePrice(product.getCalculatedBasePrice())
                     .isRegularSale(product.getIsRegularSale().getCode())
-                    .reviewCount(reviewCount)
-                    .averageScore(averageScore)
+                    .reviewCount(product.getReviewCount())
+                    .averageScore(product.getAverageScore())
                     .build();
         }).collect(Collectors.toList());
 

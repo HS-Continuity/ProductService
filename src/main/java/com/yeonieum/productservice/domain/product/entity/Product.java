@@ -8,6 +8,7 @@ import com.yeonieum.productservice.global.converter.ActiveStatusConverter;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,16 @@ public class Product {
 
     @Column(name = "calculated_personalized_price")
     private int calculatedPersonalizedPrice;
+
+    @ColumnDefault("0")
+    @Column(name = "review_count")
+    @Builder.Default
+    private Integer reviewCount = 0;
+
+    @ColumnDefault("0.0")
+    @Column(name = "average_score")
+    @Builder.Default
+    private Double averageScore = 0.0;
 
     @Convert(converter = ActiveStatusConverter.class)
     @Column(name = "is_certification")

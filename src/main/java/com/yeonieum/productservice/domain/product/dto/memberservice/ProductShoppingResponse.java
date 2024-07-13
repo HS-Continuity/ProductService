@@ -57,8 +57,8 @@ public class ProductShoppingResponse {
         private int productPrice;
         private int calculatedBasePrice;
         private char isRegularSale;
-        private int reviewCount;
-        private double averageScore;
+        private Integer reviewCount;
+        private Double averageScore;
         @Builder.Default
         private boolean isSoldOut = false;
 
@@ -87,7 +87,7 @@ public class ProductShoppingResponse {
         private int calculatedPersonalizedPrice;
         private char isRegularSale;
         private char isCertification;
-        private int reviewCount;
-        private double averageScore;
+        private Integer reviewCount;
+        private Double averageScore;
     }
 }
