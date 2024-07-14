@@ -66,7 +66,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                        @Param("isCertification") ActiveStatus isCertification,
                                                        Pageable pageable);
 
-
     @Query("SELECT p FROM Product p " +
             "WHERE p.customer.customerId = :customerId " +
             "AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE " +
