@@ -1,6 +1,5 @@
 package com.yeonieum.productservice.web.controller;
 
-import com.yeonieum.productservice.domain.customer.dto.CustomerResponse;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewRequest;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewResponse;
 import com.yeonieum.productservice.domain.review.service.ProductReviewService;
@@ -16,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/product-review")
 @RequiredArgsConstructor
@@ -31,9 +28,9 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 등록 실패")
     })
     @PostMapping
-    public ResponseEntity<ApiResponse> registerProductReview(@RequestBody ProductReviewRequest.RegisterProductReviewDto registerProductReviewDto) {
+    public ResponseEntity<ApiResponse> registerProductReview(@RequestBody ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview) {
 
-        productReviewService.registerProductReview(registerProductReviewDto);
+        productReviewService.registerProductReview(ofRegisterProductReview);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -70,7 +67,7 @@ public class ReviewController {
 
         Pageable pageable =  PageRequest.of(startPage, pageSize);
 
-        Page<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviews
+        Page<ProductReviewResponse.OfRetrieveProductWithReview> retrieveProductWithReviews
                 = productReviewService.retrieveProductWithReviews(productId, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
