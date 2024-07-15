@@ -28,8 +28,8 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "카테고리 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "카테고리 상품 조회 실패")
     })
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ApiResponse> retrieveCategoryWithProducts(@PathVariable Long categoryId,
+    @GetMapping
+    public ResponseEntity<ApiResponse> retrieveCategoryWithProducts(@RequestParam Long categoryId,
                                                                     @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
                                                                     @RequestParam(defaultValue = "0") int startPage,
                                                                     @RequestParam(defaultValue = "10") int pageSize,
@@ -52,8 +52,8 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상세 카테고리 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상세 카테고리 상품 조회 실패")
     })
-    @GetMapping("/detail-category/{detailCategoryId}")
-    public ResponseEntity<ApiResponse> retrieveDetailCategoryWithProducts(@PathVariable Long detailCategoryId,
+    @GetMapping
+    public ResponseEntity<ApiResponse> retrieveDetailCategoryWithProducts(@RequestParam Long detailCategoryId,
                                                                           @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
                                                                           @RequestParam(defaultValue = "0") int startPage,
                                                                           @RequestParam(defaultValue = "10") int pageSize,
@@ -117,8 +117,8 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 상품 조회 실패")
     })
-    @GetMapping("/search/customer/{customerId}")
-    public ResponseEntity<ApiResponse> retrieveSearchCustomerProduct(@PathVariable Long customerId,
+    @GetMapping
+    public ResponseEntity<ApiResponse> retrieveSearchCustomerProduct(@RequestParam Long customerId,
                                                                      @RequestParam(required = false) Long detailCategoryId,
                                                                      @RequestParam(defaultValue = "0") int startPage,
                                                                      @RequestParam(defaultValue = "10") int pageSize,

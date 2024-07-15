@@ -120,7 +120,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @GetMapping("/product/details/{productId}")
+    @GetMapping("/product/{productId}/details")
     public ResponseEntity<ApiResponse> getProductDetail(@PathVariable Long productId) {
         ProductManagementResponse.RetrieveDto productDetail = productManagementService.retrieveProductDetail(productId);
 
