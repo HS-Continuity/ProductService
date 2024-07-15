@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.domain.product.dto.memberservice;
 
+import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import lombok.Builder;
@@ -9,6 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductShoppingResponse {
+
+    @Getter
+    @Builder
+    public static class OfRetrieveCategoryWithProduct {
+
+        private Long productCategoryId;
+        private String categoryName;
+        @Builder.Default
+        private List<OfSearchProductInformation> searchProductInformationDtoList = new ArrayList<>();
+
+        public void changeOfSearchProductInformationList(List<OfSearchProductInformation> OfSearchProductInformation){
+            this.searchProductInformationDtoList = OfSearchProductInformation;
+        }
+
+        public static OfRetrieveCategoryWithProduct convertedBy(ProductCategory Category) {
+            return OfRetrieveCategoryWithProduct.builder()
+                    .productCategoryId(Category.getProductCategoryId())
+                    .categoryName(Category.getCategoryName())
+                    .build();
+        }
+    }
 
     @Getter
     @Builder
@@ -31,18 +53,6 @@ public class ProductShoppingResponse {
                     .shelfLifeDay(detailCategory.getShelfLifeDay())
                     .build();
         }
-    }
-
-    @Getter
-    @Builder
-    public static class RetrieveCategoryWithProductsDto {
-
-        private Long productCategoryId;
-        private String categoryName;
-        private List<OfSearchProductInformation> searchProductInformationDtoList;
-        private int totalItems;
-        private int totalPages;
-        private boolean lastPage;
     }
 
     @Getter

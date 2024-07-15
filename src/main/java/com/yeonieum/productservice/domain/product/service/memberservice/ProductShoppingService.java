@@ -28,55 +28,39 @@ public class ProductShoppingService {
     private final ProductRepository productRepository;
 
 
-
-
     /**
-     * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
-     * @param productCategoryId 상품 카테고리 ID
-     * @param isCertification 인증서 여부
-     * @param pageable 페이징 정보
-     * @throws IllegalArgumentException 존재하지 않는 상품 카테고리 ID인 경우
-     * @throws IllegalArgumentException 해당 카테고리에 등록된 상품이 없는 경우
-     * @return 카테고리에 포함되는 상품들의 정보
+     * 카테고리의 상품 목록 조회
+     * @param productCategoryId 조회할 상품 카테고리 ID
+     * @param isCertification 인증된 상품만 조회할지 여부
+     * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
+     * @throws IllegalArgumentException 카테고리 ID가 존재하지 않는 경우
+     * @throws IllegalArgumentException 카테고리에 상품이 하나도 없는 경우
+     * @return 조회된 상품 목록이 포함된 Page 객체
      */
     @Transactional
-    public ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
         ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 카테고리 ID 입니다."));
 
-        Page<Product> productsPage = productRepository.findActiveProductsByCategory(productCategoryId, isCertification, pageable);
+        Page<Product> products = productRepository.findActiveProductsByCategory(productCategoryId, isCertification, pageable);
 
-        if (productsPage.isEmpty()) {
+        if (products.isEmpty()) {
             throw new IllegalArgumentException("해당 카테고리 내의 상품이 없습니다.");
         }
 
-        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
+        // 상품 정보를 DTO 리스트로 변환
+        List<ProductShoppingResponse.OfSearchProductInformation> productInformationListDto = products.map(
+                product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product)).getContent();
 
-            return ProductShoppingResponse.OfSearchProductInformation.builder()
-                    .productId(product.getProductId())
-                    .customerId(product.getCustomer().getCustomerId())
-                    .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())
-                    .productName(product.getProductName())
-                    .productDescription(product.getProductDescription())
-                    .productImage(product.getProductImage())
-                    .baseDiscountRate(product.getBaseDiscountRate())
-                    .regularDiscountRate(product.getRegularDiscountRate())
-                    .productPrice(product.getProductPrice())
-                    .calculatedBasePrice(product.getCalculatedBasePrice())
-                    .isRegularSale(product.getIsRegularSale().getCode())
-                    .reviewCount(product.getReviewCount())
-                    .averageScore(product.getAverageScore())
-                    .build();
-        }).collect(Collectors.toList());
+        // 조회된 카테고리 정보를 기반으로 DTO 생성
+        ProductShoppingResponse.OfRetrieveCategoryWithProduct categoryWithProductsDto
+                = ProductShoppingResponse.OfRetrieveCategoryWithProduct.convertedBy(productCategory);
 
-        return ProductShoppingResponse.RetrieveCategoryWithProductsDto.builder()
-                .productCategoryId(productCategoryId)
-                .categoryName(productCategory.getCategoryName())
-                .searchProductInformationDtoList(searchProductInformationDtoList)
-                .totalItems((int) productsPage.getTotalElements())
-                .totalPages(productsPage.getTotalPages())
-                .lastPage(productsPage.isLast())
-                .build();
+        // categoryWithProductsDto에 상품 정보 리스트를 설정
+        categoryWithProductsDto.changeOfSearchProductInformationList(productInformationListDto);
+
+        // Page 객체를 생성하여 반환
+        return new PageImpl<>(Collections.singletonList(categoryWithProductsDto), pageable, products.getTotalElements());
     }
 
     /**
@@ -112,14 +96,14 @@ public class ProductShoppingService {
                 product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product)).getContent();
 
         // 조회된 상세 카테고리 정보를 기반으로 DTO 생성
-        ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct categoryWithProductsDto
+        ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct detailCategoryWithProductsDto
                 = ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct.convertedBy(productDetailCategory);
 
-        // categoryWithProductsDto에 상품 정보 리스트를 설정
-        categoryWithProductsDto.changeOfSearchProductInformationList(productInformationListDto);
+        // detailCategoryWithProductsDto에 상품 정보 리스트를 설정
+        detailCategoryWithProductsDto.changeOfSearchProductInformationList(productInformationListDto);
 
         // Page 객체를 생성하여 반환
-        return new PageImpl<>(Collections.singletonList(categoryWithProductsDto), pageable, products.getTotalElements());
+        return new PageImpl<>(Collections.singletonList(detailCategoryWithProductsDto), pageable, products.getTotalElements());
     }
 
 
