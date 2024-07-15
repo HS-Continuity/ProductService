@@ -10,6 +10,7 @@ import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +63,7 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts =
+        Page<ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct> retrieveDetailCategoryWithProducts =
                 productShoppingFacade.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()

@@ -7,14 +7,15 @@ import com.yeonieum.productservice.domain.category.repository.ProductDetailCateg
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
-import com.yeonieum.productservice.domain.review.repository.ProductReviewRepository;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,9 @@ public class ProductShoppingService {
     private final ProductCategoryRepository productCategoryRepository;
     private final ProductDetailCategoryRepository productDetailCategoryRepository;
     private final ProductRepository productRepository;
-    private final ProductReviewRepository productReviewRepository;
+
+
+
 
     /**
      * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
@@ -47,9 +50,9 @@ public class ProductShoppingService {
             throw new IllegalArgumentException("해당 카테고리 내의 상품이 없습니다.");
         }
 
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
 
-            return ProductShoppingResponse.SearchProductInformationDto.builder()
+            return ProductShoppingResponse.OfSearchProductInformation.builder()
                     .productId(product.getProductId())
                     .customerId(product.getCustomer().getCustomerId())
                     .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())
@@ -77,56 +80,50 @@ public class ProductShoppingService {
     }
 
     /**
-     * 상세 카테고리 조회시, 해당 카테고리의 상품 조회
-     * @param productDetailCategoryId 상세 카테고리 ID
-     * @param isCertification 인증서 여부
-     * @param pageable 페이징 정보
-     * @throws IllegalArgumentException 존재하지 않는 상세 카테고리 ID인 경우
-     * @throws IllegalArgumentException 해당 상세 카테고리에 등록된 상품이 없는 경우
-     * @return 상세 카테고리에 포함되는 상품들의 정보
+     * 상세 카테고리의 상품 목록 조회
+     * @param productDetailCategoryId 조회할 상세 카테고리의 ID
+     * @param isCertification 인증된 상품만 조회할지 여부
+     * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
+     * @throws IllegalArgumentException 상세 카테고리 ID가 존재하지 않는 경우
+     * @throws IllegalArgumentException 상세 카테고리에 상품이 하나도 없는 경우
+     * @return 조회된 상품 목록이 포함된 Page 객체
      */
     @Transactional
-    public ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts(Long productDetailCategoryId, ActiveStatus isCertification, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct> retrieveDetailCategoryWithProducts(
+            Long productDetailCategoryId,
+            ActiveStatus isCertification,
+            Pageable pageable) {
 
-       ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
-               .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 상세 카테고리 ID 입니다."));
+        // 상세 카테고리 정보를 조회, 존재하지 않을 경우 예외 발생
+        ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 상세 카테고리 ID 입니다."));
 
-        Page<Product> productsPage = productRepository.findActiveProductsByDetailCategoryId(productDetailCategoryId, isCertification, pageable);
+        // 해당 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
+        Page<Product> products = productRepository.findActiveProductsByDetailCategoryId(
+                productDetailCategoryId, isCertification, pageable);
 
-        if (productsPage.isEmpty()) {
-            throw new IllegalArgumentException("해당 상세 카테고리에 내의 상품이 없습니다.");
+        // 조회된 상품이 없으면 예외 발생
+        if (products.isEmpty()) {
+            throw new IllegalArgumentException("해당 상세 카테고리 내의 상품이 없습니다.");
         }
 
-        List<ProductShoppingResponse.SearchProductInformationDto> productInformationDtoList = productsPage.getContent().stream()
-                .map(product -> {
+        // 상품 정보를 DTO 리스트로 변환
+        List<ProductShoppingResponse.OfSearchProductInformation> productInformationListDto = products.map(
+                product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product)).getContent();
 
-                    return ProductShoppingResponse.SearchProductInformationDto.builder()
-                            .productId(product.getProductId())
-                            .customerId(product.getCustomer().getCustomerId())
-                            .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())
-                            .productName(product.getProductName())
-                            .productDescription(product.getProductDescription())
-                            .productImage(product.getProductImage())
-                            .baseDiscountRate(product.getBaseDiscountRate())
-                            .regularDiscountRate(product.getRegularDiscountRate())
-                            .productPrice(product.getProductPrice())
-                            .calculatedBasePrice(product.getCalculatedBasePrice())
-                            .isRegularSale(product.getIsRegularSale().getCode())
-                            .reviewCount(product.getReviewCount())
-                            .averageScore(product.getAverageScore())
-                            .build();
-                }).collect(Collectors.toList());
+        // 조회된 상세 카테고리 정보를 기반으로 DTO 생성
+        ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct categoryWithProductsDto
+                = ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct.convertedBy(productDetailCategory);
 
-        return ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto.builder()
-                .productDetailCategoryId(productDetailCategoryId)
-                .detailCategoryName(productDetailCategory.getDetailCategoryName())
-                .shelfLifeDay(productDetailCategory.getShelfLifeDay())
-                .searchProductInformationDtoList(productInformationDtoList)
-                .totalItems((int) productsPage.getTotalElements())
-                .totalPages(productsPage.getTotalPages())
-                .lastPage(productsPage.isLast())
-                .build();
+        // categoryWithProductsDto에 상품 정보 리스트를 설정
+        categoryWithProductsDto.changeOfSearchProductInformationList(productInformationListDto);
+
+        // Page 객체를 생성하여 반환
+        return new PageImpl<>(Collections.singletonList(categoryWithProductsDto), pageable, products.getTotalElements());
     }
+
+
+
 
 
     /**
@@ -178,9 +175,9 @@ public class ProductShoppingService {
             productsPage = productRepository.findByProductNameContainingAndIsActive(keyword, pageable);
         }
 
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
 
-            return ProductShoppingResponse.SearchProductInformationDto.builder()
+            return ProductShoppingResponse.OfSearchProductInformation.builder()
                     .productId(product.getProductId())
                     .customerId(product.getCustomer().getCustomerId())
                     .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())
@@ -217,9 +214,9 @@ public class ProductShoppingService {
 
         Page<Product> productsPage = productRepository.findByCustomerIdAndIsActiveAndCategoryId(customerId, detailCategoryId ,pageable);
 
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
 
-            return ProductShoppingResponse.SearchProductInformationDto.builder()
+            return ProductShoppingResponse.OfSearchProductInformation.builder()
                     .productId(product.getProductId())
                     .customerId(product.getCustomer().getCustomerId())
                     .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())

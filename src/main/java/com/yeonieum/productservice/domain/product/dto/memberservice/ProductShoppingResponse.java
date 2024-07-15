@@ -1,23 +1,36 @@
 package com.yeonieum.productservice.domain.product.dto.memberservice;
 
+import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
+import com.yeonieum.productservice.domain.product.entity.Product;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductShoppingResponse {
 
     @Getter
     @Builder
-    public static class RetrieveDetailCategoryWithProductsDto {
+    public static class OfRetrieveDetailCategoryWithProduct {
 
         private Long productDetailCategoryId;
         private String detailCategoryName;
         private int shelfLifeDay;
-        private List<SearchProductInformationDto> searchProductInformationDtoList;
-        private int totalItems;
-        private int totalPages;
-        private boolean lastPage;
+        @Builder.Default
+        private List<OfSearchProductInformation> searchProductInformationDtoList = new ArrayList<>();
+
+        public void changeOfSearchProductInformationList(List<OfSearchProductInformation> OfSearchProductInformation){
+            this.searchProductInformationDtoList = OfSearchProductInformation;
+        }
+
+        public static OfRetrieveDetailCategoryWithProduct convertedBy(ProductDetailCategory detailCategory) {
+            return OfRetrieveDetailCategoryWithProduct.builder()
+                    .productDetailCategoryId(detailCategory.getProductDetailCategoryId())
+                    .detailCategoryName(detailCategory.getDetailCategoryName())
+                    .shelfLifeDay(detailCategory.getShelfLifeDay())
+                    .build();
+        }
     }
 
     @Getter
@@ -26,7 +39,7 @@ public class ProductShoppingResponse {
 
         private Long productCategoryId;
         private String categoryName;
-        private List<SearchProductInformationDto> searchProductInformationDtoList;
+        private List<OfSearchProductInformation> searchProductInformationDtoList;
         private int totalItems;
         private int totalPages;
         private boolean lastPage;
@@ -39,12 +52,12 @@ public class ProductShoppingResponse {
         private int totalItems;
         private int totalPages;
         private boolean lastPage;
-        private List<SearchProductInformationDto> searchProductInformationDtoList;
+        private List<OfSearchProductInformation> searchProductInformationDtoList;
     }
 
     @Getter
     @Builder
-    public static class SearchProductInformationDto {
+    public static class OfSearchProductInformation {
 
         private Long productId;
         private Long customerId;
@@ -64,6 +77,24 @@ public class ProductShoppingResponse {
 
         public void changeIsSoldOut(boolean isSoldOut){
             this.isSoldOut = isSoldOut;
+        }
+
+        public static OfSearchProductInformation convertedBy(Product product) {
+            return OfSearchProductInformation.builder()
+                    .productId(product.getProductId())
+                    .customerId(product.getCustomer().getCustomerId())
+                    .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())
+                    .productName(product.getProductName())
+                    .productDescription(product.getProductDescription())
+                    .productImage(product.getProductImage())
+                    .baseDiscountRate(product.getBaseDiscountRate())
+                    .regularDiscountRate(product.getRegularDiscountRate())
+                    .productPrice(product.getProductPrice())
+                    .calculatedBasePrice(product.getCalculatedBasePrice())
+                    .isRegularSale(product.getIsRegularSale().getCode())
+                    .reviewCount(product.getReviewCount())
+                    .averageScore(product.getAverageScore())
+                    .build();
         }
     }
 
