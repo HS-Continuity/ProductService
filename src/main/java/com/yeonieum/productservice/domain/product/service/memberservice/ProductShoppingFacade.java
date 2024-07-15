@@ -6,6 +6,7 @@ import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShopp
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -20,18 +21,19 @@ public class ProductShoppingFacade {
     private final CartProductService cartProductService;
 
     /**
-     * 카테고리 조회시, 해당 (상세)카테고리의 상품 조회
-     * @param productCategoryId 상품 카테고리 ID
-     * @param isCertification 인증서 여부
-     * @param pageable 페이징 값
-     * @return 카테고리에 포함되는 상품들의 정보
+     * 카테고리의 상품 목록 조회
+     * @param productCategoryId 조회할 상품 카테고리 ID
+     * @param isCertification 인증된 상품만 조회할지 여부
+     * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
+     * @return 조회된 상품 목록이 포함된 Page 객체
      */
-    public ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
 
-        ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts = productShoppingService.retrieveCategoryWithProducts(productCategoryId, isCertification, pageable);
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveCategoryWithProducts.getSearchProductInformationDtoList();
+        Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts = productShoppingService.retrieveCategoryWithProducts(productCategoryId, isCertification, pageable);
 
-        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = retrieveCategoryWithProducts.getContent().get(0).getSearchProductInformationDtoList();
+
+        for(ProductShoppingResponse.OfSearchProductInformation searchProductInformationDto : searchProductInformationDtoList) {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
             searchProductInformationDto.changeIsSoldOut(!isSoldOut);
         }
@@ -39,18 +41,19 @@ public class ProductShoppingFacade {
     }
 
     /**
-     * 상세 카테고리 조회시, 해당 카테고리의 상품 조회
-     * @param productDetailCategoryId 상세 카테고리 ID
-     * @param isCertification 인증서 여부
-     * @param pageable 페이징 값
-     * @return 상세 카테고리에 포함되는 상품들의 정보
+     * 상세 카테고리의 상품 목록 조회
+     * @param productDetailCategoryId 조회할 상세 카테고리의 ID
+     * @param isCertification 인증된 상품만 조회할지 여부
+     * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
+     * @return 조회된 상품 목록이 포함된 Page 객체
      */
-    public ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts(Long productDetailCategoryId, ActiveStatus isCertification, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct> retrieveDetailCategoryWithProducts(Long productDetailCategoryId, ActiveStatus isCertification, Pageable pageable) {
 
-        ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts = productShoppingService.retrieveDetailCategoryWithProducts(productDetailCategoryId, isCertification, pageable);
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveDetailCategoryWithProducts.getSearchProductInformationDtoList();
+        Page<ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct> retrieveDetailCategoryWithProducts = productShoppingService.retrieveDetailCategoryWithProducts(productDetailCategoryId, isCertification, pageable);
 
-        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = retrieveDetailCategoryWithProducts.getContent().get(0).getSearchProductInformationDtoList();
+
+        for(ProductShoppingResponse.OfSearchProductInformation searchProductInformationDto : searchProductInformationDtoList) {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
             searchProductInformationDto.changeIsSoldOut(!isSoldOut);
         }
@@ -63,12 +66,11 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보
      * @return 해당 키워드의 상품들 정보
      */
-    public ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts(String keyword, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts(String keyword, Pageable pageable) {
 
-        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveKeywordWithProducts.getSearchProductInformationDtoList();
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
 
-        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+        for(ProductShoppingResponse.OfSearchProductInformation searchProductInformationDto : retrieveKeywordWithProducts) {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
             searchProductInformationDto.changeIsSoldOut(!isSoldOut);
         }
@@ -82,12 +84,11 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보
      * @return 업체 상품들의 정보
      */
-    public ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
 
-        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveCustomerWithProducts.getSearchProductInformationDtoList();
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
 
-        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+        for(ProductShoppingResponse.OfSearchProductInformation searchProductInformationDto : retrieveCustomerWithProducts) {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
             searchProductInformationDto.changeIsSoldOut(!isSoldOut);
         }
@@ -100,15 +101,15 @@ public class ProductShoppingFacade {
      * @param cartTypeId 장바구니 타입 ID
      * @return 장바구니 상품 정보
      */
-    public List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
+    public List<CartProductResponse.OfRetrieveCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
 
-        List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts = cartProductService.retrieveAllCartProducts(memberId, cartTypeId);
+        List<CartProductResponse.OfRetrieveCartProduct> ofRetrieveCartProducts = cartProductService.retrieveAllCartProducts(memberId, cartTypeId);
 
-        for(CartProductResponse.RetrieveAllCartProduct cartProduct : retrieveAllCartProducts) {
+        for(CartProductResponse.OfRetrieveCartProduct cartProduct : ofRetrieveCartProducts) {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(cartProduct.getProductId());
             cartProduct.changeIsSoldOut(!isSoldOut);
         }
 
-        return retrieveAllCartProducts;
+        return ofRetrieveCartProducts;
     }
 }

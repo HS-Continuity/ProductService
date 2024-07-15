@@ -8,13 +8,10 @@ import com.yeonieum.productservice.domain.cart.repository.CartProductRepository;
 import com.yeonieum.productservice.domain.cart.repository.CartTypeRepository;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,38 +25,33 @@ public class CartProductService {
 
     /**
      * 장바구니에 상품 등록
-     * @param registerProductCartDto 장바구니에 등록할 상품 정보 DTO
+     * @param ofRegisterProductCart 장바구니에 등록할 상품 정보 DTO
      * @throws IllegalStateException 존재하지 않는 상품 ID인 경우 발생
      * @throws IllegalStateException 존재하지 않는 장바구니 타입 ID인 경우 발생
      * @return 성공여부
      */
     @Transactional
-    public boolean registerCartProduct(CartProductRequest.RegisterProductCartDto registerProductCartDto) {
+    public boolean registerCartProduct(CartProductRequest.OfRegisterProductCart ofRegisterProductCart) {
 
-        Product product = productRepository.findById(registerProductCartDto.getProductId())
+        Product product = productRepository.findById(ofRegisterProductCart.getProductId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 상품 ID 입니다."));
 
-        CartType cartType = cartTypeRepository.findById(registerProductCartDto.getCartTypeId())
+        CartType cartType = cartTypeRepository.findById(ofRegisterProductCart.getCartTypeId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 장바구니타입 ID 입니다."));
 
-        List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(registerProductCartDto.getMemberId(), registerProductCartDto.getCartTypeId());
+        List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(ofRegisterProductCart.getMemberId(), ofRegisterProductCart.getCartTypeId());
 
         for (CartProduct existingCartProduct : cartProductList) {
-            if (existingCartProduct.getProduct().getProductId().equals(registerProductCartDto.getProductId())) {
+            if (existingCartProduct.getProduct().getProductId().equals(ofRegisterProductCart.getProductId())) {
                 // 같은 상품이 있으면 수량 추가
-                existingCartProduct.changeProductQuantity(existingCartProduct.getQuantity() + registerProductCartDto.getQuantity());
+                existingCartProduct.changeProductQuantity(existingCartProduct.getQuantity() + ofRegisterProductCart.getQuantity());
                 cartProductRepository.save(existingCartProduct);
                 return true;
             }
         }
 
         // 장바구니에 같은 상품이 없으면 상품 등록
-        CartProduct cartProduct = CartProduct.builder()
-                .product(product)
-                .cartType(cartType)
-                .memberId(registerProductCartDto.getMemberId())
-                .quantity(registerProductCartDto.getQuantity())
-                .build();
+        CartProduct cartProduct = ofRegisterProductCart.toEntity(product, cartType);
 
         cartProductRepository.save(cartProduct);
         return true;
@@ -72,11 +64,11 @@ public class CartProductService {
      * @return 장바구니 상품 목록
      */
     @Transactional
-    public List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
+    public List<CartProductResponse.OfRetrieveCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
 
         List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(memberId, cartTypeId);
 
-        List<CartProductResponse.RetrieveAllCartProduct> cartProductResponseList = new ArrayList<>();
+        List<CartProductResponse.OfRetrieveCartProduct> cartProductResponseList = new ArrayList<>();
 
         for (CartProduct cartProduct : cartProductList) {
             Product product = cartProduct.getProduct();
@@ -93,17 +85,8 @@ public class CartProductService {
                 finalPrice = product.getProductPrice();
             }
 
-            CartProductResponse.RetrieveAllCartProduct response = CartProductResponse.RetrieveAllCartProduct.builder()
-                    .cartProductId(cartProduct.getCartProductId())
-                    .customerId(product.getCustomer().getCustomerId())
-                    .storeName(product.getCustomer().getStoreName())
-                    .productId(product.getProductId())
-                    .productName(product.getProductName())
-                    .productDescription(product.getProductDescription())
-                    .productImage(product.getProductImage())
-                    .productPrice(finalPrice)
-                    .quantity(cartProduct.getQuantity())
-                    .build();
+            CartProductResponse.OfRetrieveCartProduct response = CartProductResponse.OfRetrieveCartProduct.convertedBy(cartProduct, finalPrice);
+
             cartProductResponseList.add(response);
         }
         return cartProductResponseList;

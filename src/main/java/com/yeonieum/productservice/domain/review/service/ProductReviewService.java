@@ -1,7 +1,5 @@
 package com.yeonieum.productservice.domain.review.service;
 
-import com.yeonieum.productservice.domain.customer.dto.CustomerResponse;
-import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewRequest;
@@ -14,10 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class ProductReviewService {
@@ -27,32 +21,24 @@ public class ProductReviewService {
 
     /**
      * 상품 리뷰 등록
-     *
-     * @param registerProductReviewDto 상품 리뷰를 등록할 정보 DTO
+     * @param ofRegisterProductReview 상품 리뷰를 등록할 정보 DTO
      * @return 성공 여부
      * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
      * @throws IllegalStateException    해당 상품에 대한 회원의 리뷰가 이미 존재하는 경우
      */
     @Transactional
-    public boolean registerProductReview(ProductReviewRequest.RegisterProductReviewDto registerProductReviewDto) {
+    public boolean registerProductReview(ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview) {
 
-        //상품을 구해만 회원인지에 대한 로직 필요
+        //상품을 구매한 회원인지에 대한 로직 필요
 
-        Product product = productRepository.findById(registerProductReviewDto.getProductId())
+        Product product = productRepository.findById(ofRegisterProductReview.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
 
-        if (productReviewRepository.existsByMemberId(registerProductReviewDto.getMemberId())) {
+        if (productReviewRepository.existsByMemberId(ofRegisterProductReview.getMemberId())) {
             throw new IllegalStateException("이미 해당 회원이 작성한 리뷰가 존재합니다.");
         }
 
-        ProductReview productReview = ProductReview.builder()
-                .product(product)
-                .memberId(registerProductReviewDto.getMemberId())
-                .createDate(registerProductReviewDto.getCreateDate())
-                .reviewContent(registerProductReviewDto.getReviewContent())
-                .reviewImage(registerProductReviewDto.getReviewImage())
-                .reviewScore(registerProductReviewDto.getReviewScore())
-                .build();
+        ProductReview productReview =  ofRegisterProductReview.toEntity(product);
 
         productReviewRepository.save(productReview);
         return true;
@@ -60,10 +46,9 @@ public class ProductReviewService {
 
     /**
      * 상품 리뷰 삭제
-     *
      * @param productReviewId 상품 리뷰 ID
-     * @return 성공 여부
      * @throws IllegalArgumentException 존재하지 않는 상품 리뷰 ID인 경우
+     * @return 성공 여부
      */
     @Transactional
     public boolean deleteProductReview(Long productReviewId) {
@@ -78,23 +63,19 @@ public class ProductReviewService {
 
     /**
      * 선택한 상품 조회시, 해당 상품의 리뷰 조회
-     *
      * @param productId 상품 ID
-     * @return 상품리뷰에 대한 정보
      * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
+     * @return 상품리뷰에 대한 정보
      */
     @Transactional
-    public Page<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviews(Long productId, Pageable pageable) {
+    public Page<ProductReviewResponse.OfRetrieveProductWithReview> retrieveProductWithReviews(Long productId, Pageable pageable) {
+
+        if (!productRepository.existsById(productId)) {
+            throw new IllegalArgumentException("존재하지 않는 상품 ID 입니다.");
+        }
 
         Page<ProductReview> productReviews = productReviewRepository.findByProductId(productId, pageable);
 
-        return productReviews.map(review -> ProductReviewResponse.RetrieveProductWithReviewsDto.builder()
-                .productReviewId(review.getProductReviewId())
-                .memberId(review.getMemberId())
-                .createDate(review.getCreateDate())
-                .reviewContent(review.getReviewContent())
-                .reviewImage(review.getReviewImage())
-                .reviewScore(review.getReviewScore())
-                .build());
+        return productReviews.map(review -> ProductReviewResponse.OfRetrieveProductWithReview.convertedBy(review));
     }
 }
