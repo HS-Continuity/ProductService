@@ -77,24 +77,23 @@ public class ProductShoppingFacade {
         return retrieveKeywordWithProducts;
     }
 
-//    /**
-//     * 업체별 상품 조회
-//     * @param customerId 고객 ID
-//     * @param detailCategoryId 상세 카테고리 ID
-//     * @param pageable 페이징 정보
-//     * @return 업체 상품들의 정보
-//     */
-//    public ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
-//
-//        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
-//        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = retrieveCustomerWithProducts.getSearchProductInformationDtoList();
-//
-//        for(ProductShoppingResponse.OfSearchProductInformation searchProductInformationDto : searchProductInformationDtoList) {
-//            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
-//            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
-//        }
-//        return retrieveCustomerWithProducts;
-//    }
+    /**
+     * 업체별 상품 조회
+     * @param customerId 고객 ID
+     * @param detailCategoryId 상세 카테고리 ID
+     * @param pageable 페이징 정보
+     * @return 업체 상품들의 정보
+     */
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
+
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
+
+        for(ProductShoppingResponse.OfSearchProductInformation searchProductInformationDto : retrieveCustomerWithProducts) {
+            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
+            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+        }
+        return retrieveCustomerWithProducts;
+    }
 
     /**
      * 장바구니 상품 조회

@@ -4,7 +4,6 @@ import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
 import com.yeonieum.productservice.domain.category.repository.ProductDetailCategoryRepository;
-import com.yeonieum.productservice.domain.customer.dto.CustomerResponse;
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -122,6 +120,8 @@ public class ProductShoppingService {
      */
     @Transactional
     public ProductShoppingResponse.OfDetailProductInformation detailProductInformationDto(Long productId){
+
+        // 상품 정보를 조회, 존재하지 않을 경우 예외 발생
         Product targetProduct = productRepository.findByIdAndIsActive(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
 
@@ -139,51 +139,30 @@ public class ProductShoppingService {
         Page<Product> products;
 
         if (keyword == null || keyword.trim().isEmpty()) {
+            //키워드가 존재하지 않을 경우, 모든 상품 조회
             products = productRepository.findAllByIsActive(pageable);
         } else {
+            //키워드가 존재할 경우, 키워드에 맞는 상품 조회
             products = productRepository.findByProductNameContainingAndIsActive(keyword, pageable);
         }
 
         return products.map(product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product));
     }
 
-//    /**
-//     * 업체별 상품 조회
-//     * @param customerId 고객 ID
-//     * @param detailCategoryId 상세 카테고리 ID
-//     * @param pageable 페이징 정보
-//     * @return 업체 상품들의 정보
-//     */
-//    @Transactional
-//    public ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable){
-//
-//        Page<Product> productsPage = productRepository.findByCustomerIdAndIsActiveAndCategoryId(customerId, detailCategoryId ,pageable);
-//
-//        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = productsPage.getContent().stream().map(product -> {
-//
-//            return ProductShoppingResponse.OfSearchProductInformation.builder()
-//                    .productId(product.getProductId())
-//                    .customerId(product.getCustomer().getCustomerId())
-//                    .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())
-//                    .productName(product.getProductName())
-//                    .productDescription(product.getProductDescription())
-//                    .productImage(product.getProductImage())
-//                    .baseDiscountRate(product.getBaseDiscountRate())
-//                    .regularDiscountRate(product.getRegularDiscountRate())
-//                    .productPrice(product.getProductPrice())
-//                    .calculatedBasePrice(product.getCalculatedBasePrice())
-//                    .isRegularSale(product.getIsRegularSale().getCode())
-//                    .reviewCount(product.getReviewCount())
-//                    .averageScore(product.getAverageScore())
-//                    .build();
-//        }).collect(Collectors.toList());
-//
-//        return ProductShoppingResponse.RetrieveSearchWithProductsDto.builder()
-//                .totalItems((int) productsPage.getTotalElements())
-//                .totalPages(productsPage.getTotalPages())
-//                .lastPage(productsPage.isLast())
-//                .searchProductInformationDtoList(searchProductInformationDtoList)
-//                .build();
-//    }
+    /**
+     * 업체별 상품 조회
+     * @param customerId 고객 ID
+     * @param detailCategoryId 상세 카테고리 ID
+     * @param pageable 페이징 정보
+     * @return 업체 상품들의 정보
+     */
+    @Transactional
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
+
+        // 고객 ID와 상세 카테고리 ID로 상품 조회
+        Page<Product> products = productRepository.findByCustomerIdAndIsActiveAndCategoryId(customerId, detailCategoryId, pageable);
+
+        return products.map(product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product));
+    }
 }
 
