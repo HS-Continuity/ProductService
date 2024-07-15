@@ -73,10 +73,10 @@ public class ProductShoppingController {
     }
 
 
-    @Operation(summary = "상세 상품 조회", description = "선택한 상품의 정보를 조회하는 기능입니다.")
+    @Operation(summary = "상품 상세 정보 조회", description = "선택한 상품의 상세 정보를 조회하는 기능입니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 정보 조회 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 정보 조회 실패")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 상세 정보 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 상세 정보 조회 실패")
     })
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
@@ -104,7 +104,7 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts =
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts =
                 productShoppingFacade.retrieveKeywordWithProducts(keyword, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -113,27 +113,27 @@ public class ProductShoppingController {
                 .build(), HttpStatus.OK);
     }
 
-    @Operation(summary = "업체 상품 조회", description = "선택한 업체의 상품들을 조회하는 기능입니다.")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 상품 조회 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 상품 조회 실패")
-    })
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<ApiResponse> retrieveSearchCustomerProduct(@PathVariable Long customerId,
-                                                                     @RequestParam(required = false) Long detailCategoryId,
-                                                                     @RequestParam(defaultValue = "0") int startPage,
-                                                                     @RequestParam(defaultValue = "10") int pageSize,
-                                                                     @RequestParam(defaultValue = "productName") String sort,
-                                                                     @RequestParam(defaultValue = "asc") String direction) {
-
-        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
-
-        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProducts =
-                productShoppingFacade.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
-
-        return new ResponseEntity<>(ApiResponse.builder()
-                .result(retrieveCustomerWithProducts)
-                .successCode(SuccessCode.SELECT_SUCCESS)
-                .build(), HttpStatus.OK);
-    }
+//    @Operation(summary = "업체 상품 조회", description = "선택한 업체의 상품들을 조회하는 기능입니다.")
+//    @ApiResponses({
+//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 상품 조회 성공"),
+//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 상품 조회 실패")
+//    })
+//    @GetMapping("/customer/{customerId}")
+//    public ResponseEntity<ApiResponse> retrieveSearchCustomerProduct(@PathVariable Long customerId,
+//                                                                     @RequestParam(required = false) Long detailCategoryId,
+//                                                                     @RequestParam(defaultValue = "0") int startPage,
+//                                                                     @RequestParam(defaultValue = "10") int pageSize,
+//                                                                     @RequestParam(defaultValue = "productName") String sort,
+//                                                                     @RequestParam(defaultValue = "asc") String direction) {
+//
+//        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
+//
+//        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProducts =
+//                productShoppingFacade.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
+//
+//        return new ResponseEntity<>(ApiResponse.builder()
+//                .result(retrieveCustomerWithProducts)
+//                .successCode(SuccessCode.SELECT_SUCCESS)
+//                .build(), HttpStatus.OK);
+//    }
 }

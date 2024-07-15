@@ -56,15 +56,15 @@ public class ProductShoppingResponse {
         }
     }
 
-    @Getter
-    @Builder
-    public static class RetrieveSearchWithProductsDto {
-
-        private int totalItems;
-        private int totalPages;
-        private boolean lastPage;
-        private List<OfSearchProductInformation> searchProductInformationDtoList;
-    }
+//    @Getter
+//    @Builder
+//    public static class RetrieveSearchWithProductsDto {
+//
+//        private int totalItems;
+//        private int totalPages;
+//        private boolean lastPage;
+//        private List<OfSearchProductInformation> searchProductInformationDtoList;
+//    }
 
     @Getter
     @Builder
@@ -148,8 +148,8 @@ public class ProductShoppingResponse {
                     .calculatedBasePrice(product.getCalculatedBasePrice())
                     .calculatedRegularPrice(product.getCalculatedRegularPrice())
                     .calculatedPersonalizedPrice(product.getCalculatedPersonalizedPrice())
-                    .isRegularSale((char) (product.getIsRegularSale() == ActiveStatus.ACTIVE ? 'T' : 'F'))
-                    .isCertification((char) (product.getIsCertification() == ActiveStatus.ACTIVE ? 'T' : 'F'))
+                    .isRegularSale(product.getIsRegularSale().getCode())
+                    .isCertification(product.getIsCertification().getCode())
                     .reviewCount(product.getReviewCount())
                     .averageScore(product.getAverageScore())
                     .build();
