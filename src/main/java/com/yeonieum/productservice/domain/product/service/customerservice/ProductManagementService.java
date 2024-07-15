@@ -15,7 +15,7 @@ public interface ProductManagementService {
     List<ProductManagementResponse.RetrieveDto> retrieveCustomersProducts(Long customerId, ActiveStatus activeStatus);
     ProductManagementResponse.RetrieveDto retrieveProductDetail(Long productId);
     boolean uploadProductImageUrl(Long productId, String imageUrl);
-    boolean uploadProductDetailImages(Long productId, List<Long> deleteList, List<String> imageUrlList);
+    boolean uploadProductDetailImages(Long productId, ProductManagementRequest.DetailImageList deleteList, List<String> imageUrlList);
     boolean uploadCertificationImage(Long productId, String imageUrl , ProductManagementRequest.Certification certification);
     List<ProductManagementResponse.RetrieveDetailImage> retrieveDetailImage(Long productId);
 }

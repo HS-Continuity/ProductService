@@ -171,7 +171,7 @@ public class ProductManagementController {
 
     @PostMapping("/product/{productId}/detail-image")
     public ResponseEntity<ApiResponse> uploadProductDetailImage(@PathVariable Long productId,
-                                                                List<Long> deleteDetailImageList,
+                                                                @RequestBody ProductManagementRequest.DetailImageList deleteDetailImageList,
                                                                 @RequestPart  List<MultipartFile> uploadImageList) throws IOException {
         List<String> imageUrlList = new ArrayList<>();
         for(MultipartFile uploadFile : uploadImageList) {

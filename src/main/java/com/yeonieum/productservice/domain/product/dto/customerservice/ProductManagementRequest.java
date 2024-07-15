@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class ProductManagementRequest {
     @Getter
     @NoArgsConstructor
@@ -14,6 +16,12 @@ public class ProductManagementRequest {
 
             super(customerId, mainCategoryId, subCategoryId, productName, description, image, price, origin, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, personalizedDiscountRate);
         }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class DetailImageList {
+       List<Long> detailImageList;
     }
 
     @Getter
