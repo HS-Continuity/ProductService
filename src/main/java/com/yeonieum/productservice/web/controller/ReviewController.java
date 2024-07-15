@@ -26,7 +26,7 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상품 리뷰 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 등록 실패")
     })
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<ApiResponse> registerProductReview(@RequestBody ProductReviewRequest.RegisterProductReviewDto registerProductReviewDto) {
 
         productReviewService.registerProductReview(registerProductReviewDto);

@@ -281,13 +281,13 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     @Override
     @Transactional
     public boolean uploadProductDetailImages(Long productId,
-                                             List<Long> deleteList,
+                                             ProductManagementRequest.DetailImageList deleteList,
                                              List<String> imageUrlList) {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
 
-        for(Long detailImageIdList : deleteList) {
+        for(Long detailImageIdList : deleteList.getDetailImageList()) {
             ProductDetailImage productDetailImage = productDetailImageRepository.findById(detailImageIdList).orElseThrow(
                     () -> new IllegalArgumentException("해당하는 상세이미지가 존재하지 않습니다.")
             );
