@@ -21,17 +21,11 @@ public class CustomerService {
      * @return 고객의 정보
      */
     @Transactional
-    public Page<CustomerResponse.RetrieveCustomerDto> retrieveCustomers(Pageable pageable) {
+    public Page<CustomerResponse.OfRetrieveCustomer> retrieveCustomers(Pageable pageable) {
 
         Page<Customer> customers = customerRepository.findByIsDeleted(pageable);
 
-        return customers.map(customer -> CustomerResponse.RetrieveCustomerDto.builder()
-                .customerId(customer.getCustomerId())
-                .customerName(customer.getCustomerName())
-                .customerBirthday(customer.getCustomerBirthday())
-                .customerPhoneNumber(customer.getCustomerPhoneNumber())
-                .storeName(customer.getStoreName())
-                .build());
+        return customers.map(customer -> CustomerResponse.OfRetrieveCustomer.convertedBy(customer));
     }
 
     /**
@@ -40,21 +34,11 @@ public class CustomerService {
      * @return 고객의 상세 정보
      */
     @Transactional
-    public CustomerResponse.RetrieveDetailCustomerDto retrieveDetailCustomers(Long customerId) {
+    public CustomerResponse.OfRetrieveDetailCustomer retrieveDetailCustomers(Long customerId) {
 
         Customer targetCustomer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 고객 ID 입니다."));
 
-        return CustomerResponse.RetrieveDetailCustomerDto.builder()
-                .customerId(targetCustomer.getCustomerId())
-                .customerName(targetCustomer.getCustomerName())
-                .customerBirthday(targetCustomer.getCustomerBirthday())
-                .customerPhoneNumber(targetCustomer.getCustomerPhoneNumber())
-                .storeName(targetCustomer.getStoreName())
-                .storeBusinessNumber(targetCustomer.getStoreBusinessNumber())
-                .storeImage(targetCustomer.getStoreImage())
-                .storeAddress(targetCustomer.getStoreAddress())
-                .storePhoneNumber(targetCustomer.getStorePhoneNumber())
-                .build();
+        return CustomerResponse.OfRetrieveDetailCustomer.convertedBy(targetCustomer);
     }
 }

@@ -1,10 +1,7 @@
 package com.yeonieum.productservice.web.controller;
 
-import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.customer.dto.CustomerResponse;
-import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.service.CustomerService;
-import com.yeonieum.productservice.global.paging.PageableUtil;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/customer")
@@ -38,7 +33,7 @@ public class CustomerController {
 
         Pageable pageable =  PageRequest.of(startPage, pageSize);
 
-        Page<CustomerResponse.RetrieveCustomerDto> retrieveCustomers
+        Page<CustomerResponse.OfRetrieveCustomer> retrieveCustomers
                 = customerService.retrieveCustomers(pageable);
 
 
@@ -56,7 +51,7 @@ public class CustomerController {
     @GetMapping("/{customerId}")
     public ResponseEntity<ApiResponse> retrieveDetailCustomer(@PathVariable("customerId") Long customerId) {
 
-        CustomerResponse.RetrieveDetailCustomerDto targetCustomer = customerService.retrieveDetailCustomers(customerId);
+        CustomerResponse.OfRetrieveDetailCustomer targetCustomer = customerService.retrieveDetailCustomers(customerId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(targetCustomer)
