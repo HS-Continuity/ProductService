@@ -101,15 +101,15 @@ public class ProductShoppingFacade {
      * @param cartTypeId 장바구니 타입 ID
      * @return 장바구니 상품 정보
      */
-    public List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
+    public List<CartProductResponse.OfRetrieveCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
 
-        List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts = cartProductService.retrieveAllCartProducts(memberId, cartTypeId);
+        List<CartProductResponse.OfRetrieveCartProduct> ofRetrieveCartProducts = cartProductService.retrieveAllCartProducts(memberId, cartTypeId);
 
-        for(CartProductResponse.RetrieveAllCartProduct cartProduct : retrieveAllCartProducts) {
+        for(CartProductResponse.OfRetrieveCartProduct cartProduct : ofRetrieveCartProducts) {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(cartProduct.getProductId());
             cartProduct.changeIsSoldOut(!isSoldOut);
         }
 
-        return retrieveAllCartProducts;
+        return ofRetrieveCartProducts;
     }
 }

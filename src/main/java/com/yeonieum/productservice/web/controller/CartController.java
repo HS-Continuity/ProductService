@@ -29,9 +29,9 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 등록 실패")
     })
     @PostMapping("")
-    public ResponseEntity<ApiResponse> registerCartProduct(@RequestBody CartProductRequest.RegisterProductCartDto registerProductCartDto) {
+    public ResponseEntity<ApiResponse> registerCartProduct(@RequestBody CartProductRequest.OfRegisterProductCart ofRegisterProductCart) {
 
-        cartProductService.registerCartProduct(registerProductCartDto);
+        cartProductService.registerCartProduct(ofRegisterProductCart);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -49,9 +49,9 @@ public class CartController {
             @RequestParam("memberId") String memberId,
             @RequestParam("cartTypeId") Long cartTypeId) {
 
-        List<CartProductResponse.RetrieveAllCartProduct> retrieveAllCartProducts = productShoppingFacade.retrieveAllCartProducts(memberId, cartTypeId);
+        List<CartProductResponse.OfRetrieveCartProduct> ofRetrieveCartProducts = productShoppingFacade.retrieveAllCartProducts(memberId, cartTypeId);
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(retrieveAllCartProducts)
+                .result(ofRetrieveCartProducts)
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
