@@ -81,7 +81,7 @@ public class ProductShoppingController {
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
 
-        ProductShoppingResponse.DetailProductInformationDto detailProductInformation =
+        ProductShoppingResponse.OfDetailProductInformation detailProductInformation =
                 productShoppingService.detailProductInformationDto(productId);
 
         return new ResponseEntity<>(ApiResponse.builder()

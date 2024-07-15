@@ -38,12 +38,19 @@ public class ProductShoppingService {
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
     @Transactional
-    public Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts(
+            Long productCategoryId,
+            ActiveStatus isCertification,
+            Pageable pageable) {
+
+        // 카테고리 정보를 조회, 존재하지 않을 경우 예외 발생
         ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 카테고리 ID 입니다."));
 
+        // 해당 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
         Page<Product> products = productRepository.findActiveProductsByCategory(productCategoryId, isCertification, pageable);
 
+        // 조회된 상품이 없으면 예외 발생
         if (products.isEmpty()) {
             throw new IllegalArgumentException("해당 카테고리 내의 상품이 없습니다.");
         }
@@ -82,7 +89,7 @@ public class ProductShoppingService {
         ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 상세 카테고리 ID 입니다."));
 
-        // 해당 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
+        // 해당 상세 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
         Page<Product> products = productRepository.findActiveProductsByDetailCategoryId(
                 productDetailCategoryId, isCertification, pageable);
 
@@ -106,41 +113,18 @@ public class ProductShoppingService {
         return new PageImpl<>(Collections.singletonList(detailCategoryWithProductsDto), pageable, products.getTotalElements());
     }
 
-
-
-
-
     /**
-     * 상세 상품 조회
+     * 상세 상품 정보 조회
      * @param productId 상품 ID
-     * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
-     * @return 상품의 정보
+     * @throws IllegalArgumentException 상품 ID가 존재하지 않는 경우
+     * @return 상품의 상세 정보
      */
     @Transactional
-    public ProductShoppingResponse.DetailProductInformationDto detailProductInformationDto(Long productId){
+    public ProductShoppingResponse.OfDetailProductInformation detailProductInformationDto(Long productId){
         Product targetProduct = productRepository.findByIdAndIsActive(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
 
-        return ProductShoppingResponse.DetailProductInformationDto.builder()
-                .productId(targetProduct.getProductId())
-                .customerId(targetProduct.getCustomer().getCustomerId())
-                .detailCategoryId(targetProduct.getProductDetailCategory().getProductDetailCategoryId())
-                .productName(targetProduct.getProductName())
-                .productDescription(targetProduct.getProductDescription())
-                .productImage(targetProduct.getProductImage())
-                .origin(targetProduct.getProductOrigin())
-                .baseDiscountRate(targetProduct.getBaseDiscountRate())
-                .regularDiscountRate(targetProduct.getRegularDiscountRate())
-                .personalizedDiscountRate(targetProduct.getPersonalizedDiscountRate())
-                .productPrice(targetProduct.getProductPrice())
-                .calculatedBasePrice(targetProduct.getCalculatedBasePrice())
-                .calculatedRegularPrice(targetProduct.getCalculatedRegularPrice())
-                .calculatedPersonalizedPrice(targetProduct.getCalculatedPersonalizedPrice())
-                .isRegularSale((char) (targetProduct.getIsRegularSale() == ActiveStatus.ACTIVE ? 'T' : 'F'))
-                .isCertification((char) (targetProduct.getIsCertification() == ActiveStatus.ACTIVE ? 'T' : 'F'))
-                .reviewCount(targetProduct.getReviewCount())
-                .averageScore(targetProduct.getAverageScore())
-                .build();
+        return ProductShoppingResponse.OfDetailProductInformation.convertedBy(targetProduct);
     }
 
     /**

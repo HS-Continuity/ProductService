@@ -3,6 +3,7 @@ package com.yeonieum.productservice.domain.product.dto.memberservice;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -110,7 +111,7 @@ public class ProductShoppingResponse {
 
     @Getter
     @Builder
-    public static class DetailProductInformationDto {
+    public static class OfDetailProductInformation {
 
         private Long productId;
         private Long customerId;
@@ -130,5 +131,28 @@ public class ProductShoppingResponse {
         private char isCertification;
         private Integer reviewCount;
         private Double averageScore;
+
+        public static OfDetailProductInformation convertedBy(Product product) {
+            return OfDetailProductInformation.builder()
+                    .productId(product.getProductId())
+                    .customerId(product.getCustomer().getCustomerId())
+                    .detailCategoryId(product.getProductDetailCategory().getProductDetailCategoryId())
+                    .productName(product.getProductName())
+                    .productDescription(product.getProductDescription())
+                    .productImage(product.getProductImage())
+                    .origin(product.getProductOrigin())
+                    .baseDiscountRate(product.getBaseDiscountRate())
+                    .regularDiscountRate(product.getRegularDiscountRate())
+                    .personalizedDiscountRate(product.getPersonalizedDiscountRate())
+                    .productPrice(product.getProductPrice())
+                    .calculatedBasePrice(product.getCalculatedBasePrice())
+                    .calculatedRegularPrice(product.getCalculatedRegularPrice())
+                    .calculatedPersonalizedPrice(product.getCalculatedPersonalizedPrice())
+                    .isRegularSale((char) (product.getIsRegularSale() == ActiveStatus.ACTIVE ? 'T' : 'F'))
+                    .isCertification((char) (product.getIsCertification() == ActiveStatus.ACTIVE ? 'T' : 'F'))
+                    .reviewCount(product.getReviewCount())
+                    .averageScore(product.getAverageScore())
+                    .build();
+        }
     }
 }
