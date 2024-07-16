@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +31,12 @@ public class ProductShoppingFacade {
 
         ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts = productShoppingService.retrieveCategoryWithProducts(productCategoryId, isCertification, pageable);
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveCategoryWithProducts.getSearchProductInformationDtoList();
-
-        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
-            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
-            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+        List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> {
+            return dto.getProductId();
+        }).collect(Collectors.toList());
+        List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+        for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
+            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
         }
         return retrieveCategoryWithProducts;
     }
@@ -49,10 +52,12 @@ public class ProductShoppingFacade {
 
         ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts = productShoppingService.retrieveDetailCategoryWithProducts(productDetailCategoryId, isCertification, pageable);
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveDetailCategoryWithProducts.getSearchProductInformationDtoList();
-
-        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
-            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
-            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+        List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> {
+            return dto.getProductId();
+        }).collect(Collectors.toList());
+        List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+        for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
+            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
         }
         return retrieveDetailCategoryWithProducts;
     }
@@ -67,11 +72,18 @@ public class ProductShoppingFacade {
 
         ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
         List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveKeywordWithProducts.getSearchProductInformationDtoList();
-
-        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
-            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
-            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+        List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> {
+            return dto.getProductId();
+        }).collect(Collectors.toList());
+        List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+        for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
+            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
         }
+
+//        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
+//            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
+//            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
+//        }
         return retrieveKeywordWithProducts;
     }
 
