@@ -4,6 +4,7 @@ import com.yeonieum.productservice.cache.redis.StockRedisSetOperation;
 import com.yeonieum.productservice.cache.redis.StockUsageService;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
+import com.yeonieum.productservice.domain.product.service.ProductShelflifeCache;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
@@ -23,8 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class StockSystemService {
-    private final ProductDetailCategoryService productDetailCategoryService;
-
+    private final ProductShelflifeCache productShelflifeCache;
     private final StockUsageService stockUsageService;
     private final StockRedisSetOperation stockRedisSetOperation;
     private final ProductRepository productRepository;
@@ -143,7 +143,7 @@ public class StockSystemService {
                 long startTime = System.nanoTime();
 
                 //[STEP1. 배송도착시 남아있어야하는 소비자의 최소 소비 기간을 조회해서 가져온다.]
-                int lifeDay = productDetailCategoryService.getProductShelflife(product);
+                int lifeDay = productShelflifeCache.getProductShelflife(product);
 
 
                 //[STEP2. 오늘 날짜 및 현재 시각을 조회한다.]

@@ -69,14 +69,14 @@ public class RedisConfig {
     }
 
 
-    @Bean
+    //@Bean
     public RedisConnectionFactory inMemoryRedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
         LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config);
         return connectionFactory;
     }
 
-    @Bean
+    //@Bean
     public RedisCacheManager localCacheManager() {
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
