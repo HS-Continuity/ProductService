@@ -11,12 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class StockUsageService {
     private final StockRedisSetOperation stockRedisSetOperation;
 
-    public void test(int available, Long productId, Long orderId, int quantity) {
-        if (available >= stockRedisSetOperation.totalStockUsageCount(productId) + quantity) {
-            stockRedisSetOperation.addStockUsage(new StockUsageDto(productId, orderId, quantity));
-        }
-    }
-
     /**
      * 주문 취소 이벤트 consume시 발생하는 재고사용량 감소
      * @param decreaseStockUsageDto
@@ -47,6 +41,7 @@ public class StockUsageService {
         if (totalStockUsageCount == null) {
             totalStockUsageCount = 0;
         }
+        System.out.println(available + " " + totalStockUsageCount + stockUsageDto.getQuantity());
 
         if (available >= totalStockUsageCount + stockUsageDto.getQuantity()) {
             stockRedisSetOperation.addStockUsage(stockUsageDto);

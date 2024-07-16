@@ -27,7 +27,7 @@ public class LockAcquisitionAspect {
 
 
     @Around("@annotation(com.yeonieum.productservice.global.lock.Lock)")
-    public Object distributionLock(final ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object distributionLock(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         Lock lock = method.getAnnotation(Lock.class);
@@ -45,10 +45,8 @@ public class LockAcquisitionAspect {
             return failResponse(increaseStockUsageDto);
         }
 
-
         String key = keyPrefix + productId;
         RLock rLock = redissonClient.getLock(key);
-        String lockName = rLock.getName();
         try {
             boolean available =
                     rLock.tryLock(
@@ -58,23 +56,20 @@ public class LockAcquisitionAspect {
             if (!available) {
                 return failResponse(increaseStockUsageDto);
             }
+
             return joinPoint.proceed();
         } catch (InterruptedException e) {
-
             e.printStackTrace();
             return failResponse(increaseStockUsageDto);
         } catch (Exception e) {
-
             e.printStackTrace();
+            return failResponse(increaseStockUsageDto);
         } finally{
             try {
-
                 rLock.unlock();
             } catch (IllegalMonitorStateException e) {
-
                 e.printStackTrace();
             }
-            return null;
         }
     }
 

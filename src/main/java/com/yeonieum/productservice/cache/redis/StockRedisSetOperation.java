@@ -9,22 +9,20 @@ import com.yeonieum.productservice.domain.productinventory.entity.ShippedStock;
 import com.yeonieum.productservice.domain.productinventory.entity.StockUsage;
 import com.yeonieum.productservice.domain.productinventory.repository.ShippedStockRepository;
 import com.yeonieum.productservice.domain.productinventory.repository.StockUsageRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.stereotype.Component;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 캐시 기본전략 : write through
@@ -37,39 +35,79 @@ public class StockRedisSetOperation {
     private final StockUsageRepository stockUsageRepository;
     private final ShippedStockRepository shippedStockRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-
     private final ObjectMapper objectMapper;
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Set<Object> getProductStock(Long productId) throws JsonProcessingException {
-        // Redis에서 조회
+    public Set<Object> getProductStock(Long productId) {
         String key = getStockUsageKey(productId);
 
+        // Redis에서 재고 조회
         Set<Object> productStockSet = redisTemplate.opsForSet().members(key);
-        productStockSet.size();
-        if (productStockSet == null || productStockSet.size() == 0) {
 
-            List<StockUsageDto> stockUsageList = stockUsageRepository.findShippedStockByProductId(productId);
-            LocalDateTime shippedTime = LocalDateTime.now().withHour(14);
-            List<StockUsageDto> shippedStockDtoList = shippedStockRepository.findShippedStockBeforeTodayShippedTime(productId, shippedTime);
-
-            productStockSet = new HashSet<>(stockUsageList);
-            productStockSet.removeAll(shippedStockDtoList);
-
-            for(Object stockUsageDto : productStockSet) {
-                setCacheExpriation(key, (StockUsageDto) stockUsageDto);
-            }
-            if(stockUsageList.size() == 0) {
-                setCacheExpriation(key, new StockUsageDto(productId, null, 0));
-            }
+        if (productStockSet == null || productStockSet.isEmpty()) {
+            productStockSet = fetchAndCacheProductStock(productId);
         }
 
         return productStockSet;
     }
 
-    public void setCacheExpriation(String key, StockUsageDto stockUsageDto) throws JsonProcessingException {
-        redisTemplate.opsForSet().add(key, objectMapper.writeValueAsString(stockUsageDto));
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<Set<Object>> bulkGetProductStock(List<Long> productIdList) throws InterruptedException {
+        List<String> keys = productIdList.stream()
+                .map(this::getStockUsageKey)
+                .collect(Collectors.toList());
+
+        // 파이프라인을 통해 재고 사용량을 한번에 조회해옴
+        List<Object> redisResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            RedisSerializer<String> keySerializer = redisTemplate.getStringSerializer();
+            keys.forEach(key -> connection.setCommands().sMembers(keySerializer.serialize(key)));
+            return null;
+        });
+
+        //파이프라인을 통해 가져온 결과를 List<Set> 에 할당
+        List<Set<Object>> productStockSets = redisResults.stream()
+                .map(result -> result instanceof Set ? (Set<Object>) result : Collections.emptySet())
+                .collect(Collectors.toList());
+
+        // 레디스에 존재하지 않은 키에 대해서 레포지토리 -> 레디스에 올림
+        List<Set<Object>> responseList = new ArrayList<>();
+        for (int i = 0; i < productIdList.size(); i++) {
+            Long productId = productIdList.get(i);
+            Set<Object> productStockSet = productStockSets.get(i);
+            if (productStockSet.isEmpty()) {
+                productStockSet = fetchAndCacheProductStock(productId);
+            }
+            responseList.add(productStockSet);
+        }
+
+        return responseList;
+    }
+
+    private Set<Object> fetchAndCacheProductStock(Long productId){
+        List<StockUsageDto> stockUsageList = stockUsageRepository.findShippedStockByProductId(productId);
+        LocalDateTime shippedTime = LocalDateTime.now().withHour(14);
+        List<StockUsageDto> shippedStockDtoList = shippedStockRepository.findShippedStockBeforeTodayShippedTime(productId, shippedTime);
+
+        Set<Object> productStockSet = new HashSet<>(stockUsageList);
+        productStockSet.removeAll(shippedStockDtoList);
+
+        productStockSet.forEach(stockUsageDto -> setCacheExpiration(getStockUsageKey(productId), (StockUsageDto) stockUsageDto));
+        if (stockUsageList.isEmpty()) {
+            setCacheExpiration(getStockUsageKey(productId), new StockUsageDto(productId, null, 0));
+        }
+
+        return productStockSet;
+    }
+
+
+
+    public void setCacheExpiration(String key, StockUsageDto stockUsageDto){
+        try {
+            redisTemplate.opsForSet().add(key, objectMapper.writeValueAsString(stockUsageDto));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         LocalDateTime tomorrow14 = LocalDateTime.now().plusDays(1).withHour(14);
         long expirationSeconds = Duration.between(LocalDateTime.now(), tomorrow14).getSeconds();
         redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
@@ -229,6 +267,26 @@ public class StockRedisSetOperation {
         }catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public List<Integer> bulkTotalStockUsageCount(List<Long> productIdList) {
+        try {
+            List<Integer> orderPendingAmountList = new ArrayList<>();
+            List<Set<Object>> setList = bulkGetProductStock(productIdList);
+            for(Set<Object> set : setList) {
+                int orderPendingAmount = 0;
+                for (Object stock : set) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    StockUsageDto stockUsageDto = objectMapper.convertValue(stock, StockUsageDto.class);
+                    orderPendingAmount += stockUsageDto.getQuantity();
+                }
+                orderPendingAmountList.add(orderPendingAmount);
+            }
+            return orderPendingAmountList;
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
