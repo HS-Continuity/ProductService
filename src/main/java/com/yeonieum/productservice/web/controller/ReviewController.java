@@ -8,11 +8,12 @@ import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/product-review")
@@ -26,10 +27,10 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상품 리뷰 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 등록 실패")
     })
-    @PostMapping("")
-    public ResponseEntity<ApiResponse> registerProductReview(@RequestBody ProductReviewRequest.RegisterProductReviewDto registerProductReviewDto) {
+    @PostMapping
+    public ResponseEntity<ApiResponse> registerProductReview(@RequestBody ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview) {
 
-        productReviewService.registerProductReview(registerProductReviewDto);
+        productReviewService.registerProductReview(ofRegisterProductReview);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -59,9 +60,15 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 조회 실패")
     })
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse> retrieveProductReviews(@PathVariable Long productId) {
+    public ResponseEntity<ApiResponse> retrieveProductReviews(
+            @PathVariable Long productId,
+            @RequestParam(defaultValue = "0") int startPage,
+            @RequestParam(defaultValue = "10") int pageSize) {
 
-        List<ProductReviewResponse.RetrieveProductWithReviewsDto> retrieveProductWithReviews = productReviewService.retrieveProductWithReviews(productId);
+        Pageable pageable =  PageRequest.of(startPage, pageSize);
+
+        Page<ProductReviewResponse.OfRetrieveProductWithReview> retrieveProductWithReviews
+                = productReviewService.retrieveProductWithReviews(productId, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveProductWithReviews)

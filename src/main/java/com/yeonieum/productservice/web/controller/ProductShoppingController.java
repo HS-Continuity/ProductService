@@ -10,6 +10,7 @@ import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        ProductShoppingResponse.RetrieveCategoryWithProductsDto retrieveCategoryWithProducts =
+        Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts =
                 productShoppingFacade.retrieveCategoryWithProducts(categoryId, isCertification, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -62,7 +63,7 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        ProductShoppingResponse.RetrieveDetailCategoryWithProductsDto retrieveDetailCategoryWithProducts =
+        Page<ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct> retrieveDetailCategoryWithProducts =
                 productShoppingFacade.retrieveDetailCategoryWithProducts(detailCategoryId, isCertification, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -72,15 +73,15 @@ public class ProductShoppingController {
     }
 
 
-    @Operation(summary = "상세 상품 조회", description = "선택한 상품의 정보를 조회하는 기능입니다.")
+    @Operation(summary = "상품 상세 정보 조회", description = "선택한 상품의 상세 정보를 조회하는 기능입니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 정보 조회 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 정보 조회 실패")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 상세 정보 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 상세 정보 조회 실패")
     })
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
 
-        ProductShoppingResponse.DetailProductInformationDto detailProductInformation =
+        ProductShoppingResponse.OfDetailProductInformation detailProductInformation =
                 productShoppingService.detailProductInformationDto(productId);
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -103,7 +104,7 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveKeywordWithProducts =
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts =
                 productShoppingFacade.retrieveKeywordWithProducts(keyword, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -117,7 +118,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 상품 조회 실패")
     })
-    @GetMapping("/search/customer/{customerId}")
+    @GetMapping("/customer/{customerId}")
     public ResponseEntity<ApiResponse> retrieveSearchCustomerProduct(@PathVariable Long customerId,
                                                                      @RequestParam(required = false) Long detailCategoryId,
                                                                      @RequestParam(defaultValue = "0") int startPage,
@@ -127,7 +128,7 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        ProductShoppingResponse.RetrieveSearchWithProductsDto retrieveCustomerWithProducts =
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts =
                 productShoppingFacade.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()

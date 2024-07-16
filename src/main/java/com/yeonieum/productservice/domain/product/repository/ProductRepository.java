@@ -38,8 +38,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "WHERE p.customer_id = :customerId", nativeQuery = true)
     List<RetrieveAdvertisementProductResponseDto> findAllAdvertisementProduct(@Param("customerId") Long customerId);
 
-    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productReviewList WHERE p.productId = :productId")
-    Optional<Product> findByIdWithReviews(@Param("productId") Long productId);
+//    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productReviewList WHERE p.productId = :productId")
+//    Optional<Product> findByIdWithReviews(@Param("productId") Long productId);
 
     @Query("SELECT p FROM Product p " +
             "JOIN FETCH p.productDetailCategory pdc " +
@@ -65,7 +65,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findActiveProductsByDetailCategoryId(@Param("productDetailCategoryId") Long productDetailCategoryId,
                                                        @Param("isCertification") ActiveStatus isCertification,
                                                        Pageable pageable);
-
 
     @Query("SELECT p FROM Product p " +
             "WHERE p.customer.customerId = :customerId " +
