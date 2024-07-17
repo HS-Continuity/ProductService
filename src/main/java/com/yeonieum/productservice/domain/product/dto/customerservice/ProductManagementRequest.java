@@ -1,5 +1,11 @@
 package com.yeonieum.productservice.domain.product.dto.customerservice;
 
+import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
+import com.yeonieum.productservice.domain.customer.entity.Customer;
+import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.entity.ProductCertification;
+import com.yeonieum.productservice.domain.product.entity.SaleType;
+import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,12 +13,12 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 public class ProductManagementRequest {
+    private static interface CertifiedProduct {} private static interface NormalProduct {}
     @Getter
     @NoArgsConstructor
-    public static class RegisterNormalProduct
-            extends RegisterDto implements NormalProduct {
+    public static class OfOfRegisterNormal extends OfRegister implements NormalProduct {
         @Builder
-        public RegisterNormalProduct(Long customerId, Long mainCategoryId, Long subCategoryId, String productName, String description, String image, int price, String origin, char isPageVisibility, char isRegularSale, int baseDiscountRate, int regularDiscountRate, int personalizedDiscountRate) {
+        private OfOfRegisterNormal(Long customerId, Long mainCategoryId, Long subCategoryId, String productName, String description, String image, int price, String origin, char isPageVisibility, char isRegularSale, int baseDiscountRate, int regularDiscountRate, int personalizedDiscountRate) {
 
             super(customerId, mainCategoryId, subCategoryId, productName, description, image, price, origin, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, personalizedDiscountRate);
         }
@@ -20,17 +26,10 @@ public class ProductManagementRequest {
 
     @Getter
     @NoArgsConstructor
-    public static class DetailImageList {
-       List<Long> detailImageList;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class RegisterEcoFriendlyProductDto
-            extends RegisterDto implements CertifiedProduct {
-        Certification certification;
+    public static class OfOfRegisterEcoFriendly extends OfRegister implements CertifiedProduct {
+        private Certification certification;
         @Builder
-        public RegisterEcoFriendlyProductDto(Long customerId, Long mainCategoryId, Long subCategoryId, String productName, String description, String image, int price, String origin, char isPageVisibility, char isRegularSale, int baseDiscountRate, int regularDiscountRate, int personalizedDiscountRate, Certification certification) {
+        private OfOfRegisterEcoFriendly(Long customerId, Long mainCategoryId, Long subCategoryId, String productName, String description, String image, int price, String origin, char isPageVisibility, char isRegularSale, int baseDiscountRate, int regularDiscountRate, int personalizedDiscountRate, Certification certification) {
             super(customerId, mainCategoryId, subCategoryId, productName, description, image, price, origin, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, personalizedDiscountRate);
             this.certification = certification;
         }
@@ -38,36 +37,42 @@ public class ProductManagementRequest {
 
     @Getter
     @NoArgsConstructor
-    public static abstract class RegisterDto {
+    public static class OfDeleteDetailImageList {
+        private List<Long> detailImageList;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static abstract class OfRegister {
         // 판매타입도 넣어야함.
 
-        Long customerId;
+        private Long customerId;
         // 정규식, ~자 이내
-        Long mainCategoryId;
+        private Long mainCategoryId;
         // 정규식, ~자 이내
-        Long subCategoryId;
+        private Long subCategoryId;
         // ~자 이내, 정규식
-        String productName;
+        private String productName;
         // ~자 이내
-        String description;
+        private String description;
         // customerId + productname
-        String image;
+        private String image;
         // 0 이상 값
-        int price;
+        private int price;
         // 빈문자열, 공백, null 허용 안됨
-        String origin;
+        private String origin;
         // 기본값 true
-        char isPageVisibility;
+        private char isPageVisibility;
         // 기본값 true
-        char isRegularSale;
+        private char isRegularSale;
         // 0 ~ 99사이
-        int baseDiscountRate;
+        private int baseDiscountRate;
         // 0 ~ 99사이
-        int regularDiscountRate;
+        private int regularDiscountRate;
         // 0 ~ 99사이
-        int personalizedDiscountRate;
+        private int personalizedDiscountRate;
 
-        public RegisterDto(Long customerId, Long mainCategoryId, Long subCategoryId, String productName, String description, String image, int price, String origin, char isPageVisibility, char isRegularSale, int baseDiscountRate, int regularDiscountRate, int personalizedDiscountRate) {
+        private OfRegister(Long customerId, Long mainCategoryId, Long subCategoryId, String productName, String description, String image, int price, String origin, char isPageVisibility, char isRegularSale, int baseDiscountRate, int regularDiscountRate, int personalizedDiscountRate) {
             this.customerId = customerId;
             this.mainCategoryId = mainCategoryId;
             this.subCategoryId = subCategoryId;
@@ -82,29 +87,47 @@ public class ProductManagementRequest {
             this.regularDiscountRate = regularDiscountRate;
             this.personalizedDiscountRate = personalizedDiscountRate;
         }
+
+        public Product toEntity(SaleType saleType, Customer customer, ProductDetailCategory productDetailCategory, String imageUrl) {
+            return Product.builder()
+                    .saleType(saleType)
+                    .customer(customer)
+                    .productDetailCategory(productDetailCategory)
+                    .productName(this.getProductName())
+                    .productPrice(this.getPrice())
+                    .baseDiscountRate(this.getBaseDiscountRate())
+                    .regularDiscountRate(this.getRegularDiscountRate())
+                    .personalizedDiscountRate(this.getPersonalizedDiscountRate())
+                    .productDescription(this.getDescription())
+                    .productOrigin(this.getOrigin())
+                    .productImage(imageUrl)
+                    .isPageVisibility(ActiveStatus.fromCode(this.getIsPageVisibility()))
+                    .isRegularSale(ActiveStatus.fromCode(this.getIsRegularSale()))
+                    .build();
+        }
     }
 
     @Getter
     @NoArgsConstructor
-    public static class ModifyDto {
+    public static class OfModifying {
         // ~자 이내, 정규식
-        String productName;
+        private String productName;
         // ~자 이내
-        String description;
+        private String description;
 
-        int price;
+        private int price;
         // 빈문자열, 공백, null 허용 안됨
-        String origin;
+        private String origin;
         // 기본값 true
-        char isPageVisibility;
+        private char isPageVisibility;
         // 기본값 true
-        char isRegularSale;
+        private char isRegularSale;
         // 0 ~ 99사이
-        int baseDiscountRate;
+        private int baseDiscountRate;
         // 0 ~ 99사이
-        int regularDiscountRate;
+        private int regularDiscountRate;
         // 0 ~ 99사이
-        int personalizedDiscountRate;
+        private int personalizedDiscountRate;
 
         // 이미지 , 상세이미지는 수정 안됨?
     }
@@ -113,18 +136,20 @@ public class ProductManagementRequest {
     @NoArgsConstructor
     public static class Certification {
         // ~자 이내, 정규식
-        String name;
-        String serialNumber;
+        private String name;
+        private String serialNumber;
         // ~자 이내, 정규식
-        String imageName;
+        private String imageName;
         public void changeImageName(String imageName) {
             this.imageName = imageName;
         }
+        public ProductCertification toEntity(Product product) {
+            return ProductCertification.builder()
+                    .product(product)
+                    .certificationImage(this.getImageName())
+                    .certificationName(this.getName())
+                    .certificationNumber(this.getSerialNumber())
+                    .build();
+        }
     }
-
-
-
-    public static interface CertifiedProduct {}
-
-    public static interface NormalProduct {}
 }

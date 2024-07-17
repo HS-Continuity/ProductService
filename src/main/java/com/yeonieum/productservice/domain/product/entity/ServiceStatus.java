@@ -1,6 +1,6 @@
 package com.yeonieum.productservice.domain.product.entity;
 
-import com.yeonieum.productservice.domain.review.entity.ProductReview;
+import com.yeonieum.productservice.global.enums.ServiceStatusCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,21 +13,22 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "add_service_status")
-public class AddServiceStatus {
+public class ServiceStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "add_service_status_id")
-    private Long addServiceStatusId;
+    @Column(name = "service_status_id")
+    private Long serviceStatusId;
 
     @Column(name = "status_name", nullable = false)
+    //@Convert(converter = ServiceStatusCode.class)
     private String statusName;
 
-    @OneToMany(mappedBy = "addServiceStatus")
+    @OneToMany(mappedBy = "serviceStatus")
     @Builder.Default
     private List<ProductAdvertisementService> productAdvertisementServiceList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "addServiceStatus")
+    @OneToMany(mappedBy = "serviceStatus")
     @Builder.Default
-    private List<ProductTimeSale> productTimeSaleList = new ArrayList<>();
+    private List<ProductTimesale> productTimesaleList = new ArrayList<>();
 }
