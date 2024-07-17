@@ -2,6 +2,7 @@ package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
+import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.messaging.message.AdvertisementEventMessage;
 import lombok.Builder;
@@ -18,14 +19,13 @@ public class AdvertisementRequest {
         private String productName;
         private LocalDate startDate;
         private LocalDate endDate;
-        private ActiveStatus isCompleted;
 
-        public ProductAdvertisementService toEntity(Product product) {
+        public ProductAdvertisementService toEntity(Product product, ServiceStatus status) {
             return ProductAdvertisementService.builder()
                     .startDate(this.startDate)
                     .endDate(this.endDate)
                     .product(product)
-                    .isCompleted(this.isCompleted)
+                    .serviceStatus(status)
                     .build();
         }
 

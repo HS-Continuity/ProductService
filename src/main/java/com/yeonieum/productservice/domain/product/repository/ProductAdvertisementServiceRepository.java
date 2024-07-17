@@ -1,6 +1,7 @@
 package com.yeonieum.productservice.domain.product.repository;
 
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
+import com.yeonieum.productservice.global.enums.ServiceStatusCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,13 +9,13 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ProductAdvertisementServiceRepository extends JpaRepository<ProductAdvertisementService, Long> {
+
     @Query("SELECT pas " +
             "FROM ProductAdvertisementService pas " +
             "JOIN pas.product p " +
-            "WHERE pas.isCompleted = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE " +
-            "ORDER BY FUNCTION('RAND') " +
-            "LIMIT 3")
-    List<ProductAdvertisementService> findRandomActiveAdvertisementProducts();
+            "WHERE pas.serviceStatus.statusName = :statusName " +
+            "ORDER BY FUNCTION('RAND')")
+    List<ProductAdvertisementService> findRandomActiveAdvertisements(@Param("statusName") ServiceStatusCode statusName);
 
     @Query(value = "SELECT pas" +
             "FROM ProductAdvertisementService pas " +
