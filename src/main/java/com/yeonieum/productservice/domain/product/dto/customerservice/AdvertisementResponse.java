@@ -16,7 +16,7 @@ public class AdvertisementResponse {
         private String productName;
         private LocalDate startDate;
         private LocalDate endDate;
-        private ActiveStatus isCompleted;
+        private String serviceStatus;
 
         public static OfRegister convertedBy(ProductAdvertisementService productAdvertisementService) {
             return OfRegister.builder()
@@ -24,7 +24,7 @@ public class AdvertisementResponse {
                     .productName(productAdvertisementService.getProduct().getProductName())
                     .endDate(productAdvertisementService.getEndDate())
                     .startDate(productAdvertisementService.getStartDate())
-                    .isCompleted(productAdvertisementService.getIsCompleted())
+                    .serviceStatus(productAdvertisementService.getServiceStatus().getStatusName())
                     .build();
         }
     }

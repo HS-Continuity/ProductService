@@ -18,7 +18,6 @@ public class TimesaleResponseForMember {
         int discountRate;
         LocalDateTime startDateTime;
         LocalDateTime endDateTime;
-        ActiveStatus isCompleted;
         String serviceStatus;
         private double averageRating;
         private int reviewCount;
@@ -33,7 +32,6 @@ public class TimesaleResponseForMember {
                     .averageRating(timesale.getProduct().getAverageScore())
                     .reviewCount(timesale.getProduct().getReviewCount())
                     .price(timesale.getProduct().getProductPrice())
-                    .isCompleted(timesale.getIsCompleted())
                     .discountRate(timesale.getDiscountRate())
                     .serviceStatus(timesale.getServiceStatus().getStatusName()) // N+1 예상
                     .build();

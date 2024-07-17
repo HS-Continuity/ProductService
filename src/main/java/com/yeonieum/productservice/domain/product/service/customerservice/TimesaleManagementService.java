@@ -42,8 +42,10 @@ public class TimesaleManagementService {
                 () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
 
         List<ProductTimesale> productTimesaleList = productRepository.findAllTimesaleByCustomerId(customerId);
-        return productTimesaleList.stream().map(timesale ->
-                        TimesaleResponseForCustomer.OfRetrieve.convertedBy(timesale))
+        return productTimesaleList.stream().map(timesale -> {
+                    ServiceStatus status = timesale.getServiceStatus();
+                    return TimesaleResponseForCustomer.OfRetrieve.convertedBy(timesale);
+                })
                 .collect(Collectors.toList());
     }
 

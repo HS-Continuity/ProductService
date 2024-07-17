@@ -57,7 +57,9 @@ public class AdvertisementManagementService {
         Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
-        ProductAdvertisementService productAdvertisement = registerRequest.toEntity(product);
+
+        ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
+        ProductAdvertisementService productAdvertisement = registerRequest.toEntity(product, status);
         productAdvertisementServiceRepository.save(productAdvertisement);
 
         AdvertisementEventMessage advertisementEventMessage = registerRequest.toEventMessage();

@@ -1,6 +1,7 @@
 package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
+import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class TimesaleResponseForCustomer {
         int discountRate;
         LocalDateTime startDateTime;
         LocalDateTime endDateTime;
-        ActiveStatus isCompleted;
+        String serviceStatus;
 
         public static OfRetrieve convertedBy(ProductTimesale productTimesale) {
             return OfRetrieve.builder()
@@ -27,7 +28,7 @@ public class TimesaleResponseForCustomer {
                     .startDateTime(productTimesale.getStartDatetime())
                     .endDateTime(productTimesale.getEndDatetime())
                     .discountRate(productTimesale.getDiscountRate())
-                    .isCompleted(productTimesale.getIsCompleted())
+                    .serviceStatus(productTimesale.getServiceStatus().getStatusName())
                     .build();
         }
     }
