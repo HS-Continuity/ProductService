@@ -2,6 +2,7 @@ package com.yeonieum.productservice.global.enums;
 
 public enum ServiceStatusCode {
     PENDING("PENDING"),
+    APPROVE("APPROVE"),
     IN_PROGRESS("IN_PROGRESS"),
     ENDED_EVENT("ENDED_EVENT"),
     CANCELED("CANCELED");
@@ -20,6 +21,8 @@ public enum ServiceStatusCode {
         switch (code) {
             case "PENDING":
                 return PENDING;
+            case "APPROVE":
+                return APPROVE;
             case "IN_PROGRESS":
                 return IN_PROGRESS;
             case "ENDED_EVENT":
