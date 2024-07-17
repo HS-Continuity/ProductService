@@ -121,7 +121,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ProductTimeSale> productTimeSaleList = new ArrayList<>();
+    private List<ProductTimesale> productTimesaleList = new ArrayList<>();
 
     public void changeProductName(String productName) {
         this.productName = productName;

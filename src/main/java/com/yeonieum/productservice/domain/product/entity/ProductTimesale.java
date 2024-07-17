@@ -13,20 +13,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(name = "product_time_sale")
-public class ProductTimeSale {
+public class ProductTimesale {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_time_sale_id")
-    private Long productTimeSaleId;
+    private Long productTimesaleId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "add_service_status_id", nullable = false)
-    private AddServiceStatus addServiceStatus;
+    @JoinColumn(name = "service_status_id", nullable = false)
+    private ServiceStatus serviceStatus;
 
     @Column(name = "start_datetime", nullable = false)
     private LocalDateTime startDatetime;

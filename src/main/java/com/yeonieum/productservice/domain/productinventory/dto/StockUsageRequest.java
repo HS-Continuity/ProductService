@@ -6,11 +6,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public class AvailableProductInventoryRequest {
+public class StockUsageRequest {
 
     @Getter
     @NoArgsConstructor
-    public static class IncreaseStockUsageDto {
+    public static class OfIncreasing {
         Long orderId;
         Long productId;
         int quantity;
@@ -20,12 +20,12 @@ public class AvailableProductInventoryRequest {
     @Getter
     @NoArgsConstructor
     public static class IncreaseStockUsageList {
-        List<IncreaseStockUsageDto> increaseStockUsageDtoList;
+        List<OfIncreasing> ofIncreasingList;
     }
 
     @Getter
     @Builder
-    public static class DecreaseStockUsageDto {
+    public static class OfDecreasing {
         Long orderId;
         Long productId;
         int quantity;
