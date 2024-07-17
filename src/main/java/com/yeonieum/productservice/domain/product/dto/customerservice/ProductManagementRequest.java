@@ -9,6 +9,7 @@ import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class ProductManagementRequest {
         // ~자 이내
         private String description;
         // customerId + productname
-        private String image;
+        //private String image;
         // 0 이상 값
         private int price;
         // 빈문자열, 공백, null 허용 안됨
@@ -77,7 +78,7 @@ public class ProductManagementRequest {
             this.subCategoryId = subCategoryId;
             this.productName = productName;
             this.description = description;
-            this.image = image;
+            //this.image = image;
             this.price = price;
             this.origin = origin;
             this.isPageVisibility = isPageVisibility;
@@ -137,15 +138,16 @@ public class ProductManagementRequest {
         // ~자 이내, 정규식
         private String name;
         private String serialNumber;
+        private MultipartFile image;
         // ~자 이내, 정규식
-        private String imageName;
-        public void changeImageName(String imageName) {
-            this.imageName = imageName;
+
+        public void setImage(MultipartFile image) {
+            this.image = image;
         }
-        public ProductCertification toEntity(Product product) {
+        public ProductCertification toEntity(Product product, String imageName) {
             return ProductCertification.builder()
                     .product(product)
-                    .certificationImage(this.getImageName())
+                    .certificationImage(imageName)
                     .certificationName(this.getName())
                     .certificationNumber(this.getSerialNumber())
                     .build();

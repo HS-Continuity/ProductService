@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.domain.product.service.customerservice;
 
+import com.yeonieum.productservice.domain.S3Upload.S3UploadService;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
@@ -21,7 +22,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     private final ProductCategoryRepository productCategoryRepository;
     private final SaleTypeRepository saleTypeRepository;
     private final ProductDetailImageRepository productDetailImageRepository;
+    private final S3UploadService s3UploadService;
 
     /**
      * 친환경 인증서 시리얼넘버 유효성 검증 메서드
@@ -55,7 +59,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void registerProduct(ProductManagementRequest.OfRegister registerRequest, String imageUrl) throws RuntimeException {
+    public void registerProduct(ProductManagementRequest.OfRegister registerRequest, MultipartFile defaultImage, List<MultipartFile> detailImageList) throws RuntimeException {
         try {
             Customer customer = customerRepository.findById(registerRequest.getCustomerId()).orElseThrow(
                             () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
@@ -69,9 +73,29 @@ public class ProductMangementServiceImpl implements ProductManagementService{
                     .filter(detailCategory -> detailCategory.getProductDetailCategoryId() == registerRequest.getSubCategoryId())
                     .findFirst().orElseThrow(() -> new IllegalArgumentException("잘못된 소분류 카테고리 선택입니다."));
 
+
+            String defaultImageUrl = s3UploadService.uploadImage(defaultImage);
+            List<String> detailImageUrlList = detailImageList.stream()
+                    .map(image -> {
+                        try {
+                            return s3UploadService.uploadImage(image);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+
             // [상품생성]
             SaleType saleType = saleTypeRepository.findByTypeName("일반판매"); // 일반판매타입, 타임세일타입
-            Product product = registerRequest.toEntity(saleType, customer, productDetailCategory, imageUrl);
+            Product product = registerRequest.toEntity(saleType, customer, productDetailCategory, defaultImageUrl);
+
+            // [상품상세이미지 생성]
+            List<ProductDetailImage> productDetailImageList = detailImageUrlList.stream().map(imageUrl ->
+                    ProductDetailImage.builder()
+                            .detailImage(imageUrl)
+                            .product(product)
+                            .build()).collect(Collectors.toList());
+            productDetailImageRepository.saveAll(productDetailImageList);
 
             // 친환경상품이면 [상품의 인증서 여부 T로 변경, 인증서 등록]
             if(registerRequest instanceof ProductManagementRequest.OfRegisterEcoFriendlyProduct) {
@@ -79,7 +103,9 @@ public class ProductMangementServiceImpl implements ProductManagementService{
 
                 ProductManagementRequest.Certification certification
                         = ((ProductManagementRequest.OfRegisterEcoFriendlyProduct) registerRequest).getCertification();
-                productCertificationRepository.save(certification.toEntity(product));
+
+                String certificationImageUrl = s3UploadService.uploadImage(certification.getImage());
+                productCertificationRepository.save(certification.toEntity(product, certificationImageUrl));
             }
             productRepository.save(product);
         }catch (Exception e) {
@@ -242,7 +268,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
      * @return
      */
     @Override
-    public void uploadCertificationImage(Long productId, String imageUrl, ProductManagementRequest.Certification certification) {
+    public void uploadCertificationImage(Long productId, String imageUrl, ProductManagementRequest.Certification certification) throws IOException {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
 
@@ -251,23 +277,10 @@ public class ProductMangementServiceImpl implements ProductManagementService{
         if(productCertification != null) {
             productCertification.changeCertificationImage(imageUrl);
         } else {
-            productCertification = certification.toEntity(product);
+            String certificationImageUrl = s3UploadService.uploadImage(certification.getImage());
+            productCertification = certification.toEntity(product, certificationImageUrl);
         }
         productCertificationRepository.save(productCertification);
     }
 
-    @Transactional
-    public void registerCertificationOf(Product product, ProductManagementRequest.OfRegister registerRequestDto) {
-        ProductManagementRequest.Certification certification
-                = ((ProductManagementRequest.OfRegisterEcoFriendlyProduct) registerRequestDto).getCertification();
-
-        ProductCertification productCertification = ProductCertification.builder()
-                .product(product)
-                .certificationImage(certification.getImageName())
-                .certificationName(certification.getName())
-                .certificationNumber(certification.getSerialNumber())
-                .build();
-
-        productCertificationRepository.save(productCertification);
-    }
 }
