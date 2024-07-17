@@ -16,4 +16,9 @@ public interface CartProductRepository extends JpaRepository<CartProduct, Long> 
             "AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
     List<CartProduct> findByMemberIdAndCartTypeIdWithProduct(@Param("memberId") String memberId, @Param("cartTypeId") Long cartTypeId);
 
+    @Query("SELECT COUNT(cp) FROM CartProduct cp WHERE cp.memberId = :memberId AND (:cartTypeId IS NULL OR cp.cartType.cartTypeId = :cartTypeId)")
+    Long countByMemberIdAndOptionalCartTypeId(@Param("memberId") String memberId, @Param("cartTypeId") Long cartTypeId);
+
+
+
 }
