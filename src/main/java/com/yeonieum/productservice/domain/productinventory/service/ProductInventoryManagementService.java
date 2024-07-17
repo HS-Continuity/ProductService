@@ -27,7 +27,7 @@ public class ProductInventoryManagementService {
      * @param registerDto
      * @return
      */
-    public boolean registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto) {
+    public void registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto) {
         Product product = productRepository.findById(registerDto.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
@@ -42,7 +42,6 @@ public class ProductInventoryManagementService {
 
         // 상품의 판매가능(품절, 판매가능) 상태 변경로직 추가예정
         productInventoryRepository.save(productInventory);
-        return true;
     }
 
     /**
@@ -54,13 +53,9 @@ public class ProductInventoryManagementService {
     public List<RetrieveProductInventoryResponse> retrieveProductInventories(Long productId, Pageable pageable) {
         // 고객아이디 조회 가능한지 여부 체크 로직 추가
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
-        );
+                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
 
-        // Pageable pageable = PageRequest.of(0, 10); 서비스레이어에서 처리하는 것이 맞을까, 컨트롤러에서 처리하고 내리는 것이 맞을까 고민해보기
-        List<RetrieveProductInventoryResponse> productInventoryList =
-                productInventoryRepository.findAllbyProductId(productId, pageable);
-
+        List<RetrieveProductInventoryResponse> productInventoryList = productInventoryRepository.findAllbyProductId(productId, pageable);
         return productInventoryList;
     }
 
@@ -70,15 +65,14 @@ public class ProductInventoryManagementService {
      * @param modifyDto
      * @return
      */
-    public boolean modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
+    public void modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
         ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품재고가 존재하지 않습니다.")
         );
 
-        Product product = productInventory.getProduct();
         // 고객권한 찾기
+        Product product = productInventory.getProduct();
         productInventory.changeQuantity(modifyDto.getQuantity());
-        return true;
     }
 
     /**
@@ -88,8 +82,7 @@ public class ProductInventoryManagementService {
     @Transactional
     public void disposeProductInventory(Long productInventoryId) {
         ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품재고가 존재하지 않습니다.")
-        );
+                () -> new IllegalArgumentException("해당하는 상품재고가 존재하지 않습니다."));
         // 상품재고 상태 속성 테이블에 추가 후 로직 작성
     }
 }
