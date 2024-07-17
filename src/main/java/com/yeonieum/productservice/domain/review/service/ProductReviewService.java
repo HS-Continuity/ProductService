@@ -6,11 +6,15 @@ import com.yeonieum.productservice.domain.review.dto.ProductReviewRequest;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewResponse;
 import com.yeonieum.productservice.domain.review.entity.ProductReview;
 import com.yeonieum.productservice.domain.review.repository.ProductReviewRepository;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class ProductReviewService {
      * @throws IllegalStateException    해당 상품에 대한 회원의 리뷰가 이미 존재하는 경우
      */
     @Transactional
-    public boolean registerProductReview(ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview) {
+    public boolean registerProductReview(ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview, @Nullable String imageUrl) {
 
         //상품을 구매한 회원인지에 대한 로직 필요
 
@@ -38,7 +42,7 @@ public class ProductReviewService {
             throw new IllegalStateException("이미 해당 회원이 작성한 리뷰가 존재합니다.");
         }
 
-        ProductReview productReview =  ofRegisterProductReview.toEntity(product);
+        ProductReview productReview =  ofRegisterProductReview.toEntity(product, imageUrl);
 
         productReviewRepository.save(productReview);
         return true;
@@ -73,9 +77,8 @@ public class ProductReviewService {
         if (!productRepository.existsById(productId)) {
             throw new IllegalArgumentException("존재하지 않는 상품 ID 입니다.");
         }
-
         Page<ProductReview> productReviews = productReviewRepository.findByProductId(productId, pageable);
 
-        return productReviews.map(review -> ProductReviewResponse.OfRetrieveProductWithReview.convertedBy(review));
+        return productReviews.map(ProductReviewResponse.OfRetrieveProductWithReview::convertedBy);
     }
 }

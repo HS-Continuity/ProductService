@@ -30,17 +30,21 @@ public class ProductShoppingFacade {
      */
     public Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
 
-
         Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts = productShoppingService.retrieveCategoryWithProducts(productCategoryId, isCertification, pageable);
 
-        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = retrieveCategoryWithProducts.getContent().get(0).getSearchProductInformationDtoList();
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList
+                = retrieveCategoryWithProducts.getContent().get(0).getSearchProductInformationDtoList();
+
         List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> {
                                         return dto.getProductId();
                                     }).collect(Collectors.toList());
+
         List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+
         for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
             searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
         }
+
         return retrieveCategoryWithProducts;
     }
 
@@ -76,19 +80,17 @@ public class ProductShoppingFacade {
     public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts(String keyword, Pageable pageable) {
         Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
 
-        List<ProductShoppingResponse.SearchProductInformationDto> searchProductInformationDtoList = retrieveKeywordWithProducts.getSearchProductInformationDtoList();
-        List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> {
-            return dto.getProductId();
-        }).collect(Collectors.toList());
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = retrieveKeywordWithProducts.getContent();
+
+        List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> dto.getProductId())
+                .collect(Collectors.toList());
+
         List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+
         for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
             searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
         }
 
-//        for(ProductShoppingResponse.SearchProductInformationDto searchProductInformationDto : searchProductInformationDtoList) {
-//            boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
-//            searchProductInformationDto.changeIsSoldOut(!isSoldOut);
-//        }
         return retrieveKeywordWithProducts;
     }
 
