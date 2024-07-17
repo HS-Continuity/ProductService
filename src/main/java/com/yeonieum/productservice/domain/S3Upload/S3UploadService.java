@@ -16,13 +16,13 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 
-//@Service
+@Service
 @RequiredArgsConstructor
 public class S3UploadService {
 
     private final AmazonS3 amazonS3;
 
-    //@Value("${cloud.aws.s3.bucketName}")
+    @Value("${cloud.aws.s3.bucketName}")
     private String bucket;
 
     /**
@@ -33,6 +33,7 @@ public class S3UploadService {
      * @throws IOException
      */
     public String uploadImage(MultipartFile image) throws IOException {
+
         //[STEP1]이미지 검증
         if (image == null || image.isEmpty()) {
             return null;

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,18 +55,19 @@ public class ProductShoppingService {
             throw new IllegalArgumentException("해당 카테고리 내의 상품이 없습니다.");
         }
 
-        // 상품 정보를 DTO 리스트로 변환
-        List<ProductShoppingResponse.OfSearchProductInformation> productInformationListDto = products.map(
-                product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product)).getContent();
-
-        // 조회된 카테고리 정보를 기반으로 DTO 생성
+        /// DTO 변환: 카테고리 정보 포함
         ProductShoppingResponse.OfRetrieveCategoryWithProduct categoryWithProductsDto
                 = ProductShoppingResponse.OfRetrieveCategoryWithProduct.convertedBy(productCategory);
 
-        // categoryWithProductsDto에 상품 정보 리스트를 설정
-        categoryWithProductsDto.changeOfSearchProductInformationList(productInformationListDto);
+        // 상품 정보 DTO 리스트 변환
+        List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = products.stream()
+                .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy)
+                .collect(Collectors.toList());
 
-        // Page 객체를 생성하여 반환
+        // 상품 정보 리스트를 DTO에 설정
+        categoryWithProductsDto.changeOfSearchProductInformationList(searchProductInformationDtoList);
+
+        // DTO를 단일 리스트로 포장하고, 원래 페이지 정보를 사용하여 새 Page 객체 생성
         return new PageImpl<>(Collections.singletonList(categoryWithProductsDto), pageable, products.getTotalElements());
     }
 
@@ -97,18 +99,19 @@ public class ProductShoppingService {
             throw new IllegalArgumentException("해당 상세 카테고리 내의 상품이 없습니다.");
         }
 
-        // 상품 정보를 DTO 리스트로 변환
-        List<ProductShoppingResponse.OfSearchProductInformation> productInformationListDto = products.map(
-                product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product)).getContent();
-
-        // 조회된 상세 카테고리 정보를 기반으로 DTO 생성
+        /// DTO 변환: 상세 카테고리 정보 포함
         ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct detailCategoryWithProductsDto
                 = ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct.convertedBy(productDetailCategory);
 
-        // detailCategoryWithProductsDto에 상품 정보 리스트를 설정
+        // 상품 정보 DTO 리스트 변환
+        List<ProductShoppingResponse.OfSearchProductInformation> productInformationListDto = products.getContent().stream()
+                .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy)
+                .collect(Collectors.toList());
+
+        // 상품 정보 리스트를 DTO에 설정
         detailCategoryWithProductsDto.changeOfSearchProductInformationList(productInformationListDto);
 
-        // Page 객체를 생성하여 반환
+        // DTO를 단일 리스트로 포장하고, 원래 페이지 정보를 사용하여 새 Page 객체 생성
         return new PageImpl<>(Collections.singletonList(detailCategoryWithProductsDto), pageable, products.getTotalElements());
     }
 
@@ -146,7 +149,7 @@ public class ProductShoppingService {
             products = productRepository.findByProductNameContainingAndIsActive(keyword, pageable);
         }
 
-        return products.map(product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product));
+        return products.map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
     }
 
     /**
@@ -162,7 +165,7 @@ public class ProductShoppingService {
         // 고객 ID와 상세 카테고리 ID로 상품 조회
         Page<Product> products = productRepository.findByCustomerIdAndIsActiveAndCategoryId(customerId, detailCategoryId, pageable);
 
-        return products.map(product -> ProductShoppingResponse.OfSearchProductInformation.convertedBy(product));
+        return products.map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
     }
 }
 
