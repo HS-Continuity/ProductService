@@ -102,4 +102,22 @@ public class CartController {
                 .successCode(SuccessCode.UPDATE_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    @Operation(summary = "장바구니 상품 수 조회", description = "회원의 장바구니 상품 수를 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "장바구니 상품 수 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 수 조회 실패")
+    })
+    @GetMapping("count")
+    public ResponseEntity<ApiResponse> countCartProduct(
+            @RequestParam("memberId") String memberId,
+            @RequestParam(value = "cartTypeId", required = false) Long cartTypeId) {
+
+        Long countCartProduct = cartProductService.CountCartProduct(memberId, cartTypeId);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(countCartProduct)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }

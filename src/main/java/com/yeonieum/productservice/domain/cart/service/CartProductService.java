@@ -131,4 +131,15 @@ public class CartProductService {
         cartProductRepository.save(cartProduct);
         return true;
     }
+
+    /**
+     * 장바구니 상품 개수 조회
+     * @param memberId 회원 ID
+     * @param cartTypeId 장바구니 타입 ID
+     * @return 장바구니에 담긴 상품 수 (일반구매, 정기구매)
+     */
+    @Transactional
+    public Long CountCartProduct(String memberId, Long cartTypeId) {
+        return cartProductRepository.countByMemberIdAndOptionalCartTypeId(memberId, cartTypeId);
+    }
 }
