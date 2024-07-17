@@ -27,7 +27,6 @@ public class AdvertisementController {
      * 광고 상품 조회(랜덤)
      */
 
-
     // 상품광고 서비스 신청
     @GetMapping("/list")
     public ResponseEntity getAdvertisement(@RequestParam int startPage,
@@ -55,11 +54,21 @@ public class AdvertisementController {
 
     @GetMapping("/product/list")
     public ResponseEntity getAdvertisementProduct(@RequestParam int startPage,
-                                                 @RequestParam int pageSize) {
+                                                  @RequestParam int pageSize) {
         List<AdvertisementResponse.OfRetrieve> advertisementProduct = advertisementService.retrieveAdvertisementProductList();
 
         return new ResponseEntity(ApiResponse.builder()
                 .result(advertisementProduct)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{advertisementId}/approval")
+    public ResponseEntity approveAdvertisement(@PathVariable Long advertisementId) {
+        advertisementManagementService.approveAdvertisement(advertisementId);
+
+        return new ResponseEntity(ApiResponse.builder()
+                .result(null)
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }

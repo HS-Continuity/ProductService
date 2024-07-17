@@ -58,10 +58,10 @@ public class TimesaleController {
                 .build(), HttpStatus.OK);
     }
 
-    @PatchMapping("/{timesaleId}")
-    public ResponseEntity<ApiResponse> updateTimesaleProduct(@PathVariable Long timesaleId, TimesaleRequestForCustomer.OfModifyStatus ofModifyStatus) {
-        // 타임세일 상품 수정
-        timesaleManagementService.modifyTimesaleStatus(ofModifyStatus);
+    @PatchMapping("/{timesaleId}/cancel")
+    public ResponseEntity<ApiResponse> updateTimesaleProduct(@PathVariable Long timesaleId) {
+        // 타임세일 신청 취소
+        timesaleManagementService.cancelTimesale(timesaleId);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.UPDATE_SUCCESS)

@@ -6,9 +6,13 @@ import com.yeonieum.productservice.domain.product.dto.customerservice.Advertisem
 import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
+import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
+import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
 import com.yeonieum.productservice.domain.product.repository.ProductAdvertisementServiceRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
+import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.global.enums.ServiceStatusCode;
 import com.yeonieum.productservice.messaging.message.AdvertisementEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,6 +28,7 @@ public class AdvertisementManagementService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final ProductAdvertisementServiceRepository productAdvertisementServiceRepository;
+    private final ServiceStatusRepository serviceStatusRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
@@ -33,10 +38,8 @@ public class AdvertisementManagementService {
      */
     @Transactional
     public List<AdvertisementResponse.OfRetrieve> retrieveAppliedProduct(Long customerId) {
-        Customer customer =
-                customerRepository.findById(customerId).orElseThrow(
-                        () -> new IllegalArgumentException("존재하지않는 고객 요청입니다.")
-                );
+        Customer customer = customerRepository.findById(customerId).orElseThrow(
+                        () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
         List<ProductAdvertisementService> advertisementProduct =
                 productAdvertisementServiceRepository.findAllAdvertisementProduct(customerId);
 
@@ -59,5 +62,37 @@ public class AdvertisementManagementService {
 
         AdvertisementEventMessage advertisementEventMessage = registerRequest.toEventMessage();
         kafkaTemplate.send("advertisement-topic", advertisementEventMessage);
+    }
+
+    /**
+     * 고객의 광고신청 취소
+     * @param advertisementId
+     */
+    @Transactional
+    public void cancelAdvertisement(Long advertisementId) {
+        ProductAdvertisementService advertisementService = productAdvertisementServiceRepository.findById(advertisementId).orElseThrow(
+                () -> new IllegalArgumentException("해당하는 신청 건이 존재하지 않습니다."));
+
+        if(advertisementService.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
+            throw new IllegalArgumentException("취소할 수 없는 상태입니다.");
+        }
+        ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.CANCELED.getCode());
+        advertisementService.changeServiceStatus(status);
+    }
+
+    /**
+     * 관리자의 광고신청 승인
+     * @param advertisementId
+     */
+    @Transactional
+    public void approveAdvertisement(Long advertisementId) {
+        ProductAdvertisementService advertisementService = productAdvertisementServiceRepository.findById(advertisementId).orElseThrow(
+                () -> new IllegalArgumentException("해당하는 신청 건이 존재하지 않습니다."));
+
+        if(advertisementService.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
+            throw new IllegalArgumentException("승인할 수 없는 상태입니다.");
+        }
+        ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.APPROVE.getCode());
+        advertisementService.changeServiceStatus(status);
     }
 }
