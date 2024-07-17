@@ -1,8 +1,7 @@
 package com.yeonieum.productservice.web.controller;
 
-import com.yeonieum.productservice.domain.product.dto.customerservice.RegisterAdvertisementRequestDto;
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveAdvertisementProductResponseDto;
-import com.yeonieum.productservice.domain.product.dto.memberservice.RetrieveAdvertisementProductResponse;
+import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementRequest;
+import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementResponse;
 import com.yeonieum.productservice.domain.product.service.customerservice.AdvertisementManagementService;
 import com.yeonieum.productservice.domain.product.service.memberservice.AdvertisementService;
 import com.yeonieum.productservice.global.responses.ApiResponse;
@@ -34,7 +33,7 @@ public class AdvertisementController {
     public ResponseEntity getAdvertisement(@RequestParam int startPage,
                                                 @RequestParam int pageSize,
                                                 @RequestParam long customerId) {
-        List<RetrieveAdvertisementProductResponseDto> advertisementProduct = advertisementManagementService.retrieveAppliedProduct(customerId);
+        List<AdvertisementResponse.OfRetrieve> advertisementProduct = advertisementManagementService.retrieveAppliedProduct(customerId);
 
 
         return new ResponseEntity(ApiResponse.builder()
@@ -44,8 +43,8 @@ public class AdvertisementController {
     }
 
     @PostMapping("/product")
-    public ResponseEntity registerAdvertisement(@RequestBody RegisterAdvertisementRequestDto registerAdvertisementRequestDto) {
-        advertisementManagementService.registerAdvertisement(registerAdvertisementRequestDto);
+    public ResponseEntity registerAdvertisement(@RequestBody AdvertisementRequest.OfRegister registerRequest) {
+        advertisementManagementService.registerAdvertisement(registerRequest);
 
         return new ResponseEntity(ApiResponse.builder()
                 .result(null)
@@ -55,9 +54,9 @@ public class AdvertisementController {
 
 
     @GetMapping("/product/list")
-    public ResponseEntity getAdvertisementProduct(@RequestParam int startPage,
+    public ResponseEntity<ApiResponse> getAdvertisementProduct(@RequestParam int startPage,
                                                  @RequestParam int pageSize) {
-        List<RetrieveAdvertisementProductResponse> advertisementProduct = advertisementService.retrieveAdvertisementProductList();
+        List<AdvertisementResponse.OfRetrieve> advertisementProduct = advertisementService.retrieveAdvertisementProductList();
 
         return new ResponseEntity(ApiResponse.builder()
                 .result(advertisementProduct)

@@ -3,11 +3,11 @@ package com.yeonieum.productservice.domain.productinventory.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-public class AvailableProductInventoryRequest {
+public class StockUsageRequest {
 
     @Getter
     @Builder
-    public static class IncreaseStockUsageDto {
+    public static class OfIncreasing {
         Long orderId;
         Long productId;
         int quantity;
@@ -16,7 +16,7 @@ public class AvailableProductInventoryRequest {
 
     @Getter
     @Builder
-    public static class DecreaseStockUsageDto {
+    public static class OfDecreasing {
         Long orderId;
         Long productId;
         int quantity;

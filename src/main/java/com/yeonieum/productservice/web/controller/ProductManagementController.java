@@ -10,6 +10,9 @@ import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +43,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PostMapping("/product/normal")
-    public ResponseEntity<ApiResponse> createNormalProduct(ProductManagementRequest.RegisterDto normalProduct,
+    public ResponseEntity<ApiResponse> createNormalProduct(ProductManagementRequest.OfRegister normalProduct,
                                                            @RequestPart MultipartFile defaultImage) throws IOException {
         String imageUrl = s3UploadService.uploadImage(defaultImage);
         productManagementService.registerProduct(normalProduct, imageUrl);
@@ -57,15 +60,15 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PostMapping("/product/eco-friend")
-    public ResponseEntity<ApiResponse> createEcoFriendlyProduct(ProductManagementRequest.RegisterDto ecoFriendlyProduct,
+    public ResponseEntity<ApiResponse> createEcoFriendlyProduct(ProductManagementRequest.OfRegister ecoFriendlyProduct,
                                                                 @RequestPart MultipartFile defaultImage,
                                                                 @RequestPart MultipartFile certificationImage) throws IOException {
         String defaultImageUrl = s3UploadService.uploadImage(defaultImage);
         String certificationImageUrl = s3UploadService.uploadImage(certificationImage);
 
         try {
-            ((ProductManagementRequest.RegisterEcoFriendlyProductDto)(ecoFriendlyProduct)).getCertification().changeImageName(certificationImageUrl);
-            productManagementService.registerProduct((ProductManagementRequest.RegisterEcoFriendlyProductDto) ecoFriendlyProduct, defaultImageUrl);
+            ((ProductManagementRequest.OfOfRegisterEcoFriendly)(ecoFriendlyProduct)).getCertification().changeImageName(certificationImageUrl);
+            productManagementService.registerProduct((ProductManagementRequest.OfOfRegisterEcoFriendly) ecoFriendlyProduct, defaultImageUrl);
         } catch (RuntimeException e) {
             s3UploadService.deleteImageFromS3(defaultImageUrl);
             s3UploadService.deleteImageFromS3(certificationImageUrl);
@@ -85,7 +88,7 @@ public class ProductManagementController {
     })
     @PutMapping("/product/{productId}")
     public ResponseEntity<ApiResponse> updateProductInformation(@PathVariable Long productId,
-                                                                ProductManagementRequest.ModifyDto productInformation) {
+                                                                ProductManagementRequest.OfModifying productInformation) {
         Long customerId = 1L;
         productManagementService.modifyProduct(productId, customerId, productInformation);
 
@@ -102,12 +105,14 @@ public class ProductManagementController {
     })
     @GetMapping("/product/list")
     // 친환경상품, 일반상품 조회 따로 파야한다.
-    public ResponseEntity<ApiResponse> getCustomersAllProduct(@RequestParam char isEcoFriend,
-                                                              @RequestParam(defaultValue = "1") int page,
-                                                              @RequestParam(defaultValue = "10") int size) {
-        // 고객 id 시큐리티컨텍스트 조회 할 것이다. // 페이지네이션 받기
+    public ResponseEntity<ApiResponse> getCustomersAllProduct(@RequestParam(required = false) char isEcoFriend,
+                                                              @RequestParam(defaultValue = "1") int startPage,
+                                                              @RequestParam(defaultValue = "10") int pageSize) {
+        // 고객 id 시큐리티컨텍스트 조회 할 것이다.
         Long customerId = 1L;
-        List<ProductManagementResponse.RetrieveDto> productList = productManagementService.retrieveCustomersProducts(customerId, ActiveStatus.fromCode(isEcoFriend));
+        Pageable pageable = PageRequest.of(startPage, pageSize);
+        Page<ProductManagementResponse.OfRetrieve> productList =
+                productManagementService.retrieveCustomersProducts(customerId, ActiveStatus.fromCode(isEcoFriend), pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -122,7 +127,7 @@ public class ProductManagementController {
     })
     @GetMapping("/product/{productId}/details")
     public ResponseEntity<ApiResponse> getProductDetail(@PathVariable Long productId) {
-        ProductManagementResponse.RetrieveDto productDetail = productManagementService.retrieveProductDetail(productId);
+        ProductManagementResponse.OfRetrieveDetails productDetail = productManagementService.retrieveProductDetail(productId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(productDetail)
@@ -171,18 +176,35 @@ public class ProductManagementController {
 
     @PostMapping("/product/{productId}/detail-image")
     public ResponseEntity<ApiResponse> uploadProductDetailImage(@PathVariable Long productId,
-                                                                @RequestBody ProductManagementRequest.DetailImageList deleteDetailImageList,
-                                                                @RequestPart  List<MultipartFile> uploadImageList) throws IOException {
+                                                                @RequestBody ProductManagementRequest.OfDeleteDetailImageList deleteOfDeleteDetailImageList,
+                                                                @RequestPart List<MultipartFile> uploadImageList) throws IOException {
         List<String> imageUrlList = new ArrayList<>();
         for(MultipartFile uploadFile : uploadImageList) {
             String imageUrl = s3UploadService.uploadImage(uploadFile);
             imageUrlList.add(imageUrl);
         }
 
-        productManagementService.uploadProductDetailImages(productId, deleteDetailImageList, imageUrlList);
+        productManagementService.uploadProductDetailImages(productId, deleteOfDeleteDetailImageList, imageUrlList);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.INSERT_SUCCESS)
                 .build(), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<ApiResponse> retrieveProductInformation(@PathVariable Long productId) {
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(productManagementService.retrieveProductInformatino(productId))
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/products")
+    public ResponseEntity<ApiResponse> retrieveProductInformation(@RequestParam List<Long> productIdList) {
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(productManagementService.bulkRetrieveProductInformatino(productIdList))
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
     }
 }
