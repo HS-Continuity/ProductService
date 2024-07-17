@@ -2,8 +2,8 @@ package com.yeonieum.productservice.domain.product.service.customerservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
-import com.yeonieum.productservice.domain.product.dto.customerservice.RegisterAdvertisementRequestDto;
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveAdvertisementProductResponseDto;
+import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementRequest;
+import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
 import com.yeonieum.productservice.domain.product.repository.ProductAdvertisementServiceRepository;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,42 +32,32 @@ public class AdvertisementManagementService {
      * @return
      */
     @Transactional
-    public List<RetrieveAdvertisementProductResponseDto> retrieveAppliedProduct(Long customerId) {
+    public List<AdvertisementResponse.OfRetrieve> retrieveAppliedProduct(Long customerId) {
         Customer customer =
                 customerRepository.findById(customerId).orElseThrow(
                         () -> new IllegalArgumentException("존재하지않는 고객 요청입니다.")
                 );
-        List<RetrieveAdvertisementProductResponseDto> advertisementProduct =
-                productRepository.findAllAdvertisementProduct(customerId);
+        List<ProductAdvertisementService> advertisementProduct =
+                productAdvertisementServiceRepository.findAllAdvertisementProduct(customerId);
 
-        return advertisementProduct;
+        return advertisementProduct.stream().map(appliedProduct ->
+                AdvertisementResponse.OfRetrieve.convertedBy(appliedProduct)).collect(Collectors.toList());
     }
 
     /**
      * 상품광고서비스 신청
-     * @param registerAdvertisementRequestDto
+     * @param registerRequest
      * @return
      */
     @Transactional
-    public void registerAdvertisement(RegisterAdvertisementRequestDto registerAdvertisementRequestDto) {
-        Product product = productRepository.findById(registerAdvertisementRequestDto.getProductId()).orElseThrow(
+    public void registerAdvertisement(AdvertisementRequest.OfRegister registerRequest) {
+        Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
+        ProductAdvertisementService productAdvertisement = registerRequest.toEntity(product);
+        productAdvertisementServiceRepository.save(productAdvertisement);
 
-       ProductAdvertisementService productAdvertisement = ProductAdvertisementService.builder()
-                .product(product)
-                .startDate(registerAdvertisementRequestDto.getStartDate())
-                .endDate(registerAdvertisementRequestDto.getEndDate())
-                .isCompleted(ActiveStatus.ACTIVE)
-                .build();
-
-       productAdvertisementServiceRepository.save(productAdvertisement);
-       AdvertisementEventMessage advertisementEventMessage = AdvertisementEventMessage.builder()
-                .productId(registerAdvertisementRequestDto.getProductId())
-                .startDate(registerAdvertisementRequestDto.getStartDate())
-                .endDate(registerAdvertisementRequestDto.getEndDate())
-                .build();
-
-       kafkaTemplate.send("advertisement-topic", advertisementEventMessage);
+        AdvertisementEventMessage advertisementEventMessage = registerRequest.toEventMessage();
+        kafkaTemplate.send("advertisement-topic", advertisementEventMessage);
     }
 }

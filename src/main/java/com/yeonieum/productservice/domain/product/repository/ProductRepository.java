@@ -1,8 +1,7 @@
 package com.yeonieum.productservice.domain.product.repository;
 
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveAdvertisementProductResponseDto;
-import com.yeonieum.productservice.domain.product.dto.customerservice.RetrieveTimeSaleResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,32 +13,30 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query(value = "SELECT" +
-            "new com.yeonieum.productservice.domain.product.dto.RetrieveTimeSaleProductResponseDto" +
-            "(p.product_id, p.product_name, p.price, pts.discount_rate, pts.start_datetime, pts.end_datetime, pts.is_completed)" +
+    @Query("SELECT p FROM Product p " +
+            "JOIN FETCH p.productDetailCategory pdc " +
+            "JOIN FETCH pdc.productCategory pc " +
+            "WHERE p.id = :productId")
+    Optional<Product> findProductWithCategoryInfoByProductId(@Param("productId") Long productId);
+
+    @Query(value = "SELECT p.* FROM product p " +
+            "JOIN customer c ON p.customer_id = c.customer_id " +
+            "WHERE c.customer_id = :customerId " +
+            "AND (:isEcoFriend IS NULL OR :isEcoFriend = '' OR p.is_certification = :isEcoFriend)", nativeQuery = true)
+    Page<Product> findProductsWithCustomersByStatus(@Param("customerId") Long customerId,
+                                                    @Param("isEcoFriend") Character isEcoFriend,
+                                                    Pageable pageable);
+
+    @Query(value = "SELECT pts" +
             "FROM product_time_sale pts " +
             "JOIN product p ON pts.product_id = p.id " +
             "WHERE p.customer_id = :customerId", nativeQuery = true)
-    List<RetrieveTimeSaleResponse> findAllTimeSaleByCustomerId(@Param("customerId") Long customerId);
+    List<ProductTimesale> findAllTimesaleByCustomerId(@Param("customerId") Long customerId);
 
-    @Query(value = "SELECT" +
-            "new com.yeonieum.productservice.domain.product.dto.RetrieveTimeSaleProductResponseDto" +
-            "(p.product_id, p.product_name, p.price, pts.discount_rate, pts.start_datetime, pts.end_datetime, pts.is_completed)" +
-            "FROM product_time_sale pts " +
+    @Query(value = "SELECT pts FROM product_time_sale pts " +
             "JOIN product p ON pts.product_id = p.id ", nativeQuery = true)
-    List<RetrieveTimeSaleResponse> findAllTimeSaleProduct(Pageable pageable);
+    List<ProductTimesale> findAllTimesaleProduct(Pageable pageable);
 
-
-    @Query(value = "SELECT" +
-            "new com.yeonieum.productservice.domain.product.dto.RetrieveAdvertisementProductResponseDto" +
-            "(p.product_id, p.product_name,pts.start_date, pts.end_date, pts.is_completed)" +
-            "FROM product_time_sale pts " +
-            "JOIN product p ON pts.product_id = p.id " +
-            "WHERE p.customer_id = :customerId", nativeQuery = true)
-    List<RetrieveAdvertisementProductResponseDto> findAllAdvertisementProduct(@Param("customerId") Long customerId);
-
-//    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productReviewList WHERE p.productId = :productId")
-//    Optional<Product> findByIdWithReviews(@Param("productId") Long productId);
 
     @Query("SELECT p FROM Product p " +
             "JOIN FETCH p.productDetailCategory pdc " +

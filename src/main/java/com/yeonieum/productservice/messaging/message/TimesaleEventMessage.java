@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class TimeSaleEventMessage {
+public class TimesaleEventMessage {
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private Long productId;

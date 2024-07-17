@@ -1,7 +1,7 @@
 package com.yeonieum.productservice.global.aop;
 
 import com.yeonieum.productservice.cache.redis.StockRedisSetOperation;
-import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
+import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import com.yeonieum.productservice.global.lock.Lock;
@@ -33,16 +33,16 @@ public class LockAcquisitionAspect {
         Lock lock = method.getAnnotation(Lock.class);
 
 
-        AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto =
-                (AvailableProductInventoryRequest.IncreaseStockUsageDto) joinPoint.getArgs()[0];
+        StockUsageRequest.OfIncreasing ofIncreasing =
+                (StockUsageRequest.OfIncreasing) joinPoint.getArgs()[0];
         String keyPrefix = lock.keyPrefix();
-        Long productId = increaseStockUsageDto.getProductId();
+        Long productId = ofIncreasing.getProductId();
 
-        int stockUsageCount = stockRedisSetOperation.totalStockUsageCount(increaseStockUsageDto.getProductId());
-        int stock = stockSystemService.retrieveProductStockAmount(increaseStockUsageDto.getProductId());
+        int stockUsageCount = stockRedisSetOperation.totalStockUsageCount(ofIncreasing.getProductId());
+        int stock = stockSystemService.retrieveProductStockAmount(ofIncreasing.getProductId());
 
-        if(stock < stockUsageCount + increaseStockUsageDto.getQuantity()) {
-            return failResponse(increaseStockUsageDto);
+        if(stock < stockUsageCount + ofIncreasing.getQuantity()) {
+            return failResponse(ofIncreasing);
         }
 
         String key = keyPrefix + productId;
@@ -54,16 +54,16 @@ public class LockAcquisitionAspect {
                             lock.leaseTime(),
                             lock.timeUnit());
             if (!available) {
-                return failResponse(increaseStockUsageDto);
+                return failResponse(ofIncreasing);
             }
 
             return joinPoint.proceed();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return failResponse(increaseStockUsageDto);
+            return failResponse(ofIncreasing);
         } catch (Exception e) {
             e.printStackTrace();
-            return failResponse(increaseStockUsageDto);
+            return failResponse(ofIncreasing);
         } finally{
             try {
                 rLock.unlock();
@@ -74,11 +74,11 @@ public class LockAcquisitionAspect {
     }
 
 
-    public AvailableProductInventoryResponse failResponse(AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto) {
+    public AvailableProductInventoryResponse failResponse(StockUsageRequest.OfIncreasing ofIncreasing) {
         return AvailableProductInventoryResponse.builder()
-                .productId(increaseStockUsageDto.getProductId())
-                .orderId(increaseStockUsageDto.getOrderId())
-                .quantity(increaseStockUsageDto.getQuantity())
+                .productId(ofIncreasing.getProductId())
+                .orderId(ofIncreasing.getOrderId())
+                .quantity(ofIncreasing.getQuantity())
                 .build();
     }
 }
