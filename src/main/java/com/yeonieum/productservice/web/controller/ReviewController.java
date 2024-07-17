@@ -42,6 +42,7 @@ public class ReviewController {
         if (imageFile != null && !imageFile.isEmpty()) {
             imageUrl = s3UploadService.uploadImage(imageFile);
         }
+
         productReviewService.registerProductReview(ofRegisterProductReview, imageUrl);
 
         return new ResponseEntity<>(ApiResponse.builder()
