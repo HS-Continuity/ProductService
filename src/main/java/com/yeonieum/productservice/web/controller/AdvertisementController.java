@@ -6,6 +6,8 @@ import com.yeonieum.productservice.domain.product.service.customerservice.Advert
 import com.yeonieum.productservice.domain.product.service.memberservice.AdvertisementService;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,11 @@ public class AdvertisementController {
      * 광고 상품 조회(랜덤)
      */
 
-    // 상품광고 서비스 신청
+    @Operation(summary = "상품 상단광고 조회", description = "고객이 신청한 상품 상단광고를 조회합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상단광고 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
     @GetMapping("/list")
     public ResponseEntity getAdvertisement(@RequestParam int startPage,
                                                 @RequestParam int pageSize,
@@ -41,6 +47,11 @@ public class AdvertisementController {
                 .build(), HttpStatus.OK);
     }
 
+    @Operation(summary = "상품 상단광고 신청", description = "고객이 상품 상단광고를 신청합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상단광고 신청 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
     @PostMapping("/product")
     public ResponseEntity registerAdvertisement(@RequestBody AdvertisementRequest.OfRegister registerRequest) {
         advertisementManagementService.registerAdvertisement(registerRequest);
@@ -51,7 +62,11 @@ public class AdvertisementController {
                 .build(), HttpStatus.OK);
     }
 
-
+    @Operation(summary = "고객들의 상품 상단광고 신청내역 조회", description = "관리자용 상단광고 신청내역 조회입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상단광고 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
     @GetMapping("/product/list")
     public ResponseEntity getAdvertisementProduct(@RequestParam int startPage,
                                                   @RequestParam int pageSize) {
@@ -63,13 +78,18 @@ public class AdvertisementController {
                 .build(), HttpStatus.OK);
     }
 
+    @Operation(summary = "신청한 상단광고 승인", description = "관리자가 상단광고신청에 대해 승인합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상단광고 승인 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
     @PatchMapping("/{advertisementId}/approval")
     public ResponseEntity approveAdvertisement(@PathVariable Long advertisementId) {
         advertisementManagementService.approveAdvertisement(advertisementId);
 
         return new ResponseEntity(ApiResponse.builder()
                 .result(null)
-                .successCode(SuccessCode.SELECT_SUCCESS)
+                .successCode(SuccessCode.UPDATE_SUCCESS)
                 .build(), HttpStatus.OK);
     }
 }

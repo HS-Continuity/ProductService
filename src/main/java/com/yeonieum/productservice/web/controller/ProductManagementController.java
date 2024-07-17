@@ -173,6 +173,11 @@ public class ProductManagementController {
                 .build(), HttpStatus.OK);
     }
 
+    @Operation(summary = "상품 상세이미지 등록", description = "상품 상세이미지 등록 기능입니다.(최대 5개 이미지)")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상세이미지 등록 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
     @PostMapping("/product/{productId}/detail-image")
     public ResponseEntity<ApiResponse> uploadProductDetailImage(@PathVariable Long productId,
                                                                 @RequestPart(value = "deleteList") ProductManagementRequest.OfDeleteDetailImageList deleteOfDeleteDetailImageList,
