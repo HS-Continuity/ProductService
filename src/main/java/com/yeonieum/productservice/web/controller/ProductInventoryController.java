@@ -1,6 +1,6 @@
 package com.yeonieum.productservice.web.controller;
 
-import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
+import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import lombok.Builder;
@@ -19,10 +19,10 @@ public class ProductInventoryController {
 
 
     @PostMapping("/stock-usage")
-    public AvailableProductInventoryResponseList getAvailableOrderProduct(@RequestBody AvailableProductInventoryRequest.IncreaseStockUsageList increaseStockUsageDtoList) {
+    public AvailableProductInventoryResponseList getAvailableOrderProduct(@RequestBody StockUsageRequest.IncreaseStockUsageList increaseStockUsageListDtoList) {
         List<AvailableProductInventoryResponse> responseList = new ArrayList<>();
-        for(AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto : increaseStockUsageDtoList.getIncreaseStockUsageDtoList()) {
-            AvailableProductInventoryResponse response = stockSystemService.processProductInventory(increaseStockUsageDto);
+        for(StockUsageRequest.OfIncreasing ofIncreasing : increaseStockUsageListDtoList.getOfIncreasingList()) {
+            AvailableProductInventoryResponse response = stockSystemService.processProductInventory(ofIncreasing);
             responseList.add(response);
         }
         return AvailableProductInventoryResponseList.builder()

@@ -5,7 +5,7 @@ import com.yeonieum.productservice.cache.redis.StockUsageService;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.service.ProductShelflifeCache;
-import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
+import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
 import com.yeonieum.productservice.domain.productinventory.repository.ProductInventoryRepository;
@@ -33,17 +33,17 @@ public class StockSystemService {
 
     /**
      * 주문서비스에서 요청하는 주문시 재고사용량 증가 액션 서비스
-     * @param increaseStockUsageDto
+     * @param ofIncreasing
      * @return
      */
     // AOP 프록시 객체 락 획득 시 트랜잭션 범위 안으로 편입되므로 트랜잭션 애너테이션 제거
     @Lock(keyPrefix = "lock:", leaseTime = 3)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public AvailableProductInventoryResponse processProductInventory(AvailableProductInventoryRequest.IncreaseStockUsageDto increaseStockUsageDto) {
+    public AvailableProductInventoryResponse processProductInventory(StockUsageRequest.OfIncreasing ofIncreasing) {
         // [STEP1] [받아온 주문서의 상품들을 기준으로 구매가 가능한지 체크하고, 가능하다면 재고사용량을 증가시킨다.]
-        Long productId = increaseStockUsageDto.getProductId();
-        Long orderId = increaseStockUsageDto.getOrderId();
-        int quantity = increaseStockUsageDto.getQuantity();
+        Long productId = ofIncreasing.getProductId();
+        Long orderId = ofIncreasing.getOrderId();
+        int quantity = ofIncreasing.getQuantity();
 
         //[STEP2] [응답객체에 주문서 상 상품에 대한 주문 가능여부를 담는다. -> 주문서비스는 주문 가능여부를 바탕으로 경합상황에서 주문서를 안전하게 생성할 수 있다.]
         AvailableProductInventoryResponse availableProductInventoryResponse = AvailableProductInventoryResponse.builder()
@@ -58,9 +58,9 @@ public class StockSystemService {
         boolean available =  stockUsageService.increaseStockUsage(new StockUsageDto(productId, orderId, quantity), availableStockAmount);
         //[STEP4] [주문이 가능할 경우 재고사용량을 증가시키고, 주문가능여부 true로 설정한 응답객체 리스트에 추가]
         StockUsageDto stockUsageDto = StockUsageDto.builder()
-                        .productId(increaseStockUsageDto.getProductId())
-                        .orderId(increaseStockUsageDto.getOrderId())
-                        .quantity(increaseStockUsageDto.getQuantity())
+                        .productId(ofIncreasing.getProductId())
+                        .orderId(ofIncreasing.getOrderId())
+                        .quantity(ofIncreasing.getQuantity())
                         .build();
 
         availableProductInventoryResponse.changeIsAvailableOrder(true);

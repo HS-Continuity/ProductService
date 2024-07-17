@@ -1,6 +1,6 @@
 package com.yeonieum.productservice.cache.redis;
 
-import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryRequest;
+import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,14 +13,14 @@ public class StockUsageService {
 
     /**
      * 주문 취소 이벤트 consume시 발생하는 재고사용량 감소
-     * @param decreaseStockUsageDto
+     * @param ofDecreasing
      * @return
      */
     @Transactional
-    public boolean decreaseStockUsage(AvailableProductInventoryRequest.DecreaseStockUsageDto decreaseStockUsageDto) {
-        Long productId = decreaseStockUsageDto.getProductId();
-        Long orderId = decreaseStockUsageDto.getOrderId();
-        int quantity = decreaseStockUsageDto.getQuantity();
+    public boolean decreaseStockUsage(StockUsageRequest.OfDecreasing ofDecreasing) {
+        Long productId = ofDecreasing.getProductId();
+        Long orderId = ofDecreasing.getOrderId();
+        int quantity = ofDecreasing.getQuantity();
 
         Long decreaseCount = stockRedisSetOperation.removeStockUsage(new StockUsageDto(productId, orderId, quantity));
         if(decreaseCount == 0) {
