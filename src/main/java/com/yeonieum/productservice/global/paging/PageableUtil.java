@@ -12,6 +12,8 @@ public class PageableUtil {
             case "productName":
             case "productPrice":
             case "averageScore":
+            case "reviewScore":
+            case "createDate":
                 break;
             default:
                 sort = "productName";

@@ -26,7 +26,7 @@ public class ProductCertification {
     @Column(name = "certification_number", nullable = false)
     private String certificationNumber;
 
-    @Column(name = "certification_image", nullable = false)
+    @Column(name = "certification_image", nullable = false, length = 900)
     private String certificationImage;
 
     public void changeCertificationImage(String certificationImage) {

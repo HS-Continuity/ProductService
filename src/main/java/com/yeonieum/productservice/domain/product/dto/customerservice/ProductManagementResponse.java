@@ -114,7 +114,7 @@ public class ProductManagementResponse {
 
         public static OfRetrieveDetailImage convertedBy(ProductDetailImage detailImage, Long productId) {
             return ProductManagementResponse.OfRetrieveDetailImage.builder()
-                    .imageName(detailImage.getImageDetailName())
+                    .imageName(detailImage.getDetailImage())
                     .productId(productId)
                     .productDetailImageId(detailImage.getProductDetailImageId())
                     .build();
