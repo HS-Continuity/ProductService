@@ -45,5 +45,4 @@ public class ProductTimesale {
     public void changeIsCompleted(ActiveStatus isCompleted) {
         this.isCompleted = isCompleted;
     }
-
 }

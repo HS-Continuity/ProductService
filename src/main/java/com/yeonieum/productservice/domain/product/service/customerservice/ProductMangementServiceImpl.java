@@ -203,7 +203,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
 
         List<ProductDetailImage> productDetailImageList = imageUrlList.stream().map(imageUrl ->
                 ProductDetailImage.builder()
-                        .imageDetailName(imageUrl)
+                        .detailImage(imageUrl)
                         .product(product)
                         .build()).collect(Collectors.toList());
 

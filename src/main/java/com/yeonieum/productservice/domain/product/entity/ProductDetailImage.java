@@ -20,10 +20,10 @@ public class ProductDetailImage {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(name = "image_detail_name", length = 450)
-    private String imageDetailName;
+    @Column(name = "detail_image", length = 450)
+    private String detailImage;
 
-    public void changeImageDetailName(String imageDetailName) {
-        this.imageDetailName = imageDetailName;
+    public void changeDetailImage(String detailImage) {
+        this.detailImage = detailImage;
     }
 }

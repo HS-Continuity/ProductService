@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.S3Upload.S3UploadService;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewRequest;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewResponse;
 import com.yeonieum.productservice.domain.review.service.ProductReviewService;
+import com.yeonieum.productservice.global.paging.PageableUtil;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,9 +77,11 @@ public class ReviewController {
     public ResponseEntity<ApiResponse> retrieveProductReviews(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "0") int startPage,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "createDate") String sort,
+            @RequestParam(defaultValue = "desc") String direction) {
 
-        Pageable pageable =  PageRequest.of(startPage, pageSize);
+        Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         Page<ProductReviewResponse.OfRetrieveProductWithReview> retrieveProductWithReviews
                 = productReviewService.retrieveProductWithReviews(productId, pageable);
