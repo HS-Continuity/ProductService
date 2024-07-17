@@ -38,4 +38,11 @@ public class AdvertisementRequest {
                     .build();
         }
     }
+
+
+    @Getter
+    @NoArgsConstructor
+    public static class OfModifyStatus {
+
+    }
 }

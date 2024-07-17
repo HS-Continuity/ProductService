@@ -34,9 +34,7 @@ public class ProductAdvertisementService {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Convert(converter = ActiveStatusConverter.class)
-    @Column(name = "is_completed", nullable = false)
-    @Builder.Default
-    private ActiveStatus isCompleted = ActiveStatus.INACTIVE;
-
+    public void changeServiceStatus(ServiceStatus serviceStatus) {
+        this.serviceStatus = serviceStatus;
+    }
 }

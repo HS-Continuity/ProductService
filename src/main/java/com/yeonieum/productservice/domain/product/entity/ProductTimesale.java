@@ -1,6 +1,5 @@
 package com.yeonieum.productservice.domain.product.entity;
 
-import com.yeonieum.productservice.global.converter.ActiveStatusConverter;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,13 +36,8 @@ public class ProductTimesale {
     @Column(name = "discount_rate")
     private int discountRate;
 
-    @Convert(converter = ActiveStatusConverter.class)
-    @Column(name = "is_completed", nullable = false)
-    @Builder.Default
-    private ActiveStatus isCompleted = ActiveStatus.INACTIVE;
 
-    public void changeIsCompleted(ActiveStatus isCompleted) {
-        this.isCompleted = isCompleted;
+    public void changeServiceStatus(ServiceStatus serviceStatus) {
+        this.serviceStatus = serviceStatus;
     }
-
 }

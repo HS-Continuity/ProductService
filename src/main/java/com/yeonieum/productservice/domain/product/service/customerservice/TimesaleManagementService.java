@@ -7,8 +7,11 @@ import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleRe
 import com.yeonieum.productservice.domain.product.dto.memberservice.TimesaleResponseForMember;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
+import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductTimesaleRepository;
+import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
+import com.yeonieum.productservice.global.enums.ServiceStatusCode;
 import com.yeonieum.productservice.messaging.message.TimesaleEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,7 @@ public class TimesaleManagementService {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final ProductTimesaleRepository productTimesaleRepository;
+    private final ServiceStatusRepository serviceStatusRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
@@ -35,8 +39,7 @@ public class TimesaleManagementService {
     @Transactional
     public List<TimesaleResponseForCustomer.OfRetrieve> retrieveTimesaleProducts(Long customerId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지않는 고객 요청입니다.")
-        );
+                () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
 
         List<ProductTimesale> productTimesaleList = productRepository.findAllTimesaleByCustomerId(customerId);
         return productTimesaleList.stream().map(timesale ->
@@ -64,10 +67,10 @@ public class TimesaleManagementService {
     @Transactional
     public void registerTimesale(TimesaleRequestForCustomer.OfRegister registerRequest) {
         Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
-        );
+                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
 
-        ProductTimesale productTimesale = registerRequest.toEntity(product);
+        ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
+        ProductTimesale productTimesale = registerRequest.toEntity(product, status);
         productTimesaleRepository.save(productTimesale);
 
         TimesaleEventMessage timesaleEventMessage = registerRequest.toEventMessage();
@@ -75,13 +78,19 @@ public class TimesaleManagementService {
     }
 
     /**
-     * 고객의 타임세일상태 변경
-     * @param ofModifyStatus
+     * 고객의 타임세일신청 취소
+     * @param timesaleId
      */
     @Transactional
-    public void modifyTimesaleStatus(TimesaleRequestForCustomer.OfModifyStatus ofModifyStatus) {
-        ProductTimesale productTimesale = productTimesaleRepository.findByProduct_ProductId(ofModifyStatus.getProductId());
-        productTimesale.changeIsCompleted(ofModifyStatus.getIsCompleted());
+    public void cancelTimesale(Long timesaleId) {
+        ProductTimesale productTimesale = productTimesaleRepository.findById(timesaleId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 타임세일입니다."));
+
+        if(productTimesale.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
+            throw new IllegalArgumentException("취소할 수 없는 상태입니다.");
+        }
+        ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.CANCELED.getCode());
+        productTimesale.changeServiceStatus(status);
     }
 
 

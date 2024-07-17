@@ -2,7 +2,9 @@ package com.yeonieum.productservice.domain.product.dto.customerservice;
 
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
+import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.global.enums.ServiceStatusCode;
 import com.yeonieum.productservice.messaging.message.TimesaleEventMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,13 +20,13 @@ public class TimesaleRequestForCustomer {
         LocalDateTime endTime;
         int discountRate;
 
-        public ProductTimesale toEntity(Product product) {
+        public ProductTimesale toEntity(Product product, ServiceStatus serviceStatus) {
             return ProductTimesale.builder()
                     .product(product)
                     .discountRate(this.getDiscountRate())
                     .startDatetime(this.getStartTime())
                     .endDatetime(this.getEndTime())
-                    .isCompleted(ActiveStatus.ACTIVE) // 기본값
+                    .serviceStatus(serviceStatus) // 기본값
                     .build();
         }
 
@@ -41,6 +43,6 @@ public class TimesaleRequestForCustomer {
     @NoArgsConstructor
     public static class OfModifyStatus {
         Long productId;
-        ActiveStatus isCompleted;
+        ServiceStatusCode statusCode;
     }
 }
