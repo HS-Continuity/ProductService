@@ -64,7 +64,7 @@ public class CustomerController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 배송비 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 배송비 조회 실패")
     })
-    @GetMapping("/{customerId}")
+    @GetMapping("/delivery-fee/{customerId}")
     public ResponseEntity<ApiResponse> retrieveDeliveryFee(@PathVariable("customerId") Long customerId) {
 
         int deliveryFee = customerService.retrieveDeliveryFee(customerId);
