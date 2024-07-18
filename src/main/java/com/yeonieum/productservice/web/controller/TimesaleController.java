@@ -9,6 +9,7 @@ import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -91,10 +92,10 @@ public class TimesaleController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "타임세일 상품 목록 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })    @GetMapping("/product/list")
-    public ResponseEntity<ApiResponse> getTimesaleProductList(@RequestParam int pageNumber,
-                                                              @RequestParam int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<TimesaleResponseForMember.OfRetrieve> timesaleProductResponseList = timesaleManagementService.retrieveTimesaleProducts(pageable);
+    public ResponseEntity<ApiResponse> getTimesaleProductList(@RequestParam(defaultValue = "0") int startPage,
+                                                              @RequestParam(defaultValue = "10") int pageSize) {
+        Pageable pageable = PageRequest.of(startPage, pageSize);
+        Page<TimesaleResponseForMember.OfRetrieve> timesaleProductResponseList = timesaleManagementService.retrieveTimesaleProducts(pageable);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(timesaleProductResponseList)
                 .successCode(SuccessCode.SELECT_SUCCESS)
