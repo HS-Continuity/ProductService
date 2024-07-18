@@ -74,18 +74,22 @@ public class CartProductService {
             Product product = cartProduct.getProduct();
 
             int finalPrice;
+            int finalDiscountRate;
 
             if(cartTypeId == 1){
                 finalPrice = product.getCalculatedBasePrice();
+                finalDiscountRate = product.getBaseDiscountRate();
             } else if (cartTypeId == 2) {
                 //맞춤고객 로직 필요
 
                 finalPrice = product.getCalculatedRegularPrice();
+                finalDiscountRate = product.getRegularDiscountRate();
             } else {
                 finalPrice = product.getProductPrice();
+                finalDiscountRate = product.getBaseDiscountRate();
             }
 
-            CartProductResponse.OfRetrieveCartProduct response = CartProductResponse.OfRetrieveCartProduct.convertedBy(cartProduct, finalPrice);
+            CartProductResponse.OfRetrieveCartProduct response = CartProductResponse.OfRetrieveCartProduct.convertedBy(cartProduct, finalPrice, finalDiscountRate);
 
             cartProductResponseList.add(response);
         }
