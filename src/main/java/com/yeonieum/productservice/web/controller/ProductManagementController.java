@@ -44,9 +44,10 @@ public class ProductManagementController {
     })
     @PostMapping("/product/normal")
     public ResponseEntity<ApiResponse> createNormalProduct(@RequestPart(value = "normalProduct") ProductManagementRequest.OfRegister normalProduct,
-                                                           @RequestPart(value = "image") MultipartFile defaultImage) throws IOException {
+                                                           @RequestPart(value = "image") MultipartFile defaultImage,
+                                                           @RequestPart(value = "detailImageList") List<MultipartFile> detailImageList) throws IOException {
         String imageUrl = s3UploadService.uploadImage(defaultImage);
-        productManagementService.registerProduct(normalProduct, imageUrl);
+        productManagementService.registerProduct(normalProduct, defaultImage, detailImageList);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -60,20 +61,13 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PostMapping("/product/eco-friend")
-    public ResponseEntity<ApiResponse> createEcoFriendlyProduct(ProductManagementRequest.OfRegister ecoFriendlyProduct,
+    public ResponseEntity<ApiResponse> createEcoFriendlyProduct(@RequestPart(value = "product") ProductManagementRequest.OfRegisterEcoFriendlyProduct ecoFriendlyProduct,
                                                                 @RequestPart(value = "defaultImage") MultipartFile defaultImage,
-                                                                @RequestPart(value = "certificationImage") MultipartFile certificationImage) throws IOException {
-        String defaultImageUrl = s3UploadService.uploadImage(defaultImage);
-        String certificationImageUrl = s3UploadService.uploadImage(certificationImage);
+                                                                @RequestPart(value = "certificationImage") MultipartFile certificationImage,
+                                                                @RequestPart(value = "detailImageList") List<MultipartFile> detailImageList) throws IOException {
 
-        try {
-            ((ProductManagementRequest.OfRegisterEcoFriendlyProduct)(ecoFriendlyProduct)).getCertification().changeImageName(certificationImageUrl);
-            productManagementService.registerProduct((ProductManagementRequest.OfRegisterEcoFriendlyProduct) ecoFriendlyProduct, defaultImageUrl);
-        } catch (RuntimeException e) {
-            s3UploadService.deleteImageFromS3(defaultImageUrl);
-            s3UploadService.deleteImageFromS3(certificationImageUrl);
-            throw new RuntimeException();
-        }
+        ((ProductManagementRequest.OfRegisterEcoFriendlyProduct)(ecoFriendlyProduct)).getCertification().setImage(certificationImage);
+        productManagementService.registerProduct((ProductManagementRequest.OfRegisterEcoFriendlyProduct) ecoFriendlyProduct, defaultImage, detailImageList);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
