@@ -14,6 +14,7 @@ import com.yeonieum.productservice.domain.product.repository.ServiceStatusReposi
 import com.yeonieum.productservice.global.enums.ServiceStatusCode;
 import com.yeonieum.productservice.messaging.message.TimesaleEventMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -98,16 +99,13 @@ public class TimesaleManagementService {
 
     // 타임세일 중인 상품리스트 조회
     @Transactional
-    public List<TimesaleResponseForMember.OfRetrieve> retrieveTimesaleProducts(Pageable pageable) {
+    public Page<TimesaleResponseForMember.OfRetrieve> retrieveTimesaleProducts(Pageable pageable) {
         /**
          * ==========================================================================================
          *    리뷰 레포지토리 주입받아서 리뷰 정보 조회 후 응답데이터 구성 예정   --->    상품테이블에 집계 속성 적용하여 해결
          * ==========================================================================================
          */
-        List<ProductTimesale> timesaleList = productRepository.findAllTimesaleProduct(pageable);
-        List<TimesaleResponseForMember.OfRetrieve> timesaleProductList = timesaleList.stream()
-                .map(timesale -> TimesaleResponseForMember.OfRetrieve.convertedBy(timesale)).collect(Collectors.toList());
-
-        return timesaleProductList;
+        Page<ProductTimesale> timesaleList = productTimesaleRepository.findAllTimesaleProduct(pageable);
+        return timesaleList.map(timesale -> TimesaleResponseForMember.OfRetrieve.convertedBy(timesale));
     }
 }

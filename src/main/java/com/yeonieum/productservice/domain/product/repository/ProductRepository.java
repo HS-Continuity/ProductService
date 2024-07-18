@@ -33,10 +33,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "WHERE p.customer_id = :customerId", nativeQuery = true)
     List<ProductTimesale> findAllTimesaleByCustomerId(@Param("customerId") Long customerId);
 
-    @Query(value = "SELECT pts FROM product_time_sale pts " +
-            "JOIN product p ON pts.product_id = p.id ", nativeQuery = true)
-    List<ProductTimesale> findAllTimesaleProduct(Pageable pageable);
-
 
     @Query("SELECT p FROM Product p " +
             "JOIN FETCH p.productDetailCategory pdc " +
