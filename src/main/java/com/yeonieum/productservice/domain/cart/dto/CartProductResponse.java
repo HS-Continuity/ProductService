@@ -17,6 +17,8 @@ public class CartProductResponse {
         private String productName;
         private String productDescription;
         private String productImage;
+        private int productBasePrice;
+        private int productDiscountRate;
         private int productPrice;
         private int quantity;
         @Builder.Default
@@ -26,7 +28,7 @@ public class CartProductResponse {
             this.isSoldOut = isSoldOut;
         }
 
-        public static CartProductResponse.OfRetrieveCartProduct convertedBy(CartProduct cartProduct, int finalPrice) {
+        public static CartProductResponse.OfRetrieveCartProduct convertedBy(CartProduct cartProduct, int finalPrice, int finalDiscountRate) {
             return OfRetrieveCartProduct.builder()
                     .cartProductId(cartProduct.getCartProductId())
                     .customerId(cartProduct.getProduct().getCustomer().getCustomerId())
@@ -35,6 +37,8 @@ public class CartProductResponse {
                     .productName(cartProduct.getProduct().getProductName())
                     .productDescription(cartProduct.getProduct().getProductDescription())
                     .productImage(cartProduct.getProduct().getProductImage())
+                    .productBasePrice(cartProduct.getProduct().getProductPrice())
+                    .productDiscountRate(finalDiscountRate)
                     .productPrice(finalPrice)
                     .quantity(cartProduct.getQuantity())
                     .build();

@@ -30,7 +30,7 @@ public class CustomerService {
 
     /**
      * 고객 상세정보 조회
-     * @param customerId 페이징 정보
+     * @param customerId 고객 ID
      * @return 고객의 상세 정보
      */
     @Transactional
@@ -40,5 +40,19 @@ public class CustomerService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 고객 ID 입니다."));
 
         return CustomerResponse.OfRetrieveDetailCustomer.convertedBy(targetCustomer);
+    }
+
+    /**
+     * 업체의 배송비 조회
+     * @param customerId 고객 ID
+     * @return 업체의 배송비 가격
+     */
+    @Transactional
+    public int retrieveDeliveryFee(Long customerId) {
+
+        Customer targetCustomer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 고객 ID 입니다."));
+
+        return targetCustomer.getDeliveryFee();
     }
 }

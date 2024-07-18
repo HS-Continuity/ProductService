@@ -17,4 +17,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     @Query("SELECT c FROM Customer c WHERE c.isDeleted = com.yeonieum.productservice.global.enums.ActiveStatus.INACTIVE")
     Page<Customer> findByIsDeleted(Pageable pageable);
+
+    @Query("SELECT c.deliveryFee FROM Customer c WHERE c.customerId = :customerId")
+    int findDeliveryFeeByCustomerId(@Param("customerId") Long customerId);
+
 }
