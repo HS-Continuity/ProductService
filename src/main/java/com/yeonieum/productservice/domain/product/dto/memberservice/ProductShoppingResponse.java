@@ -56,16 +56,6 @@ public class ProductShoppingResponse {
         }
     }
 
-//    @Getter
-//    @Builder
-//    public static class RetrieveSearchWithProductsDto {
-//
-//        private int totalItems;
-//        private int totalPages;
-//        private boolean lastPage;
-//        private List<OfSearchProductInformation> searchProductInformationDtoList;
-//    }
-
     @Getter
     @Builder
     public static class OfSearchProductInformation {
@@ -80,7 +70,7 @@ public class ProductShoppingResponse {
         private int regularDiscountRate;
         private int productPrice;
         private int calculatedBasePrice;
-        private char isRegularSale;
+        private ActiveStatus isRegularSale;
         private Integer reviewCount;
         private Double averageScore;
         @Builder.Default
@@ -102,7 +92,7 @@ public class ProductShoppingResponse {
                     .regularDiscountRate(product.getRegularDiscountRate())
                     .productPrice(product.getProductPrice())
                     .calculatedBasePrice(product.getCalculatedBasePrice())
-                    .isRegularSale(product.getIsRegularSale().getCode())
+                    .isRegularSale(product.getIsRegularSale())
                     .reviewCount(product.getReviewCount())
                     .averageScore(product.getAverageScore())
                     .build();
@@ -127,8 +117,8 @@ public class ProductShoppingResponse {
         private int calculatedBasePrice;
         private int calculatedRegularPrice;
         private int calculatedPersonalizedPrice;
-        private char isRegularSale;
-        private char isCertification;
+        private ActiveStatus isRegularSale;
+        private ActiveStatus isCertification;
         private Integer reviewCount;
         private Double averageScore;
 
@@ -148,8 +138,8 @@ public class ProductShoppingResponse {
                     .calculatedBasePrice(product.getCalculatedBasePrice())
                     .calculatedRegularPrice(product.getCalculatedRegularPrice())
                     .calculatedPersonalizedPrice(product.getCalculatedPersonalizedPrice())
-                    .isRegularSale(product.getIsRegularSale().getCode())
-                    .isCertification(product.getIsCertification().getCode())
+                    .isRegularSale(product.getIsRegularSale())
+                    .isCertification(product.getIsCertification())
                     .reviewCount(product.getReviewCount())
                     .averageScore(product.getAverageScore())
                     .build();
