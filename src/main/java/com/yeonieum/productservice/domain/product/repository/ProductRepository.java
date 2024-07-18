@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p " +
             "JOIN FETCH p.productDetailCategory pdc " +
             "JOIN FETCH pdc.productCategory pc " +
-            "WHERE p.id = :productId")
+            "WHERE p.productId = :productId")
     Optional<Product> findProductWithCategoryInfoByProductId(@Param("productId") Long productId);
 
     @Query(value = "SELECT p.* FROM product p " +
@@ -70,4 +70,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByCustomerIdAndIsActiveAndCategoryId(@Param("customerId") Long customerId,
                                                            @Param("detailCategoryId") Long detailCategoryId,
                                                            Pageable pageable);
+
+    @Query("SELECT p FROM Product p " +
+            "WHERE p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE " +
+            "AND p.isCertification = :isCertification")
+    Page<Product> findActiveCertifiableProductsByProductId(@Param("isCertification") ActiveStatus isCertification,
+                                                           Pageable pageable);
+
 }

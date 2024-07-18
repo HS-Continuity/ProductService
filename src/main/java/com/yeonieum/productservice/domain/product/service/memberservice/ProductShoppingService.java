@@ -122,7 +122,7 @@ public class ProductShoppingService {
      * @return 상품의 상세 정보
      */
     @Transactional
-    public ProductShoppingResponse.OfDetailProductInformation detailProductInformationDto(Long productId){
+    public ProductShoppingResponse.OfDetailProductInformation detailProductInformation(Long productId){
 
         // 상품 정보를 조회, 존재하지 않을 경우 예외 발생
         Product targetProduct = productRepository.findByIdAndIsActive(productId)
@@ -132,24 +132,33 @@ public class ProductShoppingService {
     }
 
     /**
-     * 키워드로 상품 조회
+     * 상품 필터링 조회 (키워드, 친환경)
+     * @param keyword 상품 키워드(이름)
+     * @param isCertification 인증서 유무
+     * @param pageable 페이징 정보
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
     @Transactional
-    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProductsDto(
-            String keyword, Pageable pageable){
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveFilteringProducts(
+            String keyword, ActiveStatus isCertification, Pageable pageable){
 
         Page<Product> products;
 
-        if (keyword == null || keyword.trim().isEmpty()) {
-            //키워드가 존재하지 않을 경우, 모든 상품 조회
-            products = productRepository.findAllByIsActive(pageable);
-        } else {
-            //키워드가 존재할 경우, 키워드에 맞는 상품 조회
-            products = productRepository.findByProductNameContainingAndIsActive(keyword, pageable);
+        // 키워드가 있는 경우 키워드 검색으로 제한
+        if (keyword != null) {
+            return productRepository.findByProductNameContainingAndIsActive(keyword, pageable)
+                    .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
         }
 
-        return products.map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
+        // 키워드가 없고 인증 상태만 있는 경우, 인증 상태에 따라 검색
+        if (isCertification != null) {
+            return productRepository.findActiveCertifiableProductsByProductId(isCertification, pageable)
+                    .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
+        }
+
+        // 키워드와 인증 상태 모두 없는 경우 전체 상품 조회
+        return productRepository.findAllByIsActive(pageable)
+                .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
     }
 
     /**
@@ -160,7 +169,7 @@ public class ProductShoppingService {
      * @return 업체 상품들의 정보
      */
     @Transactional
-    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts(Long customerId, Long detailCategoryId, Pageable pageable) {
 
         // 고객 ID와 상세 카테고리 ID로 상품 조회
         Page<Product> products = productRepository.findByCustomerIdAndIsActiveAndCategoryId(customerId, detailCategoryId, pageable);

@@ -82,7 +82,7 @@ public class ProductShoppingController {
     public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
 
         ProductShoppingResponse.OfDetailProductInformation detailProductInformation =
-                productShoppingService.detailProductInformationDto(productId);
+                productShoppingService.detailProductInformation(productId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(detailProductInformation)
@@ -90,13 +90,14 @@ public class ProductShoppingController {
                 .build(), HttpStatus.OK);
     }
 
-    @Operation(summary = "키워드로 상품 조회", description = "입력한 키워드를 가진 상품을 조회하는 기능입니다.")
+    @Operation(summary = "필터링된 상품 조회", description = "(키워드, 친환경)으로 필터링 된 상품을 조회하는 기능입니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "키워드 상품 조회 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "키워드 상품 조회 실패")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "필터링 상품 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "필터링 상품 조회 실패")
     })
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse> retrieveSearchKeywordProduct(@RequestParam(required = false) String keyword,
+    public ResponseEntity<ApiResponse> retrieveSearchFilterProduct(@RequestParam(required = false) String keyword,
+                                                                    @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
                                                                     @RequestParam(defaultValue = "0") int startPage,
                                                                     @RequestParam(defaultValue = "10") int pageSize,
                                                                     @RequestParam(defaultValue = "productName") String sort,
@@ -104,11 +105,11 @@ public class ProductShoppingController {
 
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
-        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts =
-                productShoppingFacade.retrieveKeywordWithProducts(keyword, pageable);
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveFilteringProducts =
+                productShoppingFacade.retrieveFilteringProducts(keyword, isCertification, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(retrieveKeywordWithProducts)
+                .result(retrieveFilteringProducts)
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
@@ -129,7 +130,7 @@ public class ProductShoppingController {
         Pageable pageable = PageableUtil.createPageable(startPage, pageSize, sort, direction);
 
         Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts =
-                productShoppingFacade.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
+                productShoppingFacade.retrieveCustomerWithProducts(customerId, detailCategoryId, pageable);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(retrieveCustomerWithProducts)

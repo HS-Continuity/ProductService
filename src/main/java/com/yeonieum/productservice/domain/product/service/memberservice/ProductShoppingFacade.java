@@ -72,13 +72,14 @@ public class ProductShoppingFacade {
     }
 
     /**
-     * 키워드로 상품 조회
+     * 상품 필터링 조회 (키워드, 친환경)
      * @param keyword 상품 키워드(이름)
+     * @param isCertification 인증서 유무
      * @param pageable 페이징 정보
-     * @return 해당 키워드의 상품들 정보
+     * @return 조회된 상품 목록이 포함된 Page 객체
      */
-    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts(String keyword, Pageable pageable) {
-        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts = productShoppingService.retrieveKeywordWithProductsDto(keyword, pageable);
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveFilteringProducts(String keyword, ActiveStatus isCertification, Pageable pageable) {
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts = productShoppingService.retrieveFilteringProducts(keyword, isCertification, pageable);
 
         List<ProductShoppingResponse.OfSearchProductInformation> searchProductInformationDtoList = retrieveKeywordWithProducts.getContent();
 
@@ -101,9 +102,9 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보
      * @return 업체 상품들의 정보
      */
-    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProductsDto(Long customerId, Long detailCategoryId, Pageable pageable) {
+    public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts(Long customerId, Long detailCategoryId, Pageable pageable) {
 
-        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProductsDto(customerId, detailCategoryId, pageable);
+        Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProducts(customerId, detailCategoryId, pageable);
 
         for(ProductShoppingResponse.OfSearchProductInformation searchProductInformationDto : retrieveCustomerWithProducts) {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(searchProductInformationDto.getProductId());
