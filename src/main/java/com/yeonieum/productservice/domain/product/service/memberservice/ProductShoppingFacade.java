@@ -5,6 +5,7 @@ import com.yeonieum.productservice.domain.cart.service.CartProductService;
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
+    @Transactional
     public Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts(Long productCategoryId, ActiveStatus isCertification, Pageable pageable) {
 
         Page<ProductShoppingResponse.OfRetrieveCategoryWithProduct> retrieveCategoryWithProducts = productShoppingService.retrieveCategoryWithProducts(productCategoryId, isCertification, pageable);
@@ -55,6 +57,7 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
+    @Transactional
     public Page<ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct> retrieveDetailCategoryWithProducts(Long productDetailCategoryId, ActiveStatus isCertification, Pageable pageable) {
 
         Page<ProductShoppingResponse.OfRetrieveDetailCategoryWithProduct> retrieveDetailCategoryWithProducts = productShoppingService.retrieveDetailCategoryWithProducts(productDetailCategoryId, isCertification, pageable);
@@ -78,6 +81,7 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
+    @Transactional
     public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveFilteringProducts(String keyword, ActiveStatus isCertification, Pageable pageable) {
         Page<ProductShoppingResponse.OfSearchProductInformation> retrieveKeywordWithProducts = productShoppingService.retrieveFilteringProducts(keyword, isCertification, pageable);
 
@@ -102,6 +106,7 @@ public class ProductShoppingFacade {
      * @param pageable 페이징 정보
      * @return 업체 상품들의 정보
      */
+    @Transactional
     public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts(Long customerId, Long detailCategoryId, Pageable pageable) {
 
         Page<ProductShoppingResponse.OfSearchProductInformation> retrieveCustomerWithProducts = productShoppingService.retrieveCustomerWithProducts(customerId, detailCategoryId, pageable);
@@ -119,6 +124,7 @@ public class ProductShoppingFacade {
      * @param cartTypeId 장바구니 타입 ID
      * @return 장바구니 상품 정보
      */
+    @Transactional
     public List<CartProductResponse.OfRetrieveCartProduct> retrieveAllCartProducts(String memberId, Long cartTypeId) {
 
         List<CartProductResponse.OfRetrieveCartProduct> ofRetrieveCartProducts = cartProductService.retrieveAllCartProducts(memberId, cartTypeId);
@@ -130,4 +136,5 @@ public class ProductShoppingFacade {
 
         return ofRetrieveCartProducts;
     }
+
 }
