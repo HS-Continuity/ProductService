@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.domain.product.repository;
 
+import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
 import org.springframework.data.domain.Page;
@@ -45,8 +46,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.productId = :productId AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
     Optional<Product> findByIdAndIsActive(@Param("productId") Long productId);
 
-    @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%')) AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
-    Page<Product> findByProductNameContainingAndIsActive(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
     Page<Product> findAllByIsActive(Pageable pageable);
@@ -66,11 +65,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByCustomerIdAndIsActiveAndCategoryId(@Param("customerId") Long customerId,
                                                            @Param("detailCategoryId") Long detailCategoryId,
                                                            Pageable pageable);
-
     @Query("SELECT p FROM Product p " +
             "WHERE p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE " +
             "AND p.isCertification = :isCertification")
     Page<Product> findActiveCertifiableProductsByProductId(@Param("isCertification") ActiveStatus isCertification,
                                                            Pageable pageable);
-
+    @Query("SELECT p FROM Product p WHERE p.productDetailCategory IN :categories AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
+    Page<Product> findByProductDetailCategoryIn(@Param("categories") List<ProductDetailCategory> categories, Pageable pageable);
 }

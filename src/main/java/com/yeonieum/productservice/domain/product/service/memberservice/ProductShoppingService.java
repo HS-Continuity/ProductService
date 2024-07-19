@@ -13,10 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +26,7 @@ public class ProductShoppingService {
     private final ProductCategoryRepository productCategoryRepository;
     private final ProductDetailCategoryRepository productDetailCategoryRepository;
     private final ProductRepository productRepository;
+    private final RedisTemplate redisTemplate;
 
 
     /**
@@ -144,10 +145,19 @@ public class ProductShoppingService {
 
         Page<Product> products;
 
-        // 키워드가 있는 경우 키워드 검색으로 제한
-        if (keyword != null) {
-            return productRepository.findByProductNameContainingAndIsActive(keyword, pageable)
-                    .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            Set<ProductDetailCategory> matchingCategories = new HashSet<>();
+            List<String> keywords = splitKeywords(keyword);
+
+            for (String singleKeyword : keywords) {
+                List<ProductDetailCategory> categories = productDetailCategoryRepository.findByNameContaining(singleKeyword);
+                matchingCategories.addAll(categories);
+            }
+
+            if (!matchingCategories.isEmpty()) {
+                return productRepository.findByProductDetailCategoryIn(new ArrayList<>(matchingCategories), pageable)
+                        .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
+            }
         }
 
         // 키워드가 없고 인증 상태만 있는 경우, 인증 상태에 따라 검색
@@ -175,6 +185,25 @@ public class ProductShoppingService {
         Page<Product> products = productRepository.findByCustomerIdAndIsActiveAndCategoryId(customerId, detailCategoryId, pageable);
 
         return products.map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
+    }
+
+    /**
+     * 입력된 문자열을 공백과 대문자 경계를 기준으로 분할
+     * @param keyword 입력 문자열
+     * @return 분할된 키워드 리스트
+     */
+    private List<String> splitKeywords(String keyword) {
+
+        List<String> result = new ArrayList<>();
+
+        // 입력 문자열을 공백("\\s+")을 기준으로 분할
+        String[] parts = keyword.split("\\s+");
+
+        for (String part : parts) {
+            // 각 파트를 대문자 경계에서 추가로 분할
+            result.addAll(Arrays.asList(part.split("(?<=.)(?=\\p{Lu})")));
+        }
+        return result;
     }
 }
 
