@@ -76,4 +76,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                            Pageable pageable);
     @Query("SELECT p FROM Product p WHERE p.productDetailCategory IN :categories AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
     Page<Product> findByProductDetailCategoryIn(@Param("categories") List<ProductDetailCategory> categories, Pageable pageable);
+
+    @Query("SELECT p FROM Product p WHERE p.productName LIKE CONCAT('%', :productName, '%') AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
+    List<Product> findByNameContaining(@Param("productName") String productName);
 }

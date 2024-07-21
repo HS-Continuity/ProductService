@@ -145,4 +145,12 @@ public class ProductShoppingResponse {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    public static class OfSearchRank {
+        private String searchName;
+        private long searchScore;
+        private int rankChange; // 이전 검색어 순위와 비교하여 상승하거나 떨어진 순위 값
+    }
 }
