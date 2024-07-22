@@ -139,4 +139,20 @@ public class ProductShoppingController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    @Operation(summary = "키워드 검색 순위 조회", description = "키워드 검색 순위를 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "키워드 검색 순위 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "키워드 검색 순위 조회 실패")
+    })
+    @GetMapping("/ranking")
+    public ResponseEntity<ApiResponse> retrieveSearchRank() {
+
+        List<ProductShoppingResponse.OfSearchRank> searchRanks = productShoppingService.retrieveSearchRank();
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(searchRanks)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }

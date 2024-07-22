@@ -157,7 +157,7 @@ public class ProductShoppingService {
      */
     @Transactional
     public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveFilteringProducts(
-            String keyword, ActiveStatus isCertification, Pageable pageable){
+            String keyword, ActiveStatus isCertification, Pageable pageable) {
 
         // 모든 검색 결과를 담을 Set
         Set<Product> allProducts = new HashSet<>();
@@ -186,14 +186,16 @@ public class ProductShoppingService {
                 allProducts.addAll(productsByCategory);
             }
 
-            // 검색 결과가 없는 경우 예외를 던짐
-            if (allProducts.isEmpty()) {
+            // 검색 결과가 존재하는 경우에만 검색어 점수 증가
+            if (!allProducts.isEmpty()) {
+                keywords.forEach(this::recordSearchKeyword);
+            } else {
+                // 검색 결과가 없는 경우 예외를 던짐
                 throw new IllegalStateException(keyword + "에 대한 검색결과가 없습니다. 다른 검색어를 입력해 주세요.");
             }
 
             // 중복 제거 후 페이징 처리
             List<Product> distinctProducts = allProducts.stream().distinct().collect(Collectors.toList());
-
             return new PageImpl<>(distinctProducts, pageable, distinctProducts.size())
                     .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
         }
@@ -215,17 +217,59 @@ public class ProductShoppingService {
      * @return 분할된 키워드 리스트
      */
     private List<String> splitKeywords(String keyword) {
-
         List<String> result = new ArrayList<>();
 
         // 입력 문자열을 공백("\\s+")을 기준으로 분할
         String[] parts = keyword.split("\\s+");
 
         for (String part : parts) {
-            // 각 파트를 대문자 경계에서 추가로 분할
+            // 각 파트를 대문자 경계에서 추가로 분할 (예: "StockMarket" -> "Stock", "Market")
             result.addAll(Arrays.asList(part.split("(?<=.)(?=\\p{Lu})")));
         }
         return result;
+    }
+
+    /**
+     * 상품 검색 순위를 조회하여 반환
+     * @return 상품 검색 순위 리스트
+     */
+    @Transactional
+    public List<ProductShoppingResponse.OfSearchRank> retrieveSearchRank() {
+        return redisTemplate.opsForZSet()
+                .reverseRangeWithScores("currentSearchRank", 0, 9)
+                .stream()
+                .map(scoredValue -> {
+                    Double score = scoredValue.getScore();
+                    String value = (String) scoredValue.getValue();
+                    return ProductShoppingResponse.OfSearchRank.builder()
+                            .searchName(value)
+                            .searchScore(Math.round(score))
+                            .rankChange(calculateRankChange(value))
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 검색어 순위 변동 계산
+     * @param keyword 검색어
+     * @return 순위 변동 값 (양수는 순위 상승, 음수는 하락을 의미)
+     */
+    private int calculateRankChange(String keyword) {
+        Double previousScore = redisTemplate.opsForZSet().score("previousSearchRank", keyword);
+        if (previousScore == null) return 0; // 이전 점수가 없는 경우 변동 없음
+
+        int previousRank = redisTemplate.opsForZSet().reverseRank("previousSearchRank", keyword).intValue();
+        int currentRank = redisTemplate.opsForZSet().reverseRank("currentSearchRank", keyword).intValue();
+        return previousRank - currentRank; // 순위 변동 계산
+    }
+
+    /**
+     * 검색어 점수 증가
+     * @param keyword 검색어
+     */
+    public void recordSearchKeyword(String keyword) {
+        redisTemplate.opsForZSet().incrementScore("tempCurrentSearchRank", keyword, 1); // tempCurrentSearchRank에 점수 1 증가
     }
 }
 
