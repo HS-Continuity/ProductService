@@ -30,31 +30,39 @@ ext {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-cache'
-	implementation 'org.aspectj:aspectjweaver:1.9.7'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.redisson:redisson-spring-boot-starter:3.20.0' // Redisson 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+
+	// spring cloud
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 //	implementation 'org.springframework.cloud:spring-cloud-starter-config-netflix-eureka-client'
-	compileOnly 'org.projectlombok:lombok'
+	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+
+	// aop
+	implementation 'org.aspectj:aspectjweaver:1.9.7'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// datasource & infrastructure
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
+	implementation 'org.springframework.kafka:spring-kafka'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	//runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
-	annotationProcessor 'org.projectlombok:lombok'
+
+
+	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	testImplementation 'org.mockito:mockito-core'
-	implementation 'org.springframework.kafka:spring-kafka'
-	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 	testImplementation 'org.hamcrest:hamcrest:2.2'
-
 }
 
 dependencyManagement {

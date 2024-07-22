@@ -25,7 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -244,10 +247,12 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     }
 
     @Override
-    public List<ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformatino(List<Long> productIdList) {
+    public Map<Long, ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformation(List<Long> productIdList) {
         List<Product> productList = productRepository.findAllById(productIdList);
-        return productList.stream().map(product -> ProductManagementResponse.OfRetrieveProductOrder.convertedBy(product))
-                .collect(Collectors.toList());
+        return productList.stream().collect(Collectors.toMap(
+                Product::getProductId, // key mapper - 상품의 ID를 키로 사용
+                ProductManagementResponse.OfRetrieveProductOrder::convertedBy // value mapper - 변환된 값을 값으로 사용
+        ));
     }
 
     @Override
