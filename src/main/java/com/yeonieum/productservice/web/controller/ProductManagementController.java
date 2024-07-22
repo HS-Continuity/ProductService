@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/management")
@@ -188,4 +189,13 @@ public class ProductManagementController {
                 .successCode(SuccessCode.INSERT_SUCCESS)
                 .build(), HttpStatus.CREATED);
     }
+
+    @GetMapping("/products")
+    public ResponseEntity<ApiResponse> bulkRetrieveProductInformation(@RequestParam List<Long> productIdList) {
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(productManagementService.bulkRetrieveProductInformation(productIdList))
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    };
+
 }
