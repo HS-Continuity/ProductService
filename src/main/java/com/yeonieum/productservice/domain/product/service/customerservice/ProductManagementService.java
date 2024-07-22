@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface ProductManagementService {
     boolean checkCertificationValidation(Long serialNumber);
@@ -22,5 +23,5 @@ public interface ProductManagementService {
     void uploadCertificationImage(Long productId, String imageUrl , ProductManagementRequest.Certification certification) throws IOException;
     List<ProductManagementResponse.OfRetrieveDetailImage> retrieveDetailImage(Long productId);
     ProductManagementResponse.OfRetrieveProductOrder retrieveProductInformation(Long productId);
-    List<ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformatino(List<Long> productIdList);
+    Map<Long, ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformation(List<Long> productIdList);
 }
