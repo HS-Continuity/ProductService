@@ -2,6 +2,7 @@ package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.domain.category.dto.detailcategory.ProductDetailCategoryRequest;
 import com.yeonieum.productservice.domain.category.service.ProductDetailCategoryService;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +24,8 @@ public class DetailCategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상품 상세 카테고리 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 상세 카테고리 등록 실패")
     })
-    @PostMapping("")
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/detail-category", method = "POST")
+    @PostMapping
     public ResponseEntity<ApiResponse> registerProductDetailCategory(@RequestBody ProductDetailCategoryRequest.RegisterDetailCategoryDto registerDetailCategoryDto) {
 
         productDetailCategoryService.registerProductDetailCategory(registerDetailCategoryDto);
@@ -39,6 +41,7 @@ public class DetailCategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 상세 카테고리 수정 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 상세 카테고리 수정 실패")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/detail-category/{productDetailCategoryId}", method = "PATCH")
     @PatchMapping("/{productDetailCategoryId}")
     public ResponseEntity<ApiResponse> modifyProductCategory(
             @PathVariable Long productDetailCategoryId, @RequestBody ProductDetailCategoryRequest.ModifyDetailCategoryDto productDetailCategoryDto) {
@@ -56,6 +59,7 @@ public class DetailCategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "상품 상세 카테고리 삭제 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 상세 카테고리 삭제 실패")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/detail-category/{productDetailCategoryId}", method = "DELETE")
     @DeleteMapping("/{productDetailCategoryId}")
     public ResponseEntity<ApiResponse> deleteProductDetailCategory(@PathVariable Long productDetailCategoryId) {
 

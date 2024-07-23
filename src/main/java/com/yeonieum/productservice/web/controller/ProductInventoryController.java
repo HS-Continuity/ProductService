@@ -3,6 +3,7 @@ package com.yeonieum.productservice.web.controller;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
+import com.yeonieum.productservice.global.auth.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 public class ProductInventoryController {
     private final StockSystemService stockSystemService;
 
-
+    @Role(role = {"ROLE_ADMIN", "ROLE_MEMBER"}, url = "/api/inventory/stock-usage", method = "POST")
     @PostMapping("/stock-usage")
     public AvailableProductInventoryResponseList getAvailableOrderProduct(@RequestBody StockUsageRequest.IncreaseStockUsageList increaseStockUsageListDtoList) {
         List<AvailableProductInventoryResponse> responseList = new ArrayList<>();

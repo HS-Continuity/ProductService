@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.S3Upload.S3UploadService;
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementRequest;
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementResponse;
 import com.yeonieum.productservice.domain.product.service.customerservice.ProductManagementService;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
@@ -43,6 +44,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/normal", method = "POST")
     @PostMapping("/product/normal")
     public ResponseEntity<ApiResponse> createNormalProduct(@RequestPart(value = "normalProduct") ProductManagementRequest.OfRegister normalProduct,
                                                            @RequestPart(value = "image") MultipartFile defaultImage,
@@ -61,6 +63,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "친환경상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/eco-friend", method = "POST")
     @PostMapping("/product/eco-friend")
     public ResponseEntity<ApiResponse> createEcoFriendlyProduct(@RequestPart(value = "product") ProductManagementRequest.OfRegisterEcoFriendlyProduct ecoFriendlyProduct,
                                                                 @RequestPart(value = "defaultImage") MultipartFile defaultImage,
@@ -81,6 +84,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}", method = "PUT")
     @PutMapping("/product/{productId}")
     public ResponseEntity<ApiResponse> updateProductInformation(@PathVariable Long productId,
                                                                 @RequestBody ProductManagementRequest.OfModify productInformation) {
@@ -98,6 +102,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/list", method = "GET")
     @GetMapping("/product/list")
     // 친환경상품, 일반상품 조회 따로 파야한다.
     public ResponseEntity<ApiResponse> getCustomersAllProduct(@RequestParam(required = false) char isEcoFriend,
@@ -119,6 +124,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}/details", method = "GET")
     @GetMapping("/product/{productId}/details")
     public ResponseEntity<ApiResponse> getProductDetail(@PathVariable Long productId) {
         ProductManagementResponse.OfRetrieveDetails productDetail = productManagementService.retrieveProductDetail(productId);
@@ -134,6 +140,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}", method = "DELETE")
     @DeleteMapping("/product/{productId}")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long productId) {
         Long customerId = 1L;
