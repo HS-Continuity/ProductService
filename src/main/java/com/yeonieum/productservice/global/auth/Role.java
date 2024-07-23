@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Role {
-    String value();
+    String[] role();
     String url();
+    String method();
 }
