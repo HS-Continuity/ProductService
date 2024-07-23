@@ -3,6 +3,7 @@ package com.yeonieum.productservice.web.controller;
 import com.yeonieum.productservice.domain.category.dto.category.ProductCategoryRequest;
 import com.yeonieum.productservice.domain.category.dto.category.ProductCategoryResponse;
 import com.yeonieum.productservice.domain.category.service.ProductCategoryService;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +27,8 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상품 카테고리 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 카테고리 등록 실패")
     })
-    @PostMapping("")
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/category", method = "POST")
+    @PostMapping
     public ResponseEntity<ApiResponse> registerProductCategory(@RequestBody ProductCategoryRequest.RegisterCategoryDto registerCategoryDto) {
 
         productCategoryService.registerCategory(registerCategoryDto);
@@ -42,7 +44,8 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 카테고리 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 카테고리 조회 실패")
     })
-    @GetMapping("")
+    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/category", method = "GET")
+    @GetMapping
     public ResponseEntity<ApiResponse> retrieveProductCategoryList() {
 
         List<ProductCategoryResponse.RetrieveAllCategoryDto> retrieveAllCategories = productCategoryService.retrieveAllCategories();
@@ -58,6 +61,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 카테고리 수정 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 카테고리 수정 실패")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/category/{productCategoryId}", method = "PATCH")
     @PatchMapping("/{productCategoryId}")
     public ResponseEntity<ApiResponse> modifyProductCategory(
             @PathVariable Long productCategoryId, @RequestBody ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
@@ -75,6 +79,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "상품 카테고리 삭제 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 카테고리 삭제 실패")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/category/{productCategoryId}", method = "DELETE")
     @DeleteMapping("/{productCategoryId}")
     public ResponseEntity<ApiResponse> deleteProductCategory(@PathVariable Long productCategoryId) {
 
@@ -91,6 +96,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 하위 카테고리 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 하위 카테고리 조회 실패")
     })
+    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/category/{productCategoryId}/detail", method = "GET")
     @GetMapping("/{productCategoryId}/detail")
     public ResponseEntity<ApiResponse> RetrieveCategoryWithDetails(@PathVariable Long productCategoryId) {
 
@@ -101,7 +107,4 @@ public class CategoryController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
-
-
-
 }

@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class RoleMetaDataCollector {
 
-    private final Map<String, List<String>> roleMetadata = new HashMap<>();
+    private final Map<String, RoleMetaData> roleMetadata = new HashMap<>();
     private final ApplicationContext applicationContext;
 
     @Autowired
@@ -35,13 +35,16 @@ public class RoleMetaDataCollector {
                 Role secured = method.getAnnotation(Role.class);
                 if (secured != null) {
                     String methodName = beanClass.getName() + "." + method.getName();
-                    roleMetadata.put(secured.url(), Arrays.asList(secured.value()));
+                    roleMetadata.put(secured.url(), RoleMetaData.builder()
+                            .roles(Arrays.asList(secured.role()))
+                            .Methods(secured.method())
+                            .build());
                 }
             }
         }
     }
 
-    public Map<String, List<String>> getRoleMetadata() {
+    public Map<String, RoleMetaData> getRoleMetadata() {
         return roleMetadata;
     }
 }

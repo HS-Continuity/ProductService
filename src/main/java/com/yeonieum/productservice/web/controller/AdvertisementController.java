@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.product.dto.customerservice.Advertisem
 import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementResponse;
 import com.yeonieum.productservice.domain.product.service.customerservice.AdvertisementManagementService;
 import com.yeonieum.productservice.domain.product.service.memberservice.AdvertisementService;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,12 +35,12 @@ public class AdvertisementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상단광고 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/advertisement/list", method = "GET")
     @GetMapping("/list")
     public ResponseEntity getAdvertisement(@RequestParam int startPage,
-                                                @RequestParam int pageSize,
-                                                @RequestParam long customerId) {
+                                           @RequestParam int pageSize,
+                                           @RequestParam long customerId) {
         List<AdvertisementResponse.OfRetrieve> advertisementProduct = advertisementManagementService.retrieveAppliedProduct(customerId);
-
 
         return new ResponseEntity(ApiResponse.builder()
                 .result(advertisementProduct)
@@ -52,6 +53,7 @@ public class AdvertisementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상단광고 신청 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/advertisement/product", method = "POST")
     @PostMapping("/product")
     public ResponseEntity registerAdvertisement(@RequestBody AdvertisementRequest.OfRegister registerRequest) {
         advertisementManagementService.registerAdvertisement(registerRequest);
@@ -67,6 +69,7 @@ public class AdvertisementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상단광고 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/advertisement/product/list", method = "GET")
     @GetMapping("/product/list")
     public ResponseEntity getAdvertisementProduct(@RequestParam int startPage,
                                                   @RequestParam int pageSize) {
@@ -83,6 +86,7 @@ public class AdvertisementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상단광고 승인 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/advertisement/{advertisementId}/approval", method = "PATCH")
     @PatchMapping("/{advertisementId}/approval")
     public ResponseEntity approveAdvertisement(@PathVariable Long advertisementId) {
         advertisementManagementService.approveAdvertisement(advertisementId);

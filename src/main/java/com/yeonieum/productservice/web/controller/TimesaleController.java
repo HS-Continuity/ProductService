@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleRe
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleResponseForCustomer;
 import com.yeonieum.productservice.domain.product.dto.memberservice.TimesaleResponseForMember;
 import com.yeonieum.productservice.domain.product.service.customerservice.TimesaleManagementService;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,7 @@ public class TimesaleController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "타임세일 리스트 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale/list", method = "GET")
     @GetMapping("/list")
     public ResponseEntity<ApiResponse> getTimesale() {
         Long customerId = 1L;
@@ -48,6 +50,7 @@ public class TimesaleController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "타임세일 신청 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale", method = "POST")
     @PostMapping
     public ResponseEntity<ApiResponse> registerTimesale(@RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) {
         timesaleManagementService.registerTimesale(registerRequest);
@@ -62,7 +65,9 @@ public class TimesaleController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "타임세일 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
-    })    @GetMapping("/{timesaleId}")
+    })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale/{timesaleId}", method = "GET")
+    @GetMapping("/{timesaleId}")
     public ResponseEntity<ApiResponse> getTimesaleProduct(@PathVariable Long timesaleId) {
         TimesaleResponseForCustomer.OfRetrieve timesaleRespone = timesaleManagementService.retrieveCustomersTimesale(timesaleId);
 
@@ -77,6 +82,7 @@ public class TimesaleController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "타임세일 취소 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale/{timesaleId}/cancel", method = "PATCH")
     @PatchMapping("/{timesaleId}/cancel")
     public ResponseEntity<ApiResponse> updateTimesaleProduct(@PathVariable Long timesaleId) {
         // 타임세일 신청 취소
@@ -91,7 +97,9 @@ public class TimesaleController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "타임세일 상품 목록 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
-    })    @GetMapping("/product/list")
+    })
+    @Role(role = {"ROLE_MEMBER", "ROLE_ANONYMOUS", "ROLE_ADMIN", "ROLE_CUSTOMER"}, url = "/api/time-sale/product/list", method = "GET")
+    @GetMapping("/product/list")
     public ResponseEntity<ApiResponse> getTimesaleProductList(@RequestParam(defaultValue = "0") int startPage,
                                                               @RequestParam(defaultValue = "10") int pageSize) {
         Pageable pageable = PageRequest.of(startPage, pageSize);

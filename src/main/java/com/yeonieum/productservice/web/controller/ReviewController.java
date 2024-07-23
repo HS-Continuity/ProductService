@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.S3Upload.S3UploadService;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewRequest;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewResponse;
 import com.yeonieum.productservice.domain.review.service.ProductReviewService;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.paging.PageableUtil;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
@@ -33,6 +34,7 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상품 리뷰 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 등록 실패")
     })
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/product-review", method = "POST")
     @PostMapping
     public ResponseEntity<ApiResponse> registerProductReview(
             @RequestPart(value = "ofRegisterProductReview") ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview,
@@ -57,6 +59,7 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "상품 리뷰 삭제 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 삭제 실패")
     })
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/product-review/{productReviewId}", method = "DELETE")
     @DeleteMapping("/{productReviewId}")
     public ResponseEntity<ApiResponse> deleteProductReview(@PathVariable Long productReviewId) {
 
@@ -73,6 +76,7 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 리뷰 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 조회 실패")
     })
+    @Role(role = {"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_CUSTOMER","ROLE_ANONYMOUS"}, url = "/api/product-review/{productId}", method = "GET")
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveProductReviews(
             @PathVariable Long productId,

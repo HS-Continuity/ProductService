@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.cart.dto.CartProductRequest;
 import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.cart.service.CartProductService;
 import com.yeonieum.productservice.domain.product.service.memberservice.ProductShoppingFacade;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,8 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "장바구니 상품 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 등록 실패")
     })
-    @PostMapping("")
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product", method = "POST")
+    @PostMapping
     public ResponseEntity<ApiResponse> registerCartProduct(@RequestBody CartProductRequest.OfRegisterProductCart ofRegisterProductCart) {
 
         cartProductService.registerCartProduct(ofRegisterProductCart);
@@ -44,7 +46,8 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "장바구니 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 조회 실패")
     })
-    @GetMapping("")
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product", method = "GET")
+    @GetMapping
     public ResponseEntity<ApiResponse> retrieveAllCartProducts(
             @RequestParam("memberId") String memberId,
             @RequestParam("cartTypeId") Long cartTypeId) {
@@ -61,6 +64,7 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "장바구니 상품 삭제 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 삭제 실패")
     })
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/{cartProductId}", method = "DELETE")
     @DeleteMapping("/{cartProductId}")
     public ResponseEntity<ApiResponse> deleteCartProduct(@PathVariable("cartProductId") Long cartProductId) {
         cartProductService.deleteCartProduct(cartProductId);
@@ -76,6 +80,7 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "장바구니 상품 개수 수정 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 개수 수정 실패")
     })
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/quantity/{cartProductId}/increment", method = "PUT")
     @PutMapping("/quantity/{cartProductId}/increment")
     public ResponseEntity<ApiResponse> increaseProductQuantity(@PathVariable("cartProductId") Long cartProductId) {
 
@@ -92,6 +97,7 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "장바구니 상품 개수 수정 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 개수 수정 실패")
     })
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/quantity/{cartProductId}/decrement", method = "PUT")
     @PutMapping("/quantity/{cartProductId}/decrement")
     public ResponseEntity<ApiResponse> decreaseProductQuantity(@PathVariable("cartProductId") Long cartProductId) {
 
@@ -108,6 +114,7 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "장바구니 상품 수 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 수 조회 실패")
     })
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/count", method = "GET")
     @GetMapping("count")
     public ResponseEntity<ApiResponse> countCartProduct(
             @RequestParam("memberId") String memberId,

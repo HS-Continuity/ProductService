@@ -2,6 +2,7 @@ package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.domain.customer.dto.CustomerResponse;
 import com.yeonieum.productservice.domain.customer.service.CustomerService;
+import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +27,7 @@ public class CustomerController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "고객 목록 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "고객 목록 조회 실패")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/customer/list", method = "GET")
     @GetMapping("/list")
     public ResponseEntity<ApiResponse> retrieveAllCustomers(
             @RequestParam(defaultValue = "0") int startPage,
@@ -48,6 +50,7 @@ public class CustomerController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "고객 상세 정보 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "고객 상세 정보 조회 실패")
     })
+    @Role(role = {"ROLE_ADMIN"}, url = "/api/customer/{customerId}", method = "GET")
     @GetMapping("/{customerId}")
     public ResponseEntity<ApiResponse> retrieveDetailCustomer(@PathVariable("customerId") Long customerId) {
 
@@ -64,6 +67,7 @@ public class CustomerController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 배송비 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 배송비 조회 실패")
     })
+    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_GUEST", "ROLE_ANONYMOUS"}, url = "/api/customer/delivery-fee/{customerId}", method = "GET")
     @GetMapping("/delivery-fee/{customerId}")
     public ResponseEntity<ApiResponse> retrieveDeliveryFee(@PathVariable("customerId") Long customerId) {
 
