@@ -7,6 +7,39 @@ import lombok.Builder;
 import lombok.Getter;
 
 public class ProductManagementResponse {
+
+    @Getter
+    @Builder
+    public static class OfOrderInformation {
+        private Long productId;
+        private String productName;
+        private String name;
+        private int originPrice;
+        private int regularDiscountRate;
+        private double finalPrice;
+        private int quantity;
+        @Builder.Default
+        private boolean isAvailable = true;
+
+        public void changeIsAvailable(boolean isAvailable) {
+            this.isAvailable = isAvailable;
+        }
+
+        public static OfOrderInformation convertedBy(Product product, int quantity) {
+            return OfOrderInformation.builder()
+                    .productId(product.getProductId())
+                    .productName(product.getProductName())
+                    .name(product.getProductName())
+                    .originPrice(product.getProductPrice())
+                    .regularDiscountRate(product.getRegularDiscountRate())
+                    .finalPrice(quantity * product.getProductPrice() * product.getRegularDiscountRate())
+                    .quantity(quantity)
+                    .build();
+        }
+    }
+
+
+
     @Getter
     @Builder
     public static class OfRetrieveProductOrder {

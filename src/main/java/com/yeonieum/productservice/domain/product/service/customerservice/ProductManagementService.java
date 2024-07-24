@@ -2,6 +2,7 @@ package com.yeonieum.productservice.domain.product.service.customerservice;
 
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementRequest;
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementResponse;
+import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,4 +25,6 @@ public interface ProductManagementService {
     List<ProductManagementResponse.OfRetrieveDetailImage> retrieveDetailImage(Long productId);
     ProductManagementResponse.OfRetrieveProductOrder retrieveProductInformation(Long productId);
     Map<Long, ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformation(List<Long> productIdList);
+
+    List<ProductManagementResponse.OfOrderInformation> retrieveOrderInformation(StockUsageRequest.IncreaseStockUsageList increaseStockUsageList);
 }
