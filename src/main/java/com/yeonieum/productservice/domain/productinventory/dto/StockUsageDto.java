@@ -17,14 +17,14 @@ import java.util.Objects;
 @Builder
 public class StockUsageDto {
     Long productId;
-    Long orderId;
+    String orderDetailId;
     int quantity;
 
     public StockUsageDto(String json) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         StockUsageDto dto = objectMapper.readValue(json, StockUsageDto.class);
         this.productId = dto.getProductId();
-        this.orderId = dto.getOrderId();
+        this.orderDetailId = dto.getOrderDetailId();
         this.quantity = dto.getQuantity();
     }
 
@@ -34,11 +34,11 @@ public class StockUsageDto {
         if (this == o) return true;
         if (o == null) return false;
         StockUsageDto that = (StockUsageDto) o;
-        return quantity == that.quantity && productId.equals(that.productId) && orderId.equals(that.orderId);
+        return quantity == that.quantity && productId.equals(that.productId) && orderDetailId.equals(that.orderDetailId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(productId, orderId, quantity);
+        return Objects.hash(productId, orderDetailId, quantity);
     }
 }

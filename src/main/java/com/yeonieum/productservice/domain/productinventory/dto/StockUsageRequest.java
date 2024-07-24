@@ -11,7 +11,7 @@ public class StockUsageRequest {
     @Getter
     @NoArgsConstructor
     public static class OfIncreasing {
-        Long orderId;
+        String orderDetailId;
         Long productId;
         int quantity;
         String memberId;
@@ -26,7 +26,7 @@ public class StockUsageRequest {
     @Getter
     @Builder
     public static class OfDecreasing {
-        Long orderId;
+        String orderDetailId;
         Long productId;
         int quantity;
     }

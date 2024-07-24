@@ -77,7 +77,7 @@ public class LockAcquisitionAspect {
     public AvailableProductInventoryResponse failResponse(StockUsageRequest.OfIncreasing ofIncreasing) {
         return AvailableProductInventoryResponse.builder()
                 .productId(ofIncreasing.getProductId())
-                .orderId(ofIncreasing.getOrderId())
+                .orderDetailId(ofIncreasing.getOrderDetailId())
                 .quantity(ofIncreasing.getQuantity())
                 .build();
     }

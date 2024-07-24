@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class ShippedStock {
     @Id
     @Column(name = "order_id", nullable = false)
-    private Long orderId;
+    private String orderDetailId;
     @Column(name = "product_id", nullable = false)
     private Long productId;
     @Column(name = "quantity", nullable = false)
