@@ -16,6 +16,7 @@ import com.yeonieum.productservice.domain.product.repository.ProductCertificatio
 import com.yeonieum.productservice.domain.product.repository.ProductDetailImageRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.SaleTypeRepository;
+import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -240,13 +241,18 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     }
 
     @Override
+    @Transactional
     public ProductManagementResponse.OfRetrieveProductOrder retrieveProductInformation(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 상품입니다."));
         return ProductManagementResponse.OfRetrieveProductOrder.convertedBy(product);
     }
 
+
+
+
     @Override
+    @Transactional(readOnly = true)
     public Map<Long, ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformation(List<Long> productIdList) {
         List<Product> productList = productRepository.findAllById(productIdList);
         return productList.stream().collect(Collectors.toMap(
@@ -256,6 +262,23 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     }
 
     @Override
+    @Transactional
+    public List<ProductManagementResponse.OfOrderInformation> retrieveOrderInformation(StockUsageRequest.IncreaseStockUsageList increaseStockUsageList) {
+        List<Product> productList = productRepository.findAllById(increaseStockUsageList.getOfIncreasingList().stream().map(
+                StockUsageRequest.OfIncreasing::getProductId).collect(Collectors.toList())
+        );
+
+        Map<Long, Integer> productQuantityMap = increaseStockUsageList.getOfIncreasingList().stream().collect(Collectors.toMap(
+                StockUsageRequest.OfIncreasing::getProductId,
+                StockUsageRequest.OfIncreasing::getQuantity
+        ));
+
+        return productList.stream().map(product -> ProductManagementResponse.OfOrderInformation.convertedBy(product, productQuantityMap.get(product.getProductId())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ProductManagementResponse.OfRetrieveDetailImage> retrieveDetailImage(Long productId) {
         List<ProductDetailImage> productDetailImageList = productDetailImageRepository.findByProductId(productId);
 
@@ -273,6 +296,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
      * @return
      */
     @Override
+    @Transactional
     public void uploadCertificationImage(Long productId, String imageUrl, ProductManagementRequest.Certification certification) throws IOException {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
