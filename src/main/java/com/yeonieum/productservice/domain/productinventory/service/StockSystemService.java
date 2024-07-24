@@ -42,24 +42,24 @@ public class StockSystemService {
     public AvailableProductInventoryResponse processProductInventory(StockUsageRequest.OfIncreasing ofIncreasing) {
         // [STEP1] [받아온 주문서의 상품들을 기준으로 구매가 가능한지 체크하고, 가능하다면 재고사용량을 증가시킨다.]
         Long productId = ofIncreasing.getProductId();
-        Long orderId = ofIncreasing.getOrderId();
+        String orderDetailId = ofIncreasing.getOrderDetailId();
         int quantity = ofIncreasing.getQuantity();
 
         //[STEP2] [응답객체에 주문서 상 상품에 대한 주문 가능여부를 담는다. -> 주문서비스는 주문 가능여부를 바탕으로 경합상황에서 주문서를 안전하게 생성할 수 있다.]
         AvailableProductInventoryResponse availableProductInventoryResponse = AvailableProductInventoryResponse.builder()
                                                         .productId(productId)
-                                                        .orderId(orderId)
+                                                        .orderDetailId(orderDetailId)
                                                         .quantity(quantity)
                                                         .build();
 
 
         //[STEP3] [주문가능 여부 로직 체크 : 총 출고 가능량 과 재고 사용량 비교 -> 주문가능여부 반환]
         int availableStockAmount = retrieveProductStockAmount(productId);
-        boolean available =  stockUsageService.increaseStockUsage(new StockUsageDto(productId, orderId, quantity), availableStockAmount);
+        boolean available =  stockUsageService.increaseStockUsage(new StockUsageDto(productId, orderDetailId, quantity), availableStockAmount);
         //[STEP4] [주문이 가능할 경우 재고사용량을 증가시키고, 주문가능여부 true로 설정한 응답객체 리스트에 추가]
         StockUsageDto stockUsageDto = StockUsageDto.builder()
                         .productId(ofIncreasing.getProductId())
-                        .orderId(ofIncreasing.getOrderId())
+                        .orderDetailId(ofIncreasing.getOrderDetailId())
                         .quantity(ofIncreasing.getQuantity())
                         .build();
 

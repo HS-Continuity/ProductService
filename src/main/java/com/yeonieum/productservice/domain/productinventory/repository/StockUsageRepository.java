@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface StockUsageRepository extends JpaRepository<StockUsage, Long> {
-    @Query("SELECT new com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto(s.productId, s.orderId, s.quantity) " +
+public interface StockUsageRepository extends JpaRepository<StockUsage, String> {
+    @Query("SELECT new com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto(s.productId, s.orderDetailId, s.quantity) " +
             "FROM StockUsage s WHERE s.productId = :productId")
     List<StockUsageDto> findShippedStockByProductId(@Param("productId") Long productId);
 

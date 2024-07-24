@@ -18,11 +18,11 @@ public class StockUsageService {
      */
     @Transactional
     public boolean decreaseStockUsage(StockUsageRequest.OfDecreasing ofDecreasing) {
-        Long productId = ofDecreasing.getProductId();
-        Long orderId = ofDecreasing.getOrderId();
-        int quantity = ofDecreasing.getQuantity();
-
-        Long decreaseCount = stockRedisSetOperation.removeStockUsage(new StockUsageDto(productId, orderId, quantity));
+        Long decreaseCount = stockRedisSetOperation.removeStockUsage(
+                new StockUsageDto(ofDecreasing.getProductId(),
+                        ofDecreasing.getOrderDetailId(),
+                        ofDecreasing.getQuantity())
+        );
         if(decreaseCount == 0) {
             return false;
         }

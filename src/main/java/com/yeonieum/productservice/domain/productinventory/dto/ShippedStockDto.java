@@ -12,7 +12,7 @@ import java.util.Objects;
 @Builder
 public class ShippedStockDto implements Serializable {
     private Long productId;
-    private Long orderId;
+    private String orderId;
     private int quantity;
     private LocalDateTime shippedTime;
 

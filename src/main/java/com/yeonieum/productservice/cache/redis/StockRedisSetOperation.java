@@ -150,7 +150,7 @@ public class StockRedisSetOperation {
 
             ShippedStock shippedStock = ShippedStock.builder()
                     .productId(shippedStockDto.getProductId())
-                    .orderId(shippedStockDto.getOrderId())
+                    .orderDetailId(shippedStockDto.getOrderId())
                     .quantity(shippedStockDto.getQuantity())
                     .shippedDateTime(shippedStockDto.getShippedTime())
                     .build();
@@ -158,7 +158,7 @@ public class StockRedisSetOperation {
         } catch (Exception e) {
             // 캐시 삭제 및 데이터 삭제 + 메시지발행
             if(savedEntity != null) {
-                shippedStockRepository.deleteById(savedEntity.getOrderId());
+                shippedStockRepository.deleteById(savedEntity.getOrderDetailId());
                 removeShippedStock(shippedStockDto);
                 // 메시지 발행
             }
@@ -196,14 +196,14 @@ public class StockRedisSetOperation {
             redisTemplate.expire(key,expirationSeconds, TimeUnit.SECONDS);
             stockUsage = StockUsage.builder()
                     .productId(stockUsageDto.getProductId())
-                    .orderId(stockUsageDto.getOrderId())
+                    .orderDetailId(stockUsageDto.getOrderDetailId())
                     .quantity(stockUsageDto.getQuantity())
                     .build();
 
             stockUsageRepository.save(stockUsage);
         } catch (Exception e) {
             if(stockUsage != null) {
-                stockUsageRepository.deleteById(stockUsage.getOrderId());
+                stockUsageRepository.deleteById(stockUsage.getOrderDetailId());
             }
             removeStockUsageOnlyForRedis(stockUsageDto);
         }
@@ -222,7 +222,7 @@ public class StockRedisSetOperation {
             String key = getStockUsageKey(stockUsageDto.getProductId());
             Long popCnt = setOps.remove(key, stockUsageDto);
 
-            stockUsageRepository.deleteById(stockUsageDto.getOrderId());
+            stockUsageRepository.deleteById(stockUsageDto.getOrderDetailId());
             return popCnt;
         } catch(Exception e) {
 

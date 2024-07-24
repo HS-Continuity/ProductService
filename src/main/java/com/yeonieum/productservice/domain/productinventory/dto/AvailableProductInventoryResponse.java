@@ -6,7 +6,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class AvailableProductInventoryResponse {
-    Long orderId;
+    String orderDetailId;
     Long productId;
     int quantity;
     @Builder.Default
