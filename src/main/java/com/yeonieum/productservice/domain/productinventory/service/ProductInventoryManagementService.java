@@ -3,16 +3,16 @@ package com.yeonieum.productservice.domain.productinventory.service;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.productinventory.dto.ProductInventoryManagementRequest;
+import com.yeonieum.productservice.domain.productinventory.dto.ProductInventorySummaryResponse;
 import com.yeonieum.productservice.domain.productinventory.dto.RetrieveProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.entity.ProductInventory;
 import com.yeonieum.productservice.domain.productinventory.repository.ProductInventoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class ProductInventoryManagementService {
      * @param registerDto
      * @return
      */
-    public boolean registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto) {
+    public void registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto) {
         Product product = productRepository.findById(registerDto.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
@@ -39,10 +39,7 @@ public class ProductInventoryManagementService {
                 .expirationDate(registerDto.getExpirationDate())
                 .build();
 
-
-        // 상품의 판매가능(품절, 판매가능) 상태 변경로직 추가예정
         productInventoryRepository.save(productInventory);
-        return true;
     }
 
     /**
@@ -51,13 +48,12 @@ public class ProductInventoryManagementService {
      * @param pageable
      * @return
      */
-    public List<RetrieveProductInventoryResponse> retrieveProductInventories(Long productId, Pageable pageable) {
+    public List<RetrieveProductInventoryResponse> retrieveProductInventorySummary(Long productId, Pageable pageable) {
         // 고객아이디 조회 가능한지 여부 체크 로직 추가
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
         );
 
-        // Pageable pageable = PageRequest.of(0, 10); 서비스레이어에서 처리하는 것이 맞을까, 컨트롤러에서 처리하고 내리는 것이 맞을까 고민해보기
         List<RetrieveProductInventoryResponse> productInventoryList =
                 productInventoryRepository.findAllbyProductId(productId, pageable);
 
@@ -65,31 +61,35 @@ public class ProductInventoryManagementService {
     }
 
     /**
-     * 등록한 상품재고 수정
+     * 등록한 상품재고 수정(폐기 시에도 사용 가능)
      * @param productInventoryId
      * @param modifyDto
      * @return
      */
-    public boolean modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
+    public void modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
         ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품재고가 존재하지 않습니다.")
         );
 
         Product product = productInventory.getProduct();
-        // 고객권한 찾기
         productInventory.changeQuantity(modifyDto.getQuantity());
-        return true;
     }
 
+
     /**
-     * 상품재고 폐기
-     * @param productInventoryId
+     * 고객이 등록한 상품재고 summary 조회(상품별 재고수량 합계 조회)
+      * @return
      */
-    @Transactional
-    public void disposeProductInventory(Long productInventoryId) {
-        ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품재고가 존재하지 않습니다.")
+    public Page<ProductInventorySummaryResponse> retrieveProductInventoryList(Long customerId, Pageable pageable) {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        Page<Object[]> productInventoryPage = productInventoryRepository.findInventorySumByProductsAndExpirations(customerId, today, pageable);
+
+        return productInventoryPage.map(
+                object -> new ProductInventorySummaryResponse(
+                        Long.parseLong(object[0].toString()),
+                        object[1].toString(),
+                        Long.parseLong(object[2].toString())
+                )
         );
-        // 상품재고 상태 속성 테이블에 추가 후 로직 작성
     }
 }
