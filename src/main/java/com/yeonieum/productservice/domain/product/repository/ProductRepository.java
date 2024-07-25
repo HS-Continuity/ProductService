@@ -13,7 +13,7 @@ import com.yeonieum.productservice.global.enums.ActiveStatus;
 import java.util.List;
 import java.util.Optional;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
     @Query("SELECT p FROM Product p " +
             "JOIN FETCH p.productDetailCategory pdc " +
             "JOIN FETCH pdc.productCategory pc " +
@@ -75,4 +75,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT p FROM Product p WHERE p.productName LIKE CONCAT('%', :productName, '%') AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
     List<Product> findByNameContaining(@Param("productName") String productName);
+
+//    @Query("SELECT DISTINCT p FROM Product p JOIN p.productDetailCategory c WHERE (p.productName LIKE CONCAT('%', :keyword, '%') OR c.detailCategoryName LIKE CONCAT('%', :keyword, '%')) AND p.isPageVisibility = com.yeonieum.productservice.global.enums.ActiveStatus.ACTIVE")
+//    Page<Product> findByKeywords(List<String> keywords, Pageable pageable);
+
 }
