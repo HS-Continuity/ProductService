@@ -6,6 +6,7 @@ import com.yeonieum.productservice.domain.category.entity.QProductDetailCategory
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.QProduct;
 
+import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
         // WHERE 절 동적 생성
         BooleanExpression predicate = keywords.stream()
                 .map(k -> product.productName.like("%" + k + "%")
-                        .or(category.detailCategoryName.like("%" + k + "%")))
+                        .or(category.detailCategoryName.like("%" + k + "%"))
+                        .and(product.isPageVisibility.eq(ActiveStatus.ACTIVE)))
                 .reduce(BooleanExpression::or)
                 .orElse(null);
 
