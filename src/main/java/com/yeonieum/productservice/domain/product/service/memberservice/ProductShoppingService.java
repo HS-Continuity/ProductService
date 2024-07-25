@@ -243,5 +243,29 @@ public class ProductShoppingService {
     public void recordSearchKeyword(String keyword) {
         redisTemplate.opsForZSet().incrementScore("tempCurrentSearchRank", keyword, 1); // tempCurrentSearchRank에 점수 1 증가
     }
+
+    /**
+     * 주문서 상품 정보 조회
+     */
+    public ProductShoppingResponse.OfRetrieveOrderInformation retrieveOrderInformation(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다.")
+                );
+
+        return ProductShoppingResponse.OfRetrieveOrderInformation.convertedBy(product);
+    }
+
+    /**
+     * 주문서 상품 정보 벌크 조회
+     * @param productIdList
+     * @return
+     */
+    public List<ProductShoppingResponse.OfRetrieveOrderInformation> retrieveOrderInformation(List<Long> productIdList) {
+        List<Product> productList = productRepository.findAllById(productIdList);
+
+        return productList.stream()
+                .map(ProductShoppingResponse.OfRetrieveOrderInformation::convertedBy)
+                .collect(Collectors.toList());
+    }
 }
 
