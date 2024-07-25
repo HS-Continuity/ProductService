@@ -8,6 +8,7 @@ import com.yeonieum.productservice.domain.category.repository.ProductDetailCateg
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
+import com.yeonieum.productservice.domain.product.repository.ProductRepositoryCustomImpl;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class ProductShoppingService {
     private final ProductDetailCategoryRepository productDetailCategoryRepository;
     private final ProductRepository productRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ProductRepositoryCustomImpl productRepositoryCustomImpl;
 
     /**
      * 카테고리의 상품 목록 조회
@@ -159,50 +161,31 @@ public class ProductShoppingService {
     public Page<ProductShoppingResponse.OfSearchProductInformation> retrieveFilteringProducts(
             String keyword, ActiveStatus isCertification, Pageable pageable) {
 
-        // 모든 검색 결과를 담을 Set
-        Set<Product> allProducts = new HashSet<>();
-
-        // 키워드가 유효한 경우 처리
         if (keyword != null && !keyword.trim().isEmpty()) {
-            // 매칭되는 카테고리를 저장할 Set
-            Set<ProductDetailCategory> matchingCategories = new HashSet<>();
 
-            // 키워드를 분할
+            // 키워드를 띄어쓰기로 분할
             List<String> keywords = splitKeywords(keyword);
 
-            for (String singleKeyword : keywords) {
-                // 각 키워드에 대해 카테고리 검색
-                List<ProductDetailCategory> categories = productDetailCategoryRepository.findByNameContaining(singleKeyword);
-                matchingCategories.addAll(categories);
-
-                // 각 키워드에 대해 상품명 검색
-                List<Product> productsByName = productRepository.findByNameContaining(singleKeyword);
-                allProducts.addAll(productsByName);
-            }
-
-            // 매칭되는 카테고리가 있는 경우, 카테고리 내의 상품을 검색하여 결과에 추가
-            if (!matchingCategories.isEmpty()) {
-                List<Product> productsByCategory = productRepository.findByProductDetailCategoryIn(new ArrayList<>(matchingCategories), pageable).getContent();
-                allProducts.addAll(productsByCategory);
-            }
+            // 모든 키워드에 대해 데이터베이스에서 검색
+            Page<Product> productsPage = productRepositoryCustomImpl.findByKeywords(keywords, pageable);
 
             // 검색 결과가 존재하는 경우에만 검색어 점수 증가
-            if (!allProducts.isEmpty()) {
+            if (productsPage.hasContent()) {
                 keywords.forEach(this::recordSearchKeyword);
             } else {
                 // 검색 결과가 없는 경우 예외를 던짐
                 throw new IllegalStateException(keyword + "에 대한 검색결과가 없습니다. 다른 검색어를 입력해 주세요.");
             }
 
-            // 중복 제거 후 페이징 처리
-            List<Product> distinctProducts = allProducts.stream().distinct().collect(Collectors.toList());
-            return new PageImpl<>(distinctProducts, pageable, distinctProducts.size())
-                    .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
-        }else if (isCertification != null) {
+            return productsPage.map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
+
+        } else if (isCertification != null) {
+
             // 인증 상태만 있는 경우 검색
             return productRepository.findActiveCertifiableProductsByProductId(isCertification, pageable)
                     .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
         } else {
+
             // 키워드와 인증 상태 모두 없는 경우 전체 상품 조회
             return productRepository.findAllByIsActive(pageable)
                     .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
@@ -210,21 +193,12 @@ public class ProductShoppingService {
     }
 
     /**
-     * 입력된 문자열을 공백과 대문자 경계를 기준으로 분할
+     * 입력된 문자열을 공백으로 분할
      * @param keyword 입력 문자열
      * @return 분할된 키워드 리스트
      */
     private List<String> splitKeywords(String keyword) {
-        List<String> result = new ArrayList<>();
-
-        // 입력 문자열을 공백("\\s+")을 기준으로 분할
-        String[] parts = keyword.split("\\s+");
-
-        for (String part : parts) {
-            // 각 파트를 대문자 경계에서 추가로 분할 (예: "StockMarket" -> "Stock", "Market")
-            result.addAll(Arrays.asList(part.split("(?<=.)(?=\\p{Lu})")));
-        }
-        return result;
+        return List.of(keyword.split("\\s+")); // 공백을 기준으로 키워드 분할
     }
 
     /**
