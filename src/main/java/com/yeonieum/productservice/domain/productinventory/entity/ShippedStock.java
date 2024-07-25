@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "shipped_stock")
 public class ShippedStock {
     @Id
-    @Column(name = "order_id", nullable = false)
+    @Column(name = "order_detail_id", nullable = false)
     private String orderDetailId;
     @Column(name = "product_id", nullable = false)
     private Long productId;

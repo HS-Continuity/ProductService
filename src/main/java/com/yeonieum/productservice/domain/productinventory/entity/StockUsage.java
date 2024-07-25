@@ -14,7 +14,7 @@ import lombok.*;
 @Table(name = "stock_usage")
 public class StockUsage {
     @Id
-    @Column(name = "order_id", nullable = false)
+    @Column(name = "order_detail_id", nullable = false)
     private String orderDetailId;
     @Column(name = "product_id", nullable = false)
     private Long productId;
