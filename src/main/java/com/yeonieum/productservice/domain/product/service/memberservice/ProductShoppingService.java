@@ -198,17 +198,15 @@ public class ProductShoppingService {
             List<Product> distinctProducts = allProducts.stream().distinct().collect(Collectors.toList());
             return new PageImpl<>(distinctProducts, pageable, distinctProducts.size())
                     .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
-        }
-
-        // 키워드가 없고 인증 상태만 있는 경우, 인증 상태에 따라 검색
-        if (isCertification != null) {
+        }else if (isCertification != null) {
+            // 인증 상태만 있는 경우 검색
             return productRepository.findActiveCertifiableProductsByProductId(isCertification, pageable)
                     .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
+        } else {
+            // 키워드와 인증 상태 모두 없는 경우 전체 상품 조회
+            return productRepository.findAllByIsActive(pageable)
+                    .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
         }
-
-        // 키워드와 인증 상태 모두 없는 경우 전체 상품 조회
-        return productRepository.findAllByIsActive(pageable)
-                .map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);
     }
 
     /**
