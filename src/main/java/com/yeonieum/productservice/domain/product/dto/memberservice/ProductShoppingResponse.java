@@ -161,12 +161,14 @@ public class ProductShoppingResponse {
         Long productId;
         String productName;
         String productImage;
+        String storeName;
 
         public static OfRetrieveOrderInformation convertedBy(Product product) {
             return OfRetrieveOrderInformation.builder()
                     .productId(product.getProductId())
                     .productName(product.getProductName())
                     .productImage(product.getProductImage())
+                    .storeName(product.getCustomer().getStoreName())
                     .build();
         }
     }
