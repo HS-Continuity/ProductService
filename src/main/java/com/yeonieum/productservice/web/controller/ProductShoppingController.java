@@ -162,4 +162,26 @@ public class ProductShoppingController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    @GetMapping("/order/{productId}")
+    public ResponseEntity<ApiResponse> retrieveOrderProductInformation(@PathVariable Long productId) {
+        ProductShoppingResponse.OfRetrieveOrderInformation orderProductInformation =
+                productShoppingService.retrieveOrderInformation(productId);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(orderProductInformation)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
+
+    @GetMapping("/order/{productIdList}")
+    public ResponseEntity<ApiResponse> retrieveOrderProductInformation(@PathVariable List<Long> productIdList) {
+        List<ProductShoppingResponse.OfRetrieveOrderInformation> orderProductInformation =
+                productShoppingService.retrieveOrderInformation(productIdList);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(orderProductInformation)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }
