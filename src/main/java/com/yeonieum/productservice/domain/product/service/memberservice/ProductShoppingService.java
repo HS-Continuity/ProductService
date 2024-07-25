@@ -248,10 +248,7 @@ public class ProductShoppingService {
      * 주문서 상품 정보 조회
      */
     public ProductShoppingResponse.OfRetrieveOrderInformation retrieveOrderInformation(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다.")
-                );
-
+        Product product = productRepository.findByIdInWithCustomer(productId);
         return ProductShoppingResponse.OfRetrieveOrderInformation.convertedBy(product);
     }
 
@@ -261,7 +258,7 @@ public class ProductShoppingService {
      * @return
      */
     public List<ProductShoppingResponse.OfRetrieveOrderInformation> retrieveOrderInformation(List<Long> productIdList) {
-        List<Product> productList = productRepository.findAllById(productIdList);
+        List<Product> productList = productRepository.findAllByIdInWithCustomer(productIdList);
 
         return productList.stream()
                 .map(ProductShoppingResponse.OfRetrieveOrderInformation::convertedBy)
