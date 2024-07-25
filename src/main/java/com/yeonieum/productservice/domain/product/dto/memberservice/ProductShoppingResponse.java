@@ -153,4 +153,21 @@ public class ProductShoppingResponse {
         private long searchScore;
         private int rankChange; // 이전 검색어 순위와 비교하여 상승하거나 떨어진 순위 값
     }
+
+
+    @Getter
+    @Builder
+    public static class OfRetrieveOrderInformation {
+        Long productId;
+        String productName;
+        String productImage;
+
+        public static OfRetrieveOrderInformation convertedBy(Product product) {
+            return OfRetrieveOrderInformation.builder()
+                    .productId(product.getProductId())
+                    .productName(product.getProductName())
+                    .productImage(product.getProductImage())
+                    .build();
+        }
+    }
 }

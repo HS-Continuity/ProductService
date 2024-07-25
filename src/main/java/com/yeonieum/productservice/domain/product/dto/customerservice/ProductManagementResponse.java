@@ -15,7 +15,7 @@ public class ProductManagementResponse {
         private String productName;
         private String name;
         private int originPrice;
-        private int regularDiscountRate;
+        private int regularPrice;
         private double finalPrice;
         private int quantity;
         @Builder.Default
@@ -31,8 +31,8 @@ public class ProductManagementResponse {
                     .productName(product.getProductName())
                     .name(product.getProductName())
                     .originPrice(product.getProductPrice())
-                    .regularDiscountRate(product.getRegularDiscountRate())
-                    .finalPrice(quantity * product.getProductPrice() * product.getRegularDiscountRate())
+                    .regularPrice(product.getCalculatedRegularPrice())
+                    .finalPrice(product.getCalculatedRegularPrice())
                     .quantity(quantity)
                     .build();
         }
