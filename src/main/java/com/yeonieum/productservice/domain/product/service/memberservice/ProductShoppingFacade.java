@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,10 +42,11 @@ public class ProductShoppingFacade {
                                         return dto.getProductId();
                                     }).collect(Collectors.toList());
 
-        List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+        Map<Long, Boolean> isSoldOutMap = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
 
         for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
-            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
+            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId()));
+            //isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId());
         }
 
         return retrieveCategoryWithProducts;
@@ -67,9 +69,11 @@ public class ProductShoppingFacade {
         List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> {
                     return dto.getProductId();
                 }).collect(Collectors.toList());
-        List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+        Map<Long, Boolean> isSoldOutMap = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+
         for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
-            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
+            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId()));
+            //isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId());
         }
         return retrieveDetailCategoryWithProducts;
     }
@@ -90,10 +94,11 @@ public class ProductShoppingFacade {
         List<Long> productIdList = searchProductInformationDtoList.stream().map(dto -> dto.getProductId())
                 .collect(Collectors.toList());
 
-        List<Boolean> isSoldOutList = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
+        Map<Long, Boolean> isSoldOutMap = stockSystemService.bulkCheckAvailableOrderProduct(productIdList);
 
         for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
-            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
+            searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId()));
+            //isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId());
         }
 
         return retrieveKeywordWithProducts;
