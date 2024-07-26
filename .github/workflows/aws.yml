@@ -4,6 +4,7 @@ on:
   push:
     branches: [ "KAN-543--test/상품서비스-자동배포-테스트" ]
 
+
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: t4-productservice-ecr
