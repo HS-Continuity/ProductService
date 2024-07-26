@@ -34,15 +34,15 @@ public class ProductInventoryController {
 
     @Role(role = {"ROLE_ADMIN", "ROLE_MEMBER"}, url = "/api/inventory/stock-usage", method = "POST")
     @PostMapping("/stock-usage")
-    public AvailableProductInventoryResponseList getAvailableOrderProduct(@RequestBody StockUsageRequest.IncreaseStockUsageList increaseStockUsageListDtoList) {
+    public ResponseEntity<AvailableProductInventoryResponseList> getAvailableOrderProduct(@RequestBody StockUsageRequest.IncreaseStockUsageList increaseStockUsageListDtoList) {
         List<AvailableProductInventoryResponse> responseList = new ArrayList<>();
         for(StockUsageRequest.OfIncreasing ofIncreasing : increaseStockUsageListDtoList.getOfIncreasingList()) {
             AvailableProductInventoryResponse response = stockSystemService.processProductInventory(ofIncreasing);
             responseList.add(response);
         }
-        return AvailableProductInventoryResponseList.builder()
+        return ResponseEntity.ok(AvailableProductInventoryResponseList.builder()
                 .availableProductInventoryResponseList(responseList)
-                .build();
+                .build());
     }
 
     @PostMapping("/regular-order/stock-usage")
