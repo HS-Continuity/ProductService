@@ -9,7 +9,7 @@ env:
   ECR_REPOSITORY: t4-productservice-ecr
   ECS_SERVICE: t4-back-product-service
   ECS_CLUSTER: t4-back-cluster
-  ECS_TASK_DEFINITION: t4-productservice-task-definition:1.json
+  ECS_TASK_DEFINITION: t4-productservice-task-definition.json
   CONTAINER_NAME: t4-productservice-container
 
 permissions:
