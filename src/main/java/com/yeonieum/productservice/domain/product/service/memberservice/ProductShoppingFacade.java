@@ -3,6 +3,8 @@ package com.yeonieum.productservice.domain.product.service.memberservice;
 import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.cart.service.CartProductService;
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
+import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,7 @@ public class ProductShoppingFacade {
     private final StockSystemService stockSystemService;
     private final ProductShoppingService productShoppingService;
     private final CartProductService cartProductService;
+    private final ProductRepository productRepository;
 
     /**
      * 카테고리의 상품 목록 조회
@@ -72,6 +75,27 @@ public class ProductShoppingFacade {
             searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutList.get(i));
         }
         return retrieveDetailCategoryWithProducts;
+    }
+
+    /**
+     * 상품 상세 정보 조회
+     * @param productId 상품 ID
+     * @throws IllegalArgumentException 상품 ID가 존재하지 않는 경우
+     * @return 상품의 상세 정보
+     */
+    @Transactional
+    public ProductShoppingResponse.OfDetailProductInformation detailProductInformation(Long productId){
+
+        // 상품 정보를 조회, 존재하지 않을 경우 예외 발생
+        Product targetProduct = productRepository.findByIdAndIsActive(productId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
+
+        ProductShoppingResponse.OfDetailProductInformation detailProductInformation =
+                ProductShoppingResponse.OfDetailProductInformation.convertedBy(targetProduct);
+
+        detailProductInformation.changeIsSoldOut(!stockSystemService.checkAvailableOrderProduct(detailProductInformation.getProductId()));
+
+        return detailProductInformation;
     }
 
     /**
