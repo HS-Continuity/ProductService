@@ -121,6 +121,12 @@ public class ProductShoppingResponse {
         private ActiveStatus isCertification;
         private Integer reviewCount;
         private Double averageScore;
+        @Builder.Default
+        private boolean isSoldOut = false;
+
+        public void changeIsSoldOut(boolean isSoldOut){
+            this.isSoldOut = isSoldOut;
+        }
 
         public static OfDetailProductInformation convertedBy(Product product) {
             return OfDetailProductInformation.builder()
