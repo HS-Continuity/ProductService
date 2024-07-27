@@ -270,20 +270,24 @@ public class StockRedisSetOperation {
         }
     }
 
-    public List<Integer> bulkTotalStockUsageCount(List<Long> productIdList) {
+    public Map<Long, Integer> bulkTotalStockUsageCount(List<Long> productIdList) {
         try {
             List<Integer> orderPendingAmountList = new ArrayList<>();
+            Map<Long, Integer> orderPendingAmountMap = new HashMap();
             List<Set<Object>> setList = bulkGetProductStock(productIdList);
             for(Set<Object> set : setList) {
                 int orderPendingAmount = 0;
+                Long productId = null;
                 for (Object stock : set) {
                     ObjectMapper objectMapper = new ObjectMapper();
                     StockUsageDto stockUsageDto = objectMapper.convertValue(stock, StockUsageDto.class);
+                    productId = stockUsageDto.getProductId();
                     orderPendingAmount += stockUsageDto.getQuantity();
                 }
+                orderPendingAmountMap.put(productId, orderPendingAmount);
                 orderPendingAmountList.add(orderPendingAmount);
             }
-            return orderPendingAmountList;
+            return orderPendingAmountMap;
         }catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException();

@@ -19,7 +19,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -76,19 +78,27 @@ public class StockSystemService {
     }
 
     @Transactional(readOnly = true)
-    public List<Boolean> bulkCheckAvailableOrderProduct(List<Long> productIdList) {
+    public Map<Long, Boolean> bulkCheckAvailableOrderProduct(List<Long> productIdList) {
         List<Boolean> resultList = new ArrayList<>();
-        List<Integer> available = bulkRetrieveProductStockAmount(productIdList);
-        List<Integer> totalStockUsage = stockRedisSetOperation.bulkTotalStockUsageCount(productIdList);
+        Map<Long, Boolean> resultMap = new HashMap<>();
+        Map<Long, Integer> availableMap = bulkRetrieveProductStockAmount(productIdList);
+        Map<Long, Integer> totalStockUsage = stockRedisSetOperation.bulkTotalStockUsageCount(productIdList);
 
-        for(int i = 0; i < productIdList.size(); i++) {
-            if(available.get(i) == null) {
-                resultList.add(false);
-            }else
-            resultList.add(available.get(i) > totalStockUsage.get(i));
+        for(Long productId : productIdList) {
+            Integer available = availableMap.getOrDefault(productId, 0);
+            Integer usage = totalStockUsage.getOrDefault(productId, 0);
+
+            resultMap.put(productId, available > usage);
         }
+//        for(int i = 0; i < productIdList.size(); i++) {
+//            System.out.println("available.get(i) : " + available.get(i));
+//            if(available.get(i) == null) {
+//                resultList.add(false);
+//            }else
+//            resultList.add(available.get(i) > totalStockUsage.get(i));
+//        }
 
-        return resultList;
+        return resultMap;
     }
 
     public int retrieveProductStockAmount(Long productId) {
@@ -132,11 +142,12 @@ public class StockSystemService {
     }
 
 
-    public List<Integer> bulkRetrieveProductStockAmount(List<Long> productId) {
+    public Map<Long, Integer> bulkRetrieveProductStockAmount(List<Long> productId) {
         try {
             List<Integer> respList = new ArrayList<>();
             List<Product> productList = productRepository.findAllById(productId);
             List<LocalDate> expirationDateList = new ArrayList<>();
+            Map<Long, Integer> productStockMap = new HashMap();
             for(Product product : productList) {
                 // 당일출고 기준시간 (조회해야함)
                 int shippingCutoffTime = 14;
@@ -164,10 +175,11 @@ public class StockSystemService {
                 } else {
                     resp = result;
                 }
-
+                productStockMap.put(product.getProductId(), resp);
                 respList.add(resp);
             }
-            return respList;
+            //return respList;
+            return productStockMap;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
