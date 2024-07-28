@@ -13,10 +13,11 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Component
 public class UserContext {
-    public static final String TRANSACTION_ID = "transaction-id";
-    public static final String AUTH_TOKEN = "auth-token";
-    public static final String USER_ID = "user-id";
-    public static final String SERVICE_ID = "service-id";
+    public static final String TRANSACTION_ID = "transactionId";
+    public static final String AUTH_TOKEN = "Authorization";
+    public static final String USER_ID = "userId";
+    public static final String UNIQUE_ID = "uniqueId";
+    public static final String SERVICE_ID = "serviceId";
 
     @Builder.Default
     private String transactionId = new String();
@@ -26,4 +27,6 @@ public class UserContext {
     private String userId = new String();
     @Builder.Default
     private String serviceId = new String();
+    @Builder.Default
+    private String uniqueId = new String();
 }

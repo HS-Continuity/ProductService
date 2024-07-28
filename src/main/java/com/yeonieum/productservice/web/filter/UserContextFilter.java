@@ -14,12 +14,13 @@ public class UserContextFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-
+        System.out.println(httpServletRequest.getHeader(UserContext.AUTH_TOKEN));
         UserContextHolder.getContext().builder()
                         .authToken(httpServletRequest.getHeader(UserContext.AUTH_TOKEN))
                         .transactionId(httpServletRequest.getHeader(UserContext.TRANSACTION_ID))
                         .userId(httpServletRequest.getHeader(UserContext.USER_ID))
                         .serviceId(httpServletRequest.getHeader(UserContext.SERVICE_ID))
+                        .uniqueId(httpServletRequest.getHeader(UserContext.UNIQUE_ID))
                         .build();
         chain.doFilter(request, response);
     }
