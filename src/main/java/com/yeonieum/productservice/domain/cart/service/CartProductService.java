@@ -146,4 +146,14 @@ public class CartProductService {
     public Long CountCartProduct(String memberId, Long cartTypeId) {
         return cartProductRepository.countByMemberIdAndOptionalCartTypeId(memberId, cartTypeId);
     }
+
+
+    /**
+     * 회원의 장바구니 상품 일괄 삭제
+     * @param memberId
+     */
+    @Transactional
+    public void deleteCartProductByMemberId(String memberId, Long cartTypeId) {
+        cartProductRepository.deleteByMemberIdAndCartType(memberId, cartTypeId);
+    }
 }
