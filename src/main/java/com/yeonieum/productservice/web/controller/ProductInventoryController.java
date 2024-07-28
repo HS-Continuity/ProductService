@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.web.controller;
 
+import com.amazonaws.services.ec2.model.LocalGateway;
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementResponse;
 import com.yeonieum.productservice.domain.product.service.customerservice.ProductManagementService;
 import com.yeonieum.productservice.domain.productinventory.dto.ProductInventoryManagementRequest;
@@ -10,6 +11,7 @@ import com.yeonieum.productservice.domain.productinventory.service.StockSystemSe
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.Builder;
@@ -67,7 +69,8 @@ public class ProductInventoryController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/inventory", method = "POST")
     @PostMapping
     public ResponseEntity<ApiResponse> registerProductInventory(@RequestBody ProductInventoryManagementRequest.RegisterDto registerDto) {
-        productInventoryManagementService.registerProductInventory(registerDto);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        productInventoryManagementService.registerProductInventory(registerDto, customer);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.INSERT_SUCCESS)
@@ -85,9 +88,9 @@ public class ProductInventoryController {
                                                                   @RequestParam(defaultValue = "0") int startPage,
                                                                   @RequestParam(defaultValue = "10") int pageSize) {
         Pageable pageable = PageRequest.of(startPage, pageSize);
-
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(productInventoryManagementService.retrieveProductInventorySummary(productId, pageable))
+                .result(productInventoryManagementService.retrieveProductInventorySummary(productId, customer ,pageable))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
@@ -102,7 +105,8 @@ public class ProductInventoryController {
     @PutMapping("/{productInventoryId}")
     public ResponseEntity<ApiResponse> modifyProductInventory(@PathVariable Long productInventoryId,
                                                               @RequestBody ProductInventoryManagementRequest.ModifyDto modifyDto) {
-        productInventoryManagementService.modifyProductInventory(productInventoryId, modifyDto);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        productInventoryManagementService.modifyProductInventory(productInventoryId, modifyDto, customer);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.UPDATE_SUCCESS)
@@ -122,8 +126,9 @@ public class ProductInventoryController {
                                                                        @RequestParam(defaultValue = "0") int startPage,
                                                                        @RequestParam(defaultValue = "10") int pageSize) {
         Pageable pageable = PageRequest.of(startPage, pageSize);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(productInventoryManagementService.retrieveProductInventorySummary(customerId, pageable))
+                .result(productInventoryManagementService.retrieveProductInventoryList(customer, pageable))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }

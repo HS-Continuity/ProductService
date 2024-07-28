@@ -84,4 +84,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.customer WHERE p.productId = :productId")
     Product findByIdInWithCustomer(@Param("productId") Long productId);
 
+    Product findByProductIdAndCustomer_CustomerId(Long productId, Long customerId);
+
+
 }

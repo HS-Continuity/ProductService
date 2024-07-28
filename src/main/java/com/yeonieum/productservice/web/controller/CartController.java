@@ -7,6 +7,7 @@ import com.yeonieum.productservice.domain.product.service.memberservice.ProductS
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,8 @@ public class CartController {
     @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product", method = "POST")
     @PostMapping
     public ResponseEntity<ApiResponse> registerCartProduct(@RequestBody CartProductRequest.OfRegisterProductCart ofRegisterProductCart) {
-
-        cartProductService.registerCartProduct(ofRegisterProductCart);
+        String memberId = UserContextHolder.getContext().getUserId();
+        cartProductService.registerCartProduct(ofRegisterProductCart, memberId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -51,8 +52,8 @@ public class CartController {
     public ResponseEntity<ApiResponse> retrieveAllCartProducts(
             @RequestParam("memberId") String memberId,
             @RequestParam("cartTypeId") Long cartTypeId) {
-
-        List<CartProductResponse.OfRetrieveCartProduct> ofRetrieveCartProducts = productShoppingFacade.retrieveAllCartProducts(memberId, cartTypeId);
+        String member = UserContextHolder.getContext().getUserId();
+        List<CartProductResponse.OfRetrieveCartProduct> ofRetrieveCartProducts = productShoppingFacade.retrieveAllCartProducts(member, cartTypeId);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(ofRetrieveCartProducts)
                 .successCode(SuccessCode.SELECT_SUCCESS)
@@ -67,7 +68,8 @@ public class CartController {
     @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/{cartProductId}", method = "DELETE")
     @DeleteMapping("/{cartProductId}")
     public ResponseEntity<ApiResponse> deleteCartProduct(@PathVariable("cartProductId") Long cartProductId) {
-        cartProductService.deleteCartProduct(cartProductId);
+        String member = UserContextHolder.getContext().getUserId();
+        cartProductService.deleteCartProduct(cartProductId, member);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -83,8 +85,8 @@ public class CartController {
     @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/quantity/{cartProductId}/increment", method = "PUT")
     @PutMapping("/quantity/{cartProductId}/increment")
     public ResponseEntity<ApiResponse> increaseProductQuantity(@PathVariable("cartProductId") Long cartProductId) {
-
-        cartProductService.modifyProductQuantity(cartProductId, 1);
+        String member = UserContextHolder.getContext().getUserId();
+        cartProductService.modifyProductQuantity(cartProductId,member ,1);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -100,8 +102,8 @@ public class CartController {
     @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/quantity/{cartProductId}/decrement", method = "PUT")
     @PutMapping("/quantity/{cartProductId}/decrement")
     public ResponseEntity<ApiResponse> decreaseProductQuantity(@PathVariable("cartProductId") Long cartProductId) {
-
-        cartProductService.modifyProductQuantity(cartProductId, -1);
+        String member = UserContextHolder.getContext().getUserId();
+        cartProductService.modifyProductQuantity(cartProductId, member ,-1);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -119,8 +121,8 @@ public class CartController {
     public ResponseEntity<ApiResponse> countCartProduct(
             @RequestParam("memberId") String memberId,
             @RequestParam(value = "cartTypeId", required = false) Long cartTypeId) {
-
-        Long countCartProduct = cartProductService.CountCartProduct(memberId, cartTypeId);
+        String member = UserContextHolder.getContext().getUserId();
+        Long countCartProduct = cartProductService.CountCartProduct(member, cartTypeId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(countCartProduct)
@@ -135,10 +137,11 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 일괄 삭제 실패")
     })
     @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/bulk", method = "DELETE")
-    @DeleteMapping
-    public ResponseEntity<ApiResponse> deleteAllCartProduct(@RequestParam("cartTypeId") Long cartTypeId) {
+    @DeleteMapping("/bulk")
+    public ResponseEntity<ApiResponse> deleteAllCartProduct(@RequestParam("cartTypeId") Long cartTypeId, @RequestParam("cartIds") List<Long> cartIds) {
         String memberId = "qwe123"; // 컨텍스트 예정
-        cartProductService.deleteCartProductByMemberId(memberId, cartTypeId);
+        String member = UserContextHolder.getContext().getUserId();
+        cartProductService.deleteCartProductByMemberId(memberId, cartTypeId, cartIds);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)

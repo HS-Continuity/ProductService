@@ -7,6 +7,7 @@ import com.yeonieum.productservice.domain.product.service.customerservice.Timesa
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class TimesaleController {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse> getTimesale() {
         Long customerId = 1L;
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUserId());
         List<TimesaleResponseForCustomer.OfRetrieve> customersTimesaleList = timesaleManagementService.retrieveTimesaleProducts(customerId);
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -53,7 +55,8 @@ public class TimesaleController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale", method = "POST")
     @PostMapping
     public ResponseEntity<ApiResponse> registerTimesale(@RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) {
-        timesaleManagementService.registerTimesale(registerRequest);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUserId());
+        timesaleManagementService.registerTimesale(registerRequest, customer);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -69,7 +72,8 @@ public class TimesaleController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale/{timesaleId}", method = "GET")
     @GetMapping("/{timesaleId}")
     public ResponseEntity<ApiResponse> getTimesaleProduct(@PathVariable Long timesaleId) {
-        TimesaleResponseForCustomer.OfRetrieve timesaleRespone = timesaleManagementService.retrieveCustomersTimesale(timesaleId);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUserId());
+        TimesaleResponseForCustomer.OfRetrieve timesaleRespone = timesaleManagementService.retrieveCustomersTimesale(timesaleId, customer);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(timesaleRespone)
@@ -86,7 +90,8 @@ public class TimesaleController {
     @PatchMapping("/{timesaleId}/cancel")
     public ResponseEntity<ApiResponse> updateTimesaleProduct(@PathVariable Long timesaleId) {
         // 타임세일 신청 취소
-        timesaleManagementService.cancelTimesale(timesaleId);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUserId());
+        timesaleManagementService.cancelTimesale(timesaleId, customer);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.UPDATE_SUCCESS)

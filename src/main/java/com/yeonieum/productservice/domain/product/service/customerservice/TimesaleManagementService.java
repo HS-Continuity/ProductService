@@ -56,8 +56,15 @@ public class TimesaleManagementService {
      * @return
      */
     @Transactional
-    public TimesaleResponseForCustomer.OfRetrieve retrieveCustomersTimesale(Long timesaleId) {
+    public TimesaleResponseForCustomer.OfRetrieve retrieveCustomersTimesale(Long timesaleId, Long customerId) {
         ProductTimesale productTimesale = productTimesaleRepository.findByIdWithProduct(timesaleId);
+        if(productTimesale == null) {
+            throw new IllegalArgumentException("존재하지 않는 타임세일입니다.");
+        }
+        Product product = productTimesale.getProduct();
+        if (product == null || product.getCustomer().getCustomerId() != customerId) {
+            throw new IllegalArgumentException("존재하지 않는 상품입니다.");
+        }
         return TimesaleResponseForCustomer.OfRetrieve.convertedBy(productTimesale);
     }
 
@@ -68,9 +75,11 @@ public class TimesaleManagementService {
      * @return
      */
     @Transactional
-    public void registerTimesale(TimesaleRequestForCustomer.OfRegister registerRequest) {
-        Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+    public void registerTimesale(TimesaleRequestForCustomer.OfRegister registerRequest, Long customerId) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
+        if (product == null) {
+            throw new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.");
+        }
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductTimesale productTimesale = registerRequest.toEntity(product, status);
@@ -85,9 +94,16 @@ public class TimesaleManagementService {
      * @param timesaleId
      */
     @Transactional
-    public void cancelTimesale(Long timesaleId) {
-        ProductTimesale productTimesale = productTimesaleRepository.findById(timesaleId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 타임세일입니다."));
+    public void cancelTimesale(Long timesaleId, Long customerId) {
+        ProductTimesale productTimesale = productTimesaleRepository.findByIdWithProduct(timesaleId);
+        if(productTimesale == null) {
+            throw new IllegalArgumentException("존재하지 않는 타임세일입니다.");
+        }
+
+        Product product = productTimesale.getProduct();
+        if (product == null || product.getCustomer().getCustomerId() != customerId) {
+            throw new IllegalArgumentException("존재하지 않는 상품입니다.");
+        }
 
         if(productTimesale.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
             throw new IllegalArgumentException("취소할 수 없는 상태입니다.");

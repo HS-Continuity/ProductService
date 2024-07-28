@@ -27,10 +27,12 @@ public class ProductInventoryManagementService {
      * @param registerDto
      * @return
      */
-    public void registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto) {
-        Product product = productRepository.findById(registerDto.getProductId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
-        );
+    public void registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto, Long customerId) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerDto.getProductId(), customerId);
+        if(product == null) {
+            throw new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.");
+        }
+
         // 출고가능한 유효기간만 입력할 수 있도록 체크하는 로직 추가 예정
         ProductInventory productInventory = ProductInventory.builder()
                 .product(product)
@@ -48,11 +50,13 @@ public class ProductInventoryManagementService {
      * @param pageable
      * @return
      */
-    public List<RetrieveProductInventoryResponse> retrieveProductInventorySummary(Long productId, Pageable pageable) {
+    public List<RetrieveProductInventoryResponse> retrieveProductInventorySummary(Long productId, Long customerId, Pageable pageable) {
         // 고객아이디 조회 가능한지 여부 체크 로직 추가
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
-        );
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(productId, customerId);
+        if(product == null) {
+            throw new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.");
+        }
+
 
         List<RetrieveProductInventoryResponse> productInventoryList =
                 productInventoryRepository.findAllbyProductId(productId, pageable);
@@ -66,12 +70,16 @@ public class ProductInventoryManagementService {
      * @param modifyDto
      * @return
      */
-    public void modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
+    public void modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto, Long customerId) {
         ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품재고가 존재하지 않습니다.")
         );
 
         Product product = productInventory.getProduct();
+        if(product == null || product.getCustomer().getCustomerId() !=customerId) {
+            throw new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.");
+        }
+
         productInventory.changeQuantity(modifyDto.getQuantity());
     }
 

@@ -53,10 +53,11 @@ public class AdvertisementManagementService {
      * @return
      */
     @Transactional
-    public void registerAdvertisement(AdvertisementRequest.OfRegister registerRequest) {
-        Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
-        );
+    public void registerAdvertisement(AdvertisementRequest.OfRegister registerRequest, Long customerId) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
+        if(product == null) {
+            throw new IllegalArgumentException("해당 상품이 존재하지 않습니다.");
+        }
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductAdvertisementService productAdvertisement = registerRequest.toEntity(product, status);
