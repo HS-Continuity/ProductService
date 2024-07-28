@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.yeonieum.productservice.domain.cart.exception.CartExceptionCode.CART_NOT_FOUND;
+import static com.yeonieum.productservice.domain.cart.exception.CartExceptionCode.CART_TYPE_NOT_FOUND;
+import static com.yeonieum.productservice.domain.cart.exception.CartExceptionCode.QUANTITY_BELOW_MINIMUM;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class CartProductService {
      * 장바구니에 상품 등록
      * @param ofRegisterProductCart 장바구니에 등록할 상품 정보 DTO
      * @throws IllegalStateException 존재하지 않는 상품 ID인 경우 발생
-     * @throws IllegalStateException 존재하지 않는 장바구니 타입 ID인 경우 발생
+     * @throws CartException 존재하지 않는 장바구니 타입 ID인 경우 발생
      * @return 성공여부
      */
     @Transactional
@@ -42,7 +44,7 @@ public class CartProductService {
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 상품 ID 입니다."));
 
         CartType cartType = cartTypeRepository.findById(ofRegisterProductCart.getCartTypeId())
-                .orElseThrow(() -> new CartException(CART_NOT_FOUND, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CartException(CART_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(ofRegisterProductCart.getMemberId(), ofRegisterProductCart.getCartTypeId());
 
@@ -113,7 +115,7 @@ public class CartProductService {
             cartProductRepository.deleteById(cartProductId);
             return true;
         } else {
-            throw new IllegalArgumentException("존재하지 않는 장바구니 ID 입니다.");
+            throw new CartException(CART_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -121,19 +123,20 @@ public class CartProductService {
      * 장바구니 상품 개수 조절
      * @param cartProductId 장바구니 상품 ID
      * @param quantityDelta 수량 증감 값 (양수이면 증가, 음수이면 감소)
-     * @throws IllegalStateException 존재하지 않는 장바구니 ID인 경우
+     * @throws CartException 존재하지 않는 장바구니 ID인 경우
+     * @throws CartException 상품 수량을 1개 미만으로 설정하려고 할 때
      * @return 성공 여부
      */
     @Transactional
     public boolean modifyProductQuantity(Long cartProductId, int quantityDelta) {
         CartProduct cartProduct = cartProductRepository.findById(cartProductId)
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 장바구니 ID 입니다."));
+                .orElseThrow(() -> new CartException(CART_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         int newQuantity = cartProduct.getQuantity() + quantityDelta;
 
         // 수량이 0 이하가 되지 않도록 제한
         if (newQuantity < 1) {
-            throw new IllegalStateException("상품 수량은 1개 이상이어야 합니다.");
+            throw new CartException(QUANTITY_BELOW_MINIMUM, HttpStatus.BAD_REQUEST);
         }
 
         cartProduct.changeProductQuantity(newQuantity);
