@@ -5,7 +5,6 @@ import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.cart.entity.CartProduct;
 import com.yeonieum.productservice.domain.cart.entity.CartType;
 import com.yeonieum.productservice.domain.cart.exception.CartException;
-import com.yeonieum.productservice.domain.cart.exception.CartExceptionCode;
 import com.yeonieum.productservice.domain.cart.repository.CartProductRepository;
 import com.yeonieum.productservice.domain.cart.repository.CartTypeRepository;
 import com.yeonieum.productservice.domain.product.entity.Product;
