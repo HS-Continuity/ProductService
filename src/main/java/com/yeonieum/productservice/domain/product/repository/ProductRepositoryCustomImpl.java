@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.domain.product.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yeonieum.productservice.domain.category.entity.QProductDetailCategory;
@@ -21,12 +22,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
-    @PersistenceContext
-    private EntityManager em;
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public Page<Product> findByKeywords(List<String> keywords, Pageable pageable) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
         QProduct product = QProduct.product;
         QProductDetailCategory category = QProductDetailCategory.productDetailCategory;
 
@@ -54,5 +54,55 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
         long total = query.fetchCount();
 
         return new PageImpl<>(productList, pageable, total);
+    }
+
+    @Override
+    public Page<Product> findProductsByCriteria(Long customerId, ActiveStatus isEcoFriend, String productName, String description, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable) {
+        QProduct product = QProduct.product;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(product.customer.customerId.eq(customerId));
+
+        if (isEcoFriend != null) {
+            builder.and(product.isCertification.eq(isEcoFriend));
+        }
+        if (productName != null) {
+            builder.and(product.productName.eq(productName));
+        }
+        if (description != null) {
+            builder.and(product.productDescription.eq(description));
+        }
+        if (origin != null) {
+            builder.and(product.productOrigin.eq(origin));
+        }
+        if (price != null) {
+            builder.and(product.productPrice.eq(price));
+        }
+        if (isPageVisibility != null) {
+            builder.and(product.isPageVisibility.eq(isPageVisibility));
+        }
+        if (isRegularSale != null) {
+            builder.and(product.isRegularSale.eq(isRegularSale));
+        }
+        if (baseDiscountRate != null) {
+            builder.and(product.baseDiscountRate.eq(baseDiscountRate));
+        }
+        if (regularDiscountRate != null) {
+            builder.and(product.regularDiscountRate.eq(regularDiscountRate));
+        }
+
+        List<Product> results = queryFactory
+                .selectFrom(product)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(product)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
     }
 }
