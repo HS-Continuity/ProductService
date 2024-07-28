@@ -4,16 +4,21 @@ import com.yeonieum.productservice.domain.cart.dto.CartProductRequest;
 import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.cart.entity.CartProduct;
 import com.yeonieum.productservice.domain.cart.entity.CartType;
+import com.yeonieum.productservice.domain.cart.exception.CartException;
+import com.yeonieum.productservice.domain.cart.exception.CartExceptionCode;
 import com.yeonieum.productservice.domain.cart.repository.CartProductRepository;
 import com.yeonieum.productservice.domain.cart.repository.CartTypeRepository;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.yeonieum.productservice.domain.cart.exception.CartExceptionCode.CART_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +42,7 @@ public class CartProductService {
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 상품 ID 입니다."));
 
         CartType cartType = cartTypeRepository.findById(ofRegisterProductCart.getCartTypeId())
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 장바구니타입 ID 입니다."));
+                .orElseThrow(() -> new CartException(CART_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(ofRegisterProductCart.getMemberId(), ofRegisterProductCart.getCartTypeId());
 
