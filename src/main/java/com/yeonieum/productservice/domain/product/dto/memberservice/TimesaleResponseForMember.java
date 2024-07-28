@@ -1,7 +1,6 @@
 package com.yeonieum.productservice.domain.product.dto.memberservice;
 
 import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
-import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,6 +11,7 @@ public class TimesaleResponseForMember {
     @Getter
     @Builder
     public static class OfRetrieve {
+        Long customerId;
         Long productId;
         String productName;
         int price;
@@ -22,17 +22,21 @@ public class TimesaleResponseForMember {
         private double averageRating;
         private int reviewCount;
 
-
         public static OfRetrieve convertedBy(ProductTimesale timesale) {
+            int originalPrice = timesale.getProduct().getProductPrice();
+            int discountRate = timesale.getDiscountRate();
+            int discountedPrice = (int) (originalPrice * (1 - discountRate / 100.0));
+
             return OfRetrieve.builder()
+                    .customerId(timesale.getProduct().getCustomer().getCustomerId())
                     .productId(timesale.getProduct().getProductId())
                     .productName(timesale.getProduct().getProductName())
                     .startDateTime(timesale.getStartDatetime())
                     .endDateTime(timesale.getEndDatetime())
                     .averageRating(timesale.getProduct().getAverageScore())
                     .reviewCount(timesale.getProduct().getReviewCount())
-                    .price(timesale.getProduct().getProductPrice())
-                    .discountRate(timesale.getDiscountRate())
+                    .price(discountedPrice)
+                    .discountRate(discountRate)
                     .serviceStatus(timesale.getServiceStatus().getStatusName()) // N+1 예상
                     .build();
         }
