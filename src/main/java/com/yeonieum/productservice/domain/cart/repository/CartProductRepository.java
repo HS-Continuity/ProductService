@@ -18,7 +18,8 @@ public interface CartProductRepository extends JpaRepository<CartProduct, Long> 
 
     @Query("SELECT COUNT(cp) FROM CartProduct cp WHERE cp.memberId = :memberId AND (:cartTypeId IS NULL OR cp.cartType.cartTypeId = :cartTypeId)")
     Long countByMemberIdAndOptionalCartTypeId(@Param("memberId") String memberId, @Param("cartTypeId") Long cartTypeId);
-
-
+    //네이티브쿼리 사용하기
+    @Query(value = "DELETE FROM cart_product WHERE member_id = :memberId AND cart_type_id = :cartTypeId", nativeQuery = true)
+    void deleteByMemberIdAndCartType(@Param("memberId") String memberId, @Param("cartTypeId") Long cartTypeId);
 
 }

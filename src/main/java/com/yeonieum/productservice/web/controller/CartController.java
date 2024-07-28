@@ -127,4 +127,22 @@ public class CartController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    // 회원의 장바구니 일괄삭제
+    @Operation(summary = "장바구니 상품 일괄 삭제", description = "회원의 장바구니 상품을 일괄 삭제하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "장바구니 상품 일괄 삭제 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 일괄 삭제 실패")
+    })
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/bulk", method = "DELETE")
+    @DeleteMapping
+    public ResponseEntity<ApiResponse> deleteAllCartProduct(@RequestParam("cartTypeId") Long cartTypeId) {
+        String memberId = "qwe123"; // 컨텍스트 예정
+        cartProductService.deleteCartProductByMemberId(memberId, cartTypeId);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(null)
+                .successCode(SuccessCode.DELETE_SUCCESS)
+                .build(), HttpStatus.valueOf(204));
+    }
 }
