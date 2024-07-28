@@ -104,15 +104,21 @@ public class ProductManagementController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/list", method = "GET")
     @GetMapping("/product/list")
-    // 친환경상품, 일반상품 조회 따로 파야한다.
-    public ResponseEntity<ApiResponse> getCustomersAllProduct(@RequestParam(required = false) char isEcoFriend,
+    public ResponseEntity<ApiResponse> getCustomersAllProduct(@RequestParam(required = false) ActiveStatus isEcoFriend,
+                                                              @RequestParam(required = false) String productName,
+                                                              @RequestParam(required = false) String description,
+                                                              @RequestParam(required = false) String origin,
+                                                              @RequestParam(required = false) Integer price,
+                                                              @RequestParam(required = false) ActiveStatus isPageVisibility,
+                                                              @RequestParam(required = false) ActiveStatus isRegularSale,
+                                                              @RequestParam(required = false) Integer baseDiscountRate,
+                                                              @RequestParam(required = false) Integer regularDiscountRate,
                                                               @RequestParam(defaultValue = "1") int startPage,
                                                               @RequestParam(defaultValue = "10") int pageSize) {
-        // 고객 id 시큐리티컨텍스트 조회 할 것이다. // 페이지네이션 받기
-        Long customerId = 1L;
+        Long customerId = 1L;  // 고객 id 시큐리티 컨텍스트에서 조회
         Pageable pageable = PageRequest.of(startPage, pageSize);
         Page<ProductManagementResponse.OfRetrieve> productList =
-                productManagementService.retrieveCustomersProducts(customerId, ActiveStatus.fromCode(isEcoFriend), pageable);
+                productManagementService.retrieveCustomersProducts(customerId, isEcoFriend, productName, description, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(productList)
                 .successCode(SuccessCode.SELECT_SUCCESS)

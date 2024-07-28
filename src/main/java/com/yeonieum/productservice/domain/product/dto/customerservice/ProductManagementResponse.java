@@ -58,37 +58,43 @@ public class ProductManagementResponse {
     @Getter
     @Builder
     public static class OfRetrieve {
-        private ActiveStatus isEcoFriendly;
-        private String productName;
+
+        private Long productId; //상품 ID
+
+        private String detailCategoryName; //상세 카테고리 이름
+
+        private ActiveStatus isEcoFriendly; //친환경상품 유무
+
+        private String productName;//상품 이름
         // ~자 이내
-        private String description;
+        private String description; //상품 상세 설명
         // 0 이상 값
-        private int price;
+        private int price; //상품 가격
+
         // 빈문자열, 공백, null 허용 안됨
-        private String origin;
+        private String origin; //상품 원산지
         // 기본값 true
-        private char isPageVisibility;
+        private ActiveStatus isPageVisibility; //페이지 노출 여부
         // 기본값 true
-        private char isRegularSale;
+        private ActiveStatus isRegularSale; //정기주문 할인 가격
         // 0 ~ 99사이
-        private int baseDiscountRate;
+        private int baseDiscountRate;//기본 할인율
         // 0 ~ 99사이
-        private int regularDiscountRate;
-        // 0 ~ 99사
-        private int personalizedDiscountRate;
+        private int regularDiscountRate;//정기 구매 할인율
 
         public static OfRetrieve convertedBy(Product product) {
-            return ProductManagementResponse.OfRetrieve.builder()
+            return OfRetrieve.builder()
+                    .productId(product.getProductId())
+                    .detailCategoryName(product.getProductDetailCategory().getDetailCategoryName())
                     .isEcoFriendly(product.getIsCertification())
                     .productName(product.getProductName())
                     .description(product.getProductDescription())
                     .price(product.getProductPrice())
                     .origin(product.getProductOrigin())
-                    .personalizedDiscountRate(product.getPersonalizedDiscountRate())
                     .baseDiscountRate(product.getBaseDiscountRate())
                     .regularDiscountRate(product.getRegularDiscountRate())
-                    .isPageVisibility(product.getIsPageVisibility().getCode())
-                    .isRegularSale(product.getIsRegularSale().getCode())
+                    .isPageVisibility(product.getIsPageVisibility())
+                    .isRegularSale(product.getIsRegularSale())
                     .build();
         }
     }
