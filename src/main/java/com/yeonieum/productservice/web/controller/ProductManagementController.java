@@ -114,7 +114,7 @@ public class ProductManagementController {
         Page<ProductManagementResponse.OfRetrieve> productList =
                 productManagementService.retrieveCustomersProducts(customerId, ActiveStatus.fromCode(isEcoFriend), pageable);
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(null)
+                .result(productList)
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
