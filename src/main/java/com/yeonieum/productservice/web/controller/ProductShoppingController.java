@@ -174,7 +174,7 @@ public class ProductShoppingController {
                 .build(), HttpStatus.OK);
     }
 
-    @GetMapping("/order/{productIdList}")
+    @GetMapping("/orders/{productIdList}")
     public ResponseEntity<ApiResponse> retrieveOrderProductInformation(@PathVariable List<Long> productIdList) {
         List<ProductShoppingResponse.OfRetrieveOrderInformation> orderProductInformation =
                 productShoppingService.retrieveOrderInformation(productIdList);
