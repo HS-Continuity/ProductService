@@ -9,6 +9,7 @@ import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class AdvertisementController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/advertisement/product", method = "POST")
     @PostMapping("/product")
-    public ResponseEntity registerAdvertisement(@RequestBody AdvertisementRequest.OfRegister registerRequest) {
+    public ResponseEntity registerAdvertisement(@Valid @RequestBody AdvertisementRequest.OfRegister registerRequest) {
         advertisementManagementService.registerAdvertisement(registerRequest);
 
         return new ResponseEntity(ApiResponse.builder()
