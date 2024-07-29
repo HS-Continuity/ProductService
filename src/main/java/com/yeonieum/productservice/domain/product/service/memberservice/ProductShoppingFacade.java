@@ -80,7 +80,6 @@ public class ProductShoppingFacade {
 
         for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
             searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId()));
-            //isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId());
         }
         return retrieveDetailCategoryWithProducts;
     }
@@ -126,9 +125,7 @@ public class ProductShoppingFacade {
 
         for(int i = 0; i < searchProductInformationDtoList.size(); i++) {
             searchProductInformationDtoList.get(i).changeIsSoldOut(!isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId()));
-            //isSoldOutMap.get(searchProductInformationDtoList.get(i).getProductId());
         }
-
         return retrieveKeywordWithProducts;
     }
 

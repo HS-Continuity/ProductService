@@ -30,10 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_NOT_FOUND;
@@ -44,7 +42,7 @@ import static com.yeonieum.productservice.domain.product.exception.ProductExcept
 
 @Service
 @RequiredArgsConstructor
-public class ProductMangementServiceImpl implements ProductManagementService{
+public class ProductManagementServiceImpl implements ProductManagementService{
     private final ProductRepository productRepository;
     private final ProductCertificationRepository productCertificationRepository;
     private final CustomerRepository customerRepository;
