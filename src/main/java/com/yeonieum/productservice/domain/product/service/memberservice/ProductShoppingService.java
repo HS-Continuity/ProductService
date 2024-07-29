@@ -96,7 +96,7 @@ public class ProductShoppingService {
 
         // 상세 카테고리 정보를 조회, 존재하지 않을 경우 예외 발생
         ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
-                .orElseThrow(() -> new CategoryException(DETAIL_CATEGORY_NOT_FOUND, HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new CategoryException(DETAIL_CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         // 해당 상세 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
         Page<Product> products = productRepository.findActiveProductsByDetailCategoryId(

@@ -96,7 +96,7 @@ public class TimesaleManagementService {
                 () -> new ProductException(PRODUCT_TIME_SALE_NOT_FOUNT, HttpStatus.NOT_FOUND));
 
         if(productTimesale.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
-            throw new ProductException(PRODUCT_TIME_SALE_CANNOT_BE_CANCELED, HttpStatus.BAD_REQUEST);
+            throw new ProductException(PRODUCT_TIME_SALE_CANNOT_BE_CANCELED, HttpStatus.CONFLICT);
         }
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.CANCELED.getCode());
         productTimesale.changeServiceStatus(status);

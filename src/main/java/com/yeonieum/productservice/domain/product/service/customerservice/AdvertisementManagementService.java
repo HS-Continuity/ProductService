@@ -79,7 +79,7 @@ public class AdvertisementManagementService {
                 () -> new ProductException(PRODUCT_ADVERTISEMENT_NOT_FOUNT,HttpStatus.NOT_FOUND));
 
         if(advertisementService.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
-            throw new ProductException(PRODUCT_ADVERTISEMENT_CANNOT_BE_CANCELED, HttpStatus.BAD_REQUEST);
+            throw new ProductException(PRODUCT_ADVERTISEMENT_CANNOT_BE_CANCELED, HttpStatus.CONFLICT);
         }
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.CANCELED.getCode());
         advertisementService.changeServiceStatus(status);
@@ -95,7 +95,7 @@ public class AdvertisementManagementService {
                 () -> new ProductException(PRODUCT_ADVERTISEMENT_NOT_FOUNT,HttpStatus.NOT_FOUND));
 
         if(advertisementService.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
-            throw new ProductException(PRODUCT_ADVERTISEMENT_CANNOT_BE_APPROVE, HttpStatus.BAD_REQUEST);
+            throw new ProductException(PRODUCT_ADVERTISEMENT_CANNOT_BE_APPROVE, HttpStatus.CONFLICT);
         }
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.APPROVE.getCode());
         advertisementService.changeServiceStatus(status);
