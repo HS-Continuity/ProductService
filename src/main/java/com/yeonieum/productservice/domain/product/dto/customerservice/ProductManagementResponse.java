@@ -42,16 +42,20 @@ public class ProductManagementResponse {
 
     @Getter
     @Builder
-    public static class OfRetrieveProductOrder {
+    public static class OfRetrieveProductOrder { // 정기주문용 조회임
         private Long productId;
         private String productName;
         private String productImage;
+        int originPrice;
+        int finalPrice;
 
         public static OfRetrieveProductOrder convertedBy(Product product) {
             return OfRetrieveProductOrder.builder()
                     .productId(product.getProductId())
                     .productName(product.getProductName())
                     .productImage(product.getProductImage())
+                    .originPrice(product.getProductPrice())
+                    .finalPrice(product.getCalculatedRegularPrice())
                     .build();
         }
     }
