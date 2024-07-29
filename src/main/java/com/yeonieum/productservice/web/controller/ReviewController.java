@@ -10,6 +10,7 @@ import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +38,7 @@ public class ReviewController {
     @Role(role = {"ROLE_MEMBER"}, url = "/api/product-review", method = "POST")
     @PostMapping
     public ResponseEntity<ApiResponse> registerProductReview(
-            @RequestPart(value = "ofRegisterProductReview") ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview,
+            @Valid @RequestPart(value = "ofRegisterProductReview") ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview,
             @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException {
 
         String imageUrl = null;

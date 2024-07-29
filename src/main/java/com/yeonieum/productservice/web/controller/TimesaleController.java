@@ -10,6 +10,7 @@ import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,7 +55,7 @@ public class TimesaleController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale", method = "POST")
     @PostMapping
-    public ResponseEntity<ApiResponse> registerTimesale(@RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) {
+    public ResponseEntity<ApiResponse> registerTimesale(@Valid @RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) {
         timesaleManagementService.registerTimesale(registerRequest);
 
         return new ResponseEntity<>(ApiResponse.builder()

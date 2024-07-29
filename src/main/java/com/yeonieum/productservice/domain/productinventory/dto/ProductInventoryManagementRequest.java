@@ -15,7 +15,6 @@ public class ProductInventoryManagementRequest {
     @Getter
     public static class RegisterDto {
 
-        @NotNull(message = "상품 아이디는 필수입니다.")
         Long productId;
 
         @NotNull(message = "입고날짜는 필수입니다.")
