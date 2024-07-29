@@ -78,4 +78,18 @@ public class CustomerController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    @Operation(summary = "인증용 고객 정보 조회", description = "인증용 고객 정보를 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "인증용 고객 정보 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "인증용 고객 정보 조회 실패")
+    })
+    @GetMapping("/auth/{businessNumber}")
+    public ResponseEntity<ApiResponse> retrieveDetailForAuth(@PathVariable("businessNumber") String businessNumber) {
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(customerService.retrieveCustomerForAuth(businessNumber))
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }
