@@ -87,7 +87,7 @@ public class ProductShoppingFacade {
     /**
      * 상품 상세 정보 조회
      * @param productId 상품 ID
-     * @throws IllegalArgumentException 상품 ID가 존재하지 않는 경우
+     * @throws ProductException 상품 ID가 존재하지 않는 경우
      * @return 상품의 상세 정보
      */
     @Transactional

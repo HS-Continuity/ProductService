@@ -4,7 +4,7 @@ import com.yeonieum.productservice.global.exceptions.code.CustomExceptionCode;
 
 public enum CustomerExceptionCode implements CustomExceptionCode {
 
-    CUSTOMER_NOT_FOUND(1700, "존재하지 않는 고객 ID 입니다.");
+    CUSTOMER_NOT_FOUND(3000, "존재하지 않는 고객 ID 입니다.");
 
     private final int code;
     private final String message;
