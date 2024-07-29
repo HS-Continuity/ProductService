@@ -57,7 +57,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public Page<Product> findProductsByCriteria(Long customerId, ActiveStatus isEcoFriend, String productName, String description, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable) {
+    public Page<Product> findProductsByCriteria(Long customerId, ActiveStatus isEcoFriend, Long productId, String productName, String detailCategoryName, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable) {
         QProduct product = QProduct.product;
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -66,14 +66,17 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
         if (isEcoFriend != null) {
             builder.and(product.isCertification.eq(isEcoFriend));
         }
-        if (productName != null) {
-            builder.and(product.productName.eq(productName));
+        if (productId != null) {
+            builder.and(product.productId.eq(productId));
         }
-        if (description != null) {
-            builder.and(product.productDescription.eq(description));
+        if (productName != null) {
+            builder.and(product.productName.like("%" + productName + "%"));
+        }
+        if (detailCategoryName != null) {
+            builder.and(product.productDetailCategory.detailCategoryName.like("%" + detailCategoryName + "%"));
         }
         if (origin != null) {
-            builder.and(product.productOrigin.eq(origin));
+            builder.and(product.productOrigin.like("%" + origin + "%"));
         }
         if (price != null) {
             builder.and(product.productPrice.eq(price));

@@ -1,6 +1,6 @@
 package com.yeonieum.productservice.global.responses;
 
-import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import lombok.Builder;
 import lombok.Getter;
 

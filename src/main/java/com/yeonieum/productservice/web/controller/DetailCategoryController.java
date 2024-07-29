@@ -4,7 +4,7 @@ import com.yeonieum.productservice.domain.category.dto.detailcategory.ProductDet
 import com.yeonieum.productservice.domain.category.service.ProductDetailCategoryService;
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
-import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;

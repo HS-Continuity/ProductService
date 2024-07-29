@@ -11,6 +11,6 @@ public interface ProductRepositoryCustom {
 
     Page<Product> findByKeywords(List<String> keywords, Pageable pageable);
 
-    Page<Product> findProductsByCriteria(Long customerId, ActiveStatus isEcoFriend, String productName, String description, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable);
+    Page<Product> findProductsByCriteria(Long customerId, ActiveStatus isEcoFriend, Long productId, String productName,String detailCategoryName, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable);
 }
 
