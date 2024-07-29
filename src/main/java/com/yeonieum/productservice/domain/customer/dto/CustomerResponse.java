@@ -61,4 +61,20 @@ public class CustomerResponse {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    public static class OfRetrieveForAuth {
+        String storeBusinessNumber;
+        Long customerId;
+        String password;
+
+        public static OfRetrieveForAuth convertedBy(Customer customer) {
+            return OfRetrieveForAuth.builder()
+                    .storeBusinessNumber(customer.getStoreBusinessNumber())
+                    .customerId(customer.getCustomerId())
+                    .password(customer.getCustomerPassword())
+                    .build();
+        }
+    }
 }

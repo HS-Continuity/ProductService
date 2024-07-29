@@ -59,4 +59,17 @@ public class CustomerService {
 
         return targetCustomer.getDeliveryFee();
     }
+
+    /**
+     * 인증용 고객 정보 조회
+     * @param
+     * @return 저장된 고객 정보
+     */
+    @Transactional
+    public CustomerResponse.OfRetrieveForAuth retrieveCustomerForAuth(String businessNumber) {
+        Customer targetCustomer = customerRepository.findByStoreBusinessNumber(businessNumber)
+                .orElseThrow(() -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        return CustomerResponse.OfRetrieveForAuth.convertedBy(targetCustomer);
+    }
 }
