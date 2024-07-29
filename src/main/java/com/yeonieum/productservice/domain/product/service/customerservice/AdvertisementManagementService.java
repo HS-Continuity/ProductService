@@ -1,26 +1,30 @@
 package com.yeonieum.productservice.domain.product.service.customerservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
+import com.yeonieum.productservice.domain.customer.exception.CustomerException;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
 import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementRequest;
 import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
-import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
 import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductAdvertisementServiceRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
-import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.enums.ServiceStatusCode;
 import com.yeonieum.productservice.messaging.message.AdvertisementEventMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.yeonieum.productservice.domain.customer.exception.CustomerExceptionCode.CUSTOMER_NOT_FOUND;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +43,7 @@ public class AdvertisementManagementService {
     @Transactional
     public List<AdvertisementResponse.OfRetrieve> retrieveAppliedProduct(Long customerId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(
-                        () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
+                        () -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
         List<ProductAdvertisementService> advertisementProduct =
                 productAdvertisementServiceRepository.findAllAdvertisementProduct(customerId);
 
@@ -55,8 +59,7 @@ public class AdvertisementManagementService {
     @Transactional
     public void registerAdvertisement(AdvertisementRequest.OfRegister registerRequest) {
         Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
-        );
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductAdvertisementService productAdvertisement = registerRequest.toEntity(product, status);
@@ -73,10 +76,10 @@ public class AdvertisementManagementService {
     @Transactional
     public void cancelAdvertisement(Long advertisementId) {
         ProductAdvertisementService advertisementService = productAdvertisementServiceRepository.findById(advertisementId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 신청 건이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_ADVERTISEMENT_NOT_FOUNT,HttpStatus.NOT_FOUND));
 
         if(advertisementService.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
-            throw new IllegalArgumentException("취소할 수 없는 상태입니다.");
+            throw new ProductException(PRODUCT_ADVERTISEMENT_CANNOT_BE_CANCELED, HttpStatus.BAD_REQUEST);
         }
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.CANCELED.getCode());
         advertisementService.changeServiceStatus(status);
@@ -89,10 +92,10 @@ public class AdvertisementManagementService {
     @Transactional
     public void approveAdvertisement(Long advertisementId) {
         ProductAdvertisementService advertisementService = productAdvertisementServiceRepository.findById(advertisementId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 신청 건이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_ADVERTISEMENT_NOT_FOUNT,HttpStatus.NOT_FOUND));
 
         if(advertisementService.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
-            throw new IllegalArgumentException("승인할 수 없는 상태입니다.");
+            throw new ProductException(PRODUCT_ADVERTISEMENT_CANNOT_BE_APPROVE, HttpStatus.BAD_REQUEST);
         }
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.APPROVE.getCode());
         advertisementService.changeServiceStatus(status);

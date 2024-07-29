@@ -1,6 +1,7 @@
 package com.yeonieum.productservice.domain.product.service.customerservice;
 
 import com.yeonieum.productservice.domain.customer.entity.Customer;
+import com.yeonieum.productservice.domain.customer.exception.CustomerException;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleResponseForCustomer;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleRequestForCustomer;
@@ -8,6 +9,7 @@ import com.yeonieum.productservice.domain.product.dto.memberservice.TimesaleResp
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
 import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductTimesaleRepository;
 import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
@@ -16,12 +18,16 @@ import com.yeonieum.productservice.messaging.message.TimesaleEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.yeonieum.productservice.domain.customer.exception.CustomerExceptionCode.CUSTOMER_NOT_FOUND;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +46,7 @@ public class TimesaleManagementService {
     @Transactional
     public List<TimesaleResponseForCustomer.OfRetrieve> retrieveTimesaleProducts(Long customerId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
+                () -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         List<ProductTimesale> productTimesaleList = productRepository.findAllTimesaleByCustomerId(customerId);
         return productTimesaleList.stream().map(timesale -> {
@@ -70,7 +76,7 @@ public class TimesaleManagementService {
     @Transactional
     public void registerTimesale(TimesaleRequestForCustomer.OfRegister registerRequest) {
         Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductTimesale productTimesale = registerRequest.toEntity(product, status);
@@ -87,10 +93,10 @@ public class TimesaleManagementService {
     @Transactional
     public void cancelTimesale(Long timesaleId) {
         ProductTimesale productTimesale = productTimesaleRepository.findById(timesaleId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 타임세일입니다."));
+                () -> new ProductException(PRODUCT_TIME_SALE_NOT_FOUNT, HttpStatus.NOT_FOUND));
 
         if(productTimesale.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
-            throw new IllegalArgumentException("취소할 수 없는 상태입니다.");
+            throw new ProductException(PRODUCT_TIME_SALE_CANNOT_BE_CANCELED, HttpStatus.BAD_REQUEST);
         }
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.CANCELED.getCode());
         productTimesale.changeServiceStatus(status);
