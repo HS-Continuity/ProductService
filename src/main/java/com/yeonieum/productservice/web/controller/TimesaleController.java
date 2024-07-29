@@ -3,6 +3,7 @@ package com.yeonieum.productservice.web.controller;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleRequestForCustomer;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleResponseForCustomer;
 import com.yeonieum.productservice.domain.product.dto.memberservice.TimesaleResponseForMember;
+import com.yeonieum.productservice.domain.product.service.customerservice.TimesaleManagementFacade;
 import com.yeonieum.productservice.domain.product.service.customerservice.TimesaleManagementService;
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TimesaleController {
     private final TimesaleManagementService timesaleManagementService;
+    private final TimesaleManagementFacade timesaleManagementFacade;
 
     // TimesaleService의 메서드를 바탕으로 타임세일 조회, 등록, 타임세일 상품 조회를 구현해주세요.
     // 타임세일 조회, 등록, 타임세일 상품 조회를 위한 API를 구현해주세요.
@@ -103,7 +105,7 @@ public class TimesaleController {
     public ResponseEntity<ApiResponse> getTimesaleProductList(@RequestParam(defaultValue = "0") int startPage,
                                                               @RequestParam(defaultValue = "10") int pageSize) {
         Pageable pageable = PageRequest.of(startPage, pageSize);
-        Page<TimesaleResponseForMember.OfRetrieve> timesaleProductResponseList = timesaleManagementService.retrieveTimesaleProducts(pageable);
+        Page<TimesaleResponseForMember.OfRetrieve> timesaleProductResponseList = timesaleManagementFacade.retrieveTimesaleProducts(pageable);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(timesaleProductResponseList)
                 .successCode(SuccessCode.SELECT_SUCCESS)

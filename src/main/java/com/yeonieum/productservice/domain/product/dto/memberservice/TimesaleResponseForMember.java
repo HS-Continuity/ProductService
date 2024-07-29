@@ -11,6 +11,7 @@ public class TimesaleResponseForMember {
     @Getter
     @Builder
     public static class OfRetrieve {
+        Long productTimesaleId;
         Long customerId;
         Long productId;
         String productName;
@@ -21,6 +22,8 @@ public class TimesaleResponseForMember {
         String serviceStatus;
         private double averageRating;
         private int reviewCount;
+        @Builder.Default
+        private boolean soldOut = false;
 
         public static OfRetrieve convertedBy(ProductTimesale timesale) {
             int originalPrice = timesale.getProduct().getProductPrice();
@@ -28,6 +31,7 @@ public class TimesaleResponseForMember {
             int discountedPrice = (int) (originalPrice * (1 - discountRate / 100.0));
 
             return OfRetrieve.builder()
+                    .productTimesaleId(timesale.getProductTimesaleId())
                     .customerId(timesale.getProduct().getCustomer().getCustomerId())
                     .productId(timesale.getProduct().getProductId())
                     .productName(timesale.getProduct().getProductName())
@@ -39,6 +43,10 @@ public class TimesaleResponseForMember {
                     .discountRate(discountRate)
                     .serviceStatus(timesale.getServiceStatus().getStatusName()) // N+1 예상
                     .build();
+        }
+
+        public void changeSoldOut(boolean isSoldOut) {
+            this.soldOut = isSoldOut;
         }
     }
 }
