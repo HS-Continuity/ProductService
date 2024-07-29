@@ -14,16 +14,16 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedHeaders(Arrays.asList("Content-Type", "application/json"));
+        corsConfiguration.setAllowedHeaders(Arrays.asList("Content-Type", "application/json", "Authorization", "Bearer"));
         corsConfiguration.addExposedHeader("Bearer");
         corsConfiguration.addExposedHeader("provider");
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:3000"));
+        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "http://localhost:3000"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
 
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5174", "http://localhost:3000")
+                .allowedOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
                 .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS")
-                .allowedHeaders("Content-Type", "application/json")
+                .allowedHeaders("Content-Type", "application/json", "Authorization", "Bearer")
                 .exposedHeaders("Bearer", "provider")
                 .allowCredentials(true);
     }
