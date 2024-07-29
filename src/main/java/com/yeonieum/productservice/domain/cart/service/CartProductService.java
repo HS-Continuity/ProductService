@@ -8,6 +8,7 @@ import com.yeonieum.productservice.domain.cart.exception.CartException;
 import com.yeonieum.productservice.domain.cart.repository.CartProductRepository;
 import com.yeonieum.productservice.domain.cart.repository.CartTypeRepository;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 import static com.yeonieum.productservice.domain.cart.exception.CartExceptionCode.CART_NOT_FOUND;
 import static com.yeonieum.productservice.domain.cart.exception.CartExceptionCode.CART_TYPE_NOT_FOUND;
 import static com.yeonieum.productservice.domain.cart.exception.CartExceptionCode.QUANTITY_BELOW_MINIMUM;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class CartProductService {
     /**
      * 장바구니에 상품 등록
      * @param ofRegisterProductCart 장바구니에 등록할 상품 정보 DTO
-     * @throws IllegalStateException 존재하지 않는 상품 ID인 경우 발생
+     * @throws ProductException 존재하지 않는 상품 ID인 경우 발생
      * @throws CartException 존재하지 않는 장바구니 타입 ID인 경우 발생
      * @return 성공여부
      */
@@ -40,7 +42,7 @@ public class CartProductService {
     public boolean registerCartProduct(CartProductRequest.OfRegisterProductCart ofRegisterProductCart) {
 
         Product product = productRepository.findById(ofRegisterProductCart.getProductId())
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 상품 ID 입니다."));
+                .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         CartType cartType = cartTypeRepository.findById(ofRegisterProductCart.getCartTypeId())
                 .orElseThrow(() -> new CartException(CART_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
@@ -105,7 +107,7 @@ public class CartProductService {
     /**
      * 장바구니 상품 삭제
      * @param cartProductId 장바구니 상품 ID
-     * @throws IllegalArgumentException 존재하지 않는 장바구니 ID인 경우
+     * @throws CartException 존재하지 않는 장바구니 ID인 경우
      * @return 성공 여부
      */
     @Transactional
