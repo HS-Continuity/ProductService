@@ -31,8 +31,8 @@ public class ProductReviewService {
      * 상품 리뷰 등록
      * @param ofRegisterProductReview 상품 리뷰를 등록할 정보 DTO
      * @return 성공 여부
-     * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
-     * @throws IllegalStateException    해당 상품에 대한 회원의 리뷰가 이미 존재하는 경우
+     * @throws ProductException 존재하지 않는 상품 ID인 경우
+     * @throws ProductReviewException 해당 상품에 대한 회원의 리뷰가 이미 존재하는 경우
      */
     @Transactional
     public boolean registerProductReview(ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview, @Nullable String imageUrl) {
@@ -55,7 +55,7 @@ public class ProductReviewService {
     /**
      * 상품 리뷰 삭제
      * @param productReviewId 상품 리뷰 ID
-     * @throws IllegalArgumentException 존재하지 않는 상품 리뷰 ID인 경우
+     * @throws ProductReviewException 존재하지 않는 상품 리뷰 ID인 경우
      * @return 성공 여부
      */
     @Transactional
@@ -72,7 +72,7 @@ public class ProductReviewService {
     /**
      * 선택한 상품 조회시, 해당 상품의 리뷰 조회
      * @param productId 상품 ID
-     * @throws IllegalArgumentException 존재하지 않는 상품 ID인 경우
+     * @throws ProductException 존재하지 않는 상품 ID인 경우
      * @return 상품리뷰에 대한 정보
      */
     @Transactional

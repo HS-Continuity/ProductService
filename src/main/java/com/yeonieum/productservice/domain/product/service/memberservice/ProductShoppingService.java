@@ -1,6 +1,5 @@
 package com.yeonieum.productservice.domain.product.service.memberservice;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
 import com.yeonieum.productservice.domain.category.exception.CategoryException;
@@ -24,8 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_ALREADY_EXISTS;
-import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.DETAIL_CATEGORY_NOT_FOUND;
+import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.*;
 import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.*;
 
 @Service
@@ -44,7 +42,7 @@ public class ProductShoppingService {
      * @param isCertification 인증된 상품만 조회할지 여부
      * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
      * @throws CategoryException 카테고리 ID가 존재하지 않는 경우
-     * @throws IllegalArgumentException 카테고리에 상품이 하나도 없는 경우
+     * @throws ProductException 카테고리에 상품이 하나도 없는 경우
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
     @Transactional
@@ -55,7 +53,7 @@ public class ProductShoppingService {
 
         // 카테고리 정보를 조회, 존재하지 않을 경우 예외 발생
         ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
-                .orElseThrow(() -> new CategoryException(CATEGORY_ALREADY_EXISTS, HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new CategoryException(CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         // 해당 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
         Page<Product> products = productRepository.findActiveProductsByCategory(productCategoryId, isCertification, pageable);
@@ -87,7 +85,7 @@ public class ProductShoppingService {
      * @param isCertification 인증된 상품만 조회할지 여부
      * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
      * @throws CategoryException 상세 카테고리 ID가 존재하지 않는 경우
-     * @throws IllegalArgumentException 상세 카테고리에 상품이 하나도 없는 경우
+     * @throws ProductException 상세 카테고리에 상품이 하나도 없는 경우
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
     @Transactional
@@ -162,6 +160,7 @@ public class ProductShoppingService {
      * @param keyword 상품 키워드(이름)
      * @param isCertification 인증서 유무
      * @param pageable 페이징 정보
+     * @throws ProductException 검색결과가 없는 경우
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
     @Transactional
