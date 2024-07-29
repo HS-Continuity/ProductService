@@ -30,7 +30,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ProductManagementController {
     private final ProductManagementService productManagementService;
-    S3UploadService s3UploadService;
+    private final S3UploadService s3UploadService;
     /**
      * 일반상품 등록(이미지등록) ok, 수정 ok, 조회 ok, 삭제 ok
      * 친환경상품 등록 ok , 수정 ok, 조회 ok, 삭제 ok (친환경이미지 등록)
@@ -47,7 +47,8 @@ public class ProductManagementController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/normal", method = "POST")
     @PostMapping("/product/normal")
-    public ResponseEntity<ApiResponse> createNormalProduct(@Valid @RequestPart(value = "normalProduct") ProductManagementRequest.OfRegister normalProduct,
+
+    public ResponseEntity<ApiResponse> createNormalProduct(@Valid @RequestPart(value = "normalProduct") ProductManagementRequest.OfRegisterNormalProduct normalProduct,
                                                            @RequestPart(value = "image") MultipartFile defaultImage,
                                                            @RequestPart(value = "detailImageList") List<MultipartFile> detailImageList) throws IOException {
         String imageUrl = s3UploadService.uploadImage(defaultImage);
