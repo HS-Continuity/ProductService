@@ -34,7 +34,7 @@ public class ProductDetailCategoryService {
                 .orElseThrow(() -> new CategoryException(CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (productDetailCategoryRepository.existsByDetailCategoryName(registerDetailCategoryDto.getDetailCategoryName())) {
-            throw new CategoryException(DETAIL_CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new CategoryException(DETAIL_CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
         ProductDetailCategory productDetailCategory = ProductDetailCategory.builder()
@@ -63,7 +63,7 @@ public class ProductDetailCategoryService {
                 .orElseThrow(() -> new CategoryException(DETAIL_CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (productDetailCategoryRepository.existsByDetailCategoryName(modifyDetailCategoryDto.getDetailCategoryName())) {
-            throw new CategoryException(DETAIL_CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new CategoryException(DETAIL_CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
         existingDetailCategory.changeDetailCategoryName(modifyDetailCategoryDto.getDetailCategoryName());

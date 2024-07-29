@@ -137,7 +137,7 @@ public class CartProductService {
 
         // 수량이 0 이하가 되지 않도록 제한
         if (newQuantity < 1) {
-            throw new CartException(QUANTITY_BELOW_MINIMUM, HttpStatus.BAD_REQUEST);
+            throw new CartException(QUANTITY_BELOW_MINIMUM, HttpStatus.CONFLICT);
         }
 
         cartProduct.changeProductQuantity(newQuantity);

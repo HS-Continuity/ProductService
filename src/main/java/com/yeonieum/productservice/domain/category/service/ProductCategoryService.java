@@ -31,7 +31,7 @@ public class ProductCategoryService {
     @Transactional
     public boolean registerCategory(ProductCategoryRequest.RegisterCategoryDto registerCategoryDto) {
         if (productCategoryRepository.existsByCategoryName(registerCategoryDto.getCategoryName())) {
-            throw new CategoryException(CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new CategoryException(CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
         ProductCategory productCategory = ProductCategory.builder()
@@ -74,7 +74,7 @@ public class ProductCategoryService {
                 .orElseThrow(() -> new CategoryException(CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (productCategoryRepository.existsByCategoryName(modifyCategoryDto.getCategoryName())) {
-            throw new CategoryException(CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new CategoryException(CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
         existingCategory.changeCategoryName(modifyCategoryDto.getCategoryName());
