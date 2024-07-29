@@ -1,20 +1,24 @@
 package com.yeonieum.productservice.domain.review.service;
 
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewRequest;
 import com.yeonieum.productservice.domain.review.dto.ProductReviewResponse;
 import com.yeonieum.productservice.domain.review.entity.ProductReview;
+import com.yeonieum.productservice.domain.review.exception.ProductReviewException;
 import com.yeonieum.productservice.domain.review.repository.ProductReviewRepository;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
+import static com.yeonieum.productservice.domain.review.exception.ProductReviewExceptionCode.PRODUCT_REVIEW_NOT_FOUND;
+import static com.yeonieum.productservice.domain.review.exception.ProductReviewExceptionCode.REVIEW_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +40,10 @@ public class ProductReviewService {
         //상품을 구매한 회원인지에 대한 로직 필요
 
         Product product = productRepository.findById(ofRegisterProductReview.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
+                .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (productReviewRepository.existsByMemberId(ofRegisterProductReview.getMemberId())) {
-            throw new IllegalStateException("이미 해당 회원이 작성한 리뷰가 존재합니다.");
+            throw new ProductReviewException(REVIEW_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
         ProductReview productReview =  ofRegisterProductReview.toEntity(product, imageUrl);
@@ -61,7 +65,7 @@ public class ProductReviewService {
             productReviewRepository.deleteById(productReviewId);
             return true;
         } else {
-            throw new IllegalArgumentException("존재하지 않는 상품리뷰 ID 입니다.");
+            throw new ProductReviewException(PRODUCT_REVIEW_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -75,7 +79,7 @@ public class ProductReviewService {
     public Page<ProductReviewResponse.OfRetrieveProductWithReview> retrieveProductWithReviews(Long productId, Pageable pageable) {
 
         if (!productRepository.existsById(productId)) {
-            throw new IllegalArgumentException("존재하지 않는 상품 ID 입니다.");
+            throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         Page<ProductReview> productReviews = productReviewRepository.findByProductId(productId, pageable);
 
