@@ -4,6 +4,7 @@ import com.yeonieum.productservice.domain.cart.dto.CartProductResponse;
 import com.yeonieum.productservice.domain.cart.service.CartProductService;
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
@@ -11,11 +12,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +96,7 @@ public class ProductShoppingFacade {
 
         // 상품 정보를 조회, 존재하지 않을 경우 예외 발생
         Product targetProduct = productRepository.findByIdAndIsActive(productId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
+                .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         ProductShoppingResponse.OfDetailProductInformation detailProductInformation =
                 ProductShoppingResponse.OfDetailProductInformation.convertedBy(targetProduct);
@@ -162,7 +166,6 @@ public class ProductShoppingFacade {
             boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(cartProduct.getProductId());
             cartProduct.changeIsSoldOut(!isSoldOut);
         }
-
         return ofRetrieveCartProducts;
     }
 

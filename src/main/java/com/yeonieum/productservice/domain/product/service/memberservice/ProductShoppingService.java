@@ -3,10 +3,12 @@ package com.yeonieum.productservice.domain.product.service.memberservice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
+import com.yeonieum.productservice.domain.category.exception.CategoryException;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
 import com.yeonieum.productservice.domain.category.repository.ProductDetailCategoryRepository;
 import com.yeonieum.productservice.domain.product.dto.memberservice.ProductShoppingResponse;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductRepositoryCustomImpl;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
@@ -16,10 +18,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_ALREADY_EXISTS;
+import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.DETAIL_CATEGORY_NOT_FOUND;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +43,7 @@ public class ProductShoppingService {
      * @param productCategoryId 조회할 상품 카테고리 ID
      * @param isCertification 인증된 상품만 조회할지 여부
      * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
-     * @throws IllegalArgumentException 카테고리 ID가 존재하지 않는 경우
+     * @throws CategoryException 카테고리 ID가 존재하지 않는 경우
      * @throws IllegalArgumentException 카테고리에 상품이 하나도 없는 경우
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
@@ -48,14 +55,14 @@ public class ProductShoppingService {
 
         // 카테고리 정보를 조회, 존재하지 않을 경우 예외 발생
         ProductCategory productCategory = productCategoryRepository.findById(productCategoryId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 카테고리 ID 입니다."));
+                .orElseThrow(() -> new CategoryException(CATEGORY_ALREADY_EXISTS, HttpStatus.BAD_REQUEST));
 
         // 해당 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
         Page<Product> products = productRepository.findActiveProductsByCategory(productCategoryId, isCertification, pageable);
 
         // 조회된 상품이 없으면 예외 발생
         if (products.isEmpty()) {
-            throw new IllegalArgumentException("해당 카테고리 내의 상품이 없습니다.");
+            throw new ProductException(NO_PRODUCTS_IN_CATEGORY, HttpStatus.NOT_FOUND);
         }
 
         /// DTO 변환: 카테고리 정보 포함
@@ -79,7 +86,7 @@ public class ProductShoppingService {
      * @param productDetailCategoryId 조회할 상세 카테고리의 ID
      * @param isCertification 인증된 상품만 조회할지 여부
      * @param pageable 페이징 정보 (페이지 번호, 페이지 크기)
-     * @throws IllegalArgumentException 상세 카테고리 ID가 존재하지 않는 경우
+     * @throws CategoryException 상세 카테고리 ID가 존재하지 않는 경우
      * @throws IllegalArgumentException 상세 카테고리에 상품이 하나도 없는 경우
      * @return 조회된 상품 목록이 포함된 Page 객체
      */
@@ -91,7 +98,7 @@ public class ProductShoppingService {
 
         // 상세 카테고리 정보를 조회, 존재하지 않을 경우 예외 발생
         ProductDetailCategory productDetailCategory = productDetailCategoryRepository.findById(productDetailCategoryId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 상세 카테고리 ID 입니다."));
+                .orElseThrow(() -> new CategoryException(DETAIL_CATEGORY_NOT_FOUND, HttpStatus.BAD_REQUEST));
 
         // 해당 상세 카테고리의 상품을 조회, 인증 여부와 페이징 정보를 반영
         Page<Product> products = productRepository.findActiveProductsByDetailCategoryId(
@@ -99,7 +106,7 @@ public class ProductShoppingService {
 
         // 조회된 상품이 없으면 예외 발생
         if (products.isEmpty()) {
-            throw new IllegalArgumentException("해당 상세 카테고리 내의 상품이 없습니다.");
+            throw new ProductException(NO_PRODUCTS_IN_DETAIL_CATEGORY, HttpStatus.NOT_FOUND);
         }
 
         /// DTO 변환: 상세 카테고리 정보 포함
@@ -121,7 +128,7 @@ public class ProductShoppingService {
     /**
      * 상품 상세 정보 조회
      * @param productId 상품 ID
-     * @throws IllegalArgumentException 상품 ID가 존재하지 않는 경우
+     * @throws ProductException 상품 ID가 존재하지 않는 경우
      * @return 상품의 상세 정보
      */
     @Transactional
@@ -129,7 +136,7 @@ public class ProductShoppingService {
 
         // 상품 정보를 조회, 존재하지 않을 경우 예외 발생
         Product targetProduct = productRepository.findByIdAndIsActive(productId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품 ID 입니다."));
+                .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         return ProductShoppingResponse.OfDetailProductInformation.convertedBy(targetProduct);
     }
@@ -174,7 +181,7 @@ public class ProductShoppingService {
                 keywords.forEach(this::recordSearchKeyword);
             } else {
                 // 검색 결과가 없는 경우 예외를 던짐
-                throw new IllegalStateException(keyword + "에 대한 검색결과가 없습니다. 다른 검색어를 입력해 주세요.");
+                throw new ProductException(NO_SEARCH_RESULTS, HttpStatus.NOT_FOUND);
             }
 
             return productsPage.map(ProductShoppingResponse.OfSearchProductInformation::convertedBy);

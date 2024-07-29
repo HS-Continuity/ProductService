@@ -3,8 +3,10 @@ package com.yeonieum.productservice.domain.product.service.customerservice;
 import com.yeonieum.productservice.domain.S3Upload.S3UploadService;
 import com.yeonieum.productservice.domain.category.entity.ProductCategory;
 import com.yeonieum.productservice.domain.category.entity.ProductDetailCategory;
+import com.yeonieum.productservice.domain.category.exception.CategoryException;
 import com.yeonieum.productservice.domain.category.repository.ProductCategoryRepository;
 import com.yeonieum.productservice.domain.customer.entity.Customer;
+import com.yeonieum.productservice.domain.customer.exception.CustomerException;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementRequest;
 import com.yeonieum.productservice.domain.product.dto.customerservice.ProductManagementResponse;
@@ -12,6 +14,7 @@ import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductCertification;
 import com.yeonieum.productservice.domain.product.entity.ProductDetailImage;
 import com.yeonieum.productservice.domain.product.entity.SaleType;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductCertificationRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductDetailImageRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
@@ -21,6 +24,7 @@ import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_NOT_FOUND;
+import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.DETAIL_CATEGORY_NOT_FOUND;
+import static com.yeonieum.productservice.domain.customer.exception.CustomerExceptionCode.CUSTOMER_NOT_FOUND;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.NOT_PRODUCT_OWNER;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -66,16 +76,16 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     public void registerProduct(ProductManagementRequest.OfRegister registerRequest, MultipartFile defaultImage, List<MultipartFile> detailImageList) throws RuntimeException {
         try {
             Customer customer = customerRepository.findById(registerRequest.getCustomerId()).orElseThrow(
-                            () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
+                            () -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             ProductCategory productCategory = productCategoryRepository.findById(registerRequest.getMainCategoryId()).orElseThrow(
-                            () -> new IllegalArgumentException("존재하지않는 대분류 카테고리입니다."));
+                            () -> new CategoryException(CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             // []
             List<ProductDetailCategory> productDetailCategoryList = productCategory.getProductDetailCategoryList();
             ProductDetailCategory productDetailCategory = productDetailCategoryList.stream()
                     .filter(detailCategory -> detailCategory.getProductDetailCategoryId() == registerRequest.getSubCategoryId())
-                    .findFirst().orElseThrow(() -> new IllegalArgumentException("잘못된 소분류 카테고리 선택입니다."));
+                    .findFirst().orElseThrow(() -> new CategoryException(DETAIL_CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
 
             String defaultImageUrl = s3UploadService.uploadImage(defaultImage);
@@ -132,10 +142,10 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     @Override
     public void deleteProduct(Long productId, Long customerId) {
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         // delete 매핑이라 customerId가 product의 소유자인지 검증
         if(product.getCustomer().getCustomerId() != customerId) {
-            throw new IllegalArgumentException("해당 상품의 소유자가 아닙니다.");
+            throw new ProductException(NOT_PRODUCT_OWNER, HttpStatus.FORBIDDEN);
         }
         productRepository.deleteById(productId);
     }
@@ -152,10 +162,10 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     @Transactional
     public void modifyProduct(Long productId,  Long customerId, ProductManagementRequest.OfModify ofModify) {
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         // put매핑이라 customerId가 product의 소유자인지 검증
         if(product.getCustomer().getCustomerId() != customerId) {
-            throw new IllegalArgumentException("해당 상품의 소유자가 아닙니다.");
+            throw new ProductException(NOT_PRODUCT_OWNER, HttpStatus.FORBIDDEN);
         }
 
         product.changeProductName(ofModify.getProductName());
@@ -188,7 +198,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     @Override
     public ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long productId) {
         Product product = productRepository.findProductWithCategoryInfoByProductId(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         return ProductManagementResponse.OfRetrieveDetails.convertedBy(product);
     }
 
@@ -203,7 +213,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     public void uploadProductImageUrl(Long productId, String imageUrl) {
         try {
             Product product = productRepository.findById(productId).orElseThrow(
-                    () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                    () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             product.changeProductImage(imageUrl);
             productRepository.save(product);
@@ -225,7 +235,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
                                              ProductManagementRequest.OfDeleteDetailImageList deleteList,
                                              List<String> imageUrlList) {
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         for(Long detailImageIdList : deleteList.getDetailImageList()) {
             productDetailImageRepository.deleteById(detailImageIdList);
@@ -244,7 +254,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     @Transactional
     public ProductManagementResponse.OfRetrieveProductOrder retrieveProductInformation(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         return ProductManagementResponse.OfRetrieveProductOrder.convertedBy(product);
     }
 
@@ -299,7 +309,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     @Transactional
     public void uploadCertificationImage(Long productId, String imageUrl, ProductManagementRequest.Certification certification) throws IOException {
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         ProductCertification productCertification = productCertificationRepository.findByProductId(productId);
         // 이미 등록된 경우 덮어 쓰기 || 등록된 인증서가 없는경우 생성
