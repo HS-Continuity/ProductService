@@ -19,4 +19,5 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, Lo
 
     @Query("SELECT pr FROM ProductReview pr WHERE pr.product.productId = :productId")
     Page<ProductReview> findByProductId(@Param("productId") Long productId, Pageable pageable);
+    boolean existsByProductReviewIdAndMemberId(Long productReviewId, String memberId);
 }

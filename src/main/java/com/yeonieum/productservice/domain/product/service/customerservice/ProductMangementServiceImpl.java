@@ -63,9 +63,9 @@ public class ProductMangementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void registerProduct(ProductManagementRequest.OfRegister registerRequest, MultipartFile defaultImage, List<MultipartFile> detailImageList) throws RuntimeException {
+    public void registerProduct(Long customerId, ProductManagementRequest.OfRegister registerRequest, MultipartFile defaultImage, List<MultipartFile> detailImageList) throws RuntimeException {
         try {
-            Customer customer = customerRepository.findById(registerRequest.getCustomerId()).orElseThrow(
+            Customer customer = customerRepository.findById(customerId).orElseThrow(
                             () -> new IllegalArgumentException("존재하지않는 고객 요청입니다."));
 
             ProductCategory productCategory = productCategoryRepository.findById(registerRequest.getMainCategoryId()).orElseThrow(
@@ -130,7 +130,7 @@ public class ProductMangementServiceImpl implements ProductManagementService{
      * @return
      */
     @Override
-    public void deleteProduct(Long productId, Long customerId) {
+    public void deleteProduct(Long customerId, Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
         // delete 매핑이라 customerId가 product의 소유자인지 검증
@@ -186,9 +186,13 @@ public class ProductMangementServiceImpl implements ProductManagementService{
      * @return
      */
     @Override
-    public ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long productId) {
+    public ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long customerId, Long productId) {
         Product product = productRepository.findProductWithCategoryInfoByProductId(productId).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+        if(product.getCustomer().getCustomerId() != customerId) {
+            throw new IllegalArgumentException("해당 상품의 소유자가 아닙니다.");
+        }
+
         return ProductManagementResponse.OfRetrieveDetails.convertedBy(product);
     }
 
@@ -200,10 +204,12 @@ public class ProductMangementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void uploadProductImageUrl(Long productId, String imageUrl) {
+    public void uploadProductImageUrl(Long productId, Long customerId ,String imageUrl) {
         try {
-            Product product = productRepository.findById(productId).orElseThrow(
-                    () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+            Product product = productRepository.findByProductIdAndCustomer_CustomerId(productId, customerId);
+            if(product == null) {
+                throw new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.");
+            }
 
             product.changeProductImage(imageUrl);
             productRepository.save(product);
@@ -222,10 +228,13 @@ public class ProductMangementServiceImpl implements ProductManagementService{
     @Override
     @Transactional
     public void uploadProductDetailImages(Long productId,
-                                             ProductManagementRequest.OfDeleteDetailImageList deleteList,
-                                             List<String> imageUrlList) {
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다."));
+                                          Long customerId,
+                                          ProductManagementRequest.OfDeleteDetailImageList deleteList,
+                                          List<String> imageUrlList) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(productId, customerId);
+        if(product == null) {
+            throw new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.");
+        }
 
         for(Long detailImageIdList : deleteList.getDetailImageList()) {
             productDetailImageRepository.deleteById(detailImageIdList);
