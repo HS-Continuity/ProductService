@@ -171,7 +171,6 @@ public class ProductManagementServiceImpl implements ProductManagementService{
         product.changeProductOrigin(ofModify.getOrigin());
         product.changeProductPrice(ofModify.getPrice());
         product.changeBaseDiscountRate(ofModify.getBaseDiscountRate());
-        product.changePersonalizedDiscountRate(ofModify.getPersonalizedDiscountRate());
         product.changeRegularDiscountRate(ofModify.getRegularDiscountRate());
         product.changeIsPageVisibility(ActiveStatus.fromCode(ofModify.getIsPageVisibility()));
         product.changeIsRegularSale(ActiveStatus.fromCode(ofModify.getIsRegularSale()));
