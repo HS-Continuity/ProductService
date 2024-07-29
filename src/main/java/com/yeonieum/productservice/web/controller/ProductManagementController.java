@@ -7,7 +7,7 @@ import com.yeonieum.productservice.domain.product.service.customerservice.Produc
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.responses.ApiResponse;
-import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/management")
@@ -107,8 +106,9 @@ public class ProductManagementController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/list", method = "GET")
     @GetMapping("/product/list")
     public ResponseEntity<ApiResponse> getCustomersAllProduct(@RequestParam(required = false) ActiveStatus isEcoFriend,
+                                                              @RequestParam(required = false) Long productId,
                                                               @RequestParam(required = false) String productName,
-                                                              @RequestParam(required = false) String description,
+                                                              @RequestParam(required = false) String detailCategoryName,
                                                               @RequestParam(required = false) String origin,
                                                               @RequestParam(required = false) Integer price,
                                                               @RequestParam(required = false) ActiveStatus isPageVisibility,
@@ -120,7 +120,7 @@ public class ProductManagementController {
         Long customerId = 1L;  // 고객 id 시큐리티 컨텍스트에서 조회
         Pageable pageable = PageRequest.of(startPage, pageSize);
         Page<ProductManagementResponse.OfRetrieve> productList =
-                productManagementService.retrieveCustomersProducts(customerId, isEcoFriend, productName, description, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
+                productManagementService.retrieveCustomersProducts(customerId, isEcoFriend, productId, productName, detailCategoryName, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(productList)
                 .successCode(SuccessCode.SELECT_SUCCESS)

@@ -182,8 +182,8 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      * @return
      */
     @Transactional(readOnly = true)
-    public Page<ProductManagementResponse.OfRetrieve> retrieveCustomersProducts(Long customerId, ActiveStatus isEcoFriend, String productName, String description, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable) {
-        Page<Product> productListOfCustomer = productRepository.findProductsByCriteria(customerId, isEcoFriend, productName, description, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
+    public Page<ProductManagementResponse.OfRetrieve> retrieveCustomersProducts(Long customerId, ActiveStatus isEcoFriend, Long productId, String productName, String detailCategoryName, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable) {
+        Page<Product> productListOfCustomer = productRepository.findProductsByCriteria(customerId, isEcoFriend, productId, productName, detailCategoryName, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
         return productListOfCustomer.map(ProductManagementResponse.OfRetrieve::convertedBy);
     }
 

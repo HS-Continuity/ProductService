@@ -17,7 +17,7 @@ public interface ProductManagementService {
     void registerProduct(ProductManagementRequest.OfRegister registerRequestDto, MultipartFile defaultImage, List<MultipartFile> detailImageList);
     void  deleteProduct(Long productId, Long customerId);
     void modifyProduct(Long productId, Long customerId, ProductManagementRequest.OfModify ofModify);
-    Page<ProductManagementResponse.OfRetrieve> retrieveCustomersProducts(Long customerId, ActiveStatus isEcoFriend, String productName, String description, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable);
+    Page<ProductManagementResponse.OfRetrieve> retrieveCustomersProducts(Long customerId, ActiveStatus isEcoFriend, Long productId, String productName, String description, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable);
     ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long productId);
     void uploadProductImageUrl(Long productId, String imageUrl);
     void uploadProductDetailImages(Long productId, ProductManagementRequest.OfDeleteDetailImageList deleteList, List<String> imageUrlList);

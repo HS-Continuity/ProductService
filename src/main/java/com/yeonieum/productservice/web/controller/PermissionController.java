@@ -2,7 +2,7 @@ package com.yeonieum.productservice.web.controller;
 
 import com.yeonieum.productservice.global.auth.RoleMetaDataCollector;
 import com.yeonieum.productservice.global.responses.ApiResponse;
-import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
+import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
