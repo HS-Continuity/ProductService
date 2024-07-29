@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.domain.productinventory.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
