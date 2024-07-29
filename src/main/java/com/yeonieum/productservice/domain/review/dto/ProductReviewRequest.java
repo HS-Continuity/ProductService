@@ -17,8 +17,6 @@ public class ProductReviewRequest {
         private String memberId;
         private LocalDateTime createDate;
         private String reviewContent;
-        @Nullable
-        private MultipartFile reviewImage;
         private double reviewScore;
 
         public ProductReview toEntity(Product product, String reviewImageUrl) {
