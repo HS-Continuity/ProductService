@@ -1,20 +1,26 @@
 package com.yeonieum.productservice.domain.productinventory.service;
 
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.productinventory.dto.ProductInventoryManagementRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.ProductInventorySummaryResponse;
 import com.yeonieum.productservice.domain.productinventory.dto.RetrieveProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.entity.ProductInventory;
+import com.yeonieum.productservice.domain.productinventory.exception.ProductInventoryException;
 import com.yeonieum.productservice.domain.productinventory.repository.ProductInventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
+import static com.yeonieum.productservice.domain.productinventory.exception.ProductInventoryExceptionCode.PRODUCT_INVENTORY_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +35,7 @@ public class ProductInventoryManagementService {
      */
     public void registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto) {
         Product product = productRepository.findById(registerDto.getProductId()).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND)
         );
         // 출고가능한 유효기간만 입력할 수 있도록 체크하는 로직 추가 예정
         ProductInventory productInventory = ProductInventory.builder()
@@ -51,7 +57,7 @@ public class ProductInventoryManagementService {
     public List<RetrieveProductInventoryResponse> retrieveProductInventorySummary(Long productId, Pageable pageable) {
         // 고객아이디 조회 가능한지 여부 체크 로직 추가
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
+                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND)
         );
 
         List<RetrieveProductInventoryResponse> productInventoryList =
@@ -68,7 +74,7 @@ public class ProductInventoryManagementService {
      */
     public void modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
         ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
-                () -> new IllegalArgumentException("해당하는 상품재고가 존재하지 않습니다.")
+                () -> new ProductInventoryException(PRODUCT_INVENTORY_NOT_FOUND, HttpStatus.NOT_FOUND)
         );
 
         Product product = productInventory.getProduct();
