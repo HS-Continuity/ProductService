@@ -1,6 +1,7 @@
 package com.yeonieum.productservice.domain.product.dto.memberservice;
 
 import com.yeonieum.productservice.domain.product.entity.ProductTimesale;
+import com.yeonieum.productservice.global.enums.ActiveStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,13 +16,17 @@ public class TimesaleResponseForMember {
         Long customerId;
         Long productId;
         String productName;
+        String productImage;
         int price;
+        int discountPrice;
         int discountRate;
         LocalDateTime startDateTime;
         LocalDateTime endDateTime;
         String serviceStatus;
         private double averageRating;
         private int reviewCount;
+        private ActiveStatus isCertification;
+
         @Builder.Default
         private boolean soldOut = false;
 
@@ -31,6 +36,7 @@ public class TimesaleResponseForMember {
             int discountedPrice = (int) (originalPrice * (1 - discountRate / 100.0));
 
             return OfRetrieve.builder()
+                    .productImage(timesale.getProduct().getProductImage())
                     .productTimesaleId(timesale.getProductTimesaleId())
                     .customerId(timesale.getProduct().getCustomer().getCustomerId())
                     .productId(timesale.getProduct().getProductId())
@@ -39,9 +45,11 @@ public class TimesaleResponseForMember {
                     .endDateTime(timesale.getEndDatetime())
                     .averageRating(timesale.getProduct().getAverageScore())
                     .reviewCount(timesale.getProduct().getReviewCount())
-                    .price(discountedPrice)
+                    .price(originalPrice)
                     .discountRate(discountRate)
-                    .serviceStatus(timesale.getServiceStatus().getStatusName()) // N+1 예상
+                    .discountPrice(discountedPrice)
+                    .serviceStatus(timesale.getServiceStatus().getStatusName())
+                    .isCertification(timesale.getProduct().getIsCertification())
                     .build();
         }
 
@@ -49,4 +57,5 @@ public class TimesaleResponseForMember {
             this.soldOut = isSoldOut;
         }
     }
+
 }
