@@ -10,6 +10,7 @@ import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,7 +55,7 @@ public class TimesaleController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale", method = "POST")
     @PostMapping
-    public ResponseEntity<ApiResponse> registerTimesale(@RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) {
+    public ResponseEntity<ApiResponse> registerTimesale(@Valid @RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) {
         timesaleManagementService.registerTimesale(registerRequest);
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -102,12 +103,26 @@ public class TimesaleController {
     })
     @Role(role = {"ROLE_MEMBER", "ROLE_ANONYMOUS", "ROLE_ADMIN", "ROLE_CUSTOMER"}, url = "/api/time-sale/product/list", method = "GET")
     @GetMapping("/product/list")
-    public ResponseEntity<ApiResponse> getTimesaleProductList(@RequestParam(defaultValue = "0") int startPage,
+    public ResponseEntity<ApiResponse> getTimesaleProductListForMember(@RequestParam(defaultValue = "0") int startPage,
                                                               @RequestParam(defaultValue = "10") int pageSize) {
         Pageable pageable = PageRequest.of(startPage, pageSize);
         Page<TimesaleResponseForMember.OfRetrieve> timesaleProductResponseList = timesaleManagementFacade.retrieveTimesaleProducts(pageable);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(timesaleProductResponseList)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "회원용 타임세일 상품 조회", description = "회원이 타임세일 상품 목록을 조회합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "타임세일 상품 목록 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @Role(role = {"ROLE_MEMBER", "ROLE_ANONYMOUS", "ROLE_ADMIN", "ROLE_CUSTOMER"}, url = "/api/time-sale/product/list", method = "GET")
+    @GetMapping("/{timesaleId}/product")
+    public ResponseEntity<ApiResponse> getTimesaleProductForMember(@PathVariable Long timesaleId) {
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(timesaleManagementFacade.retrieveTimesaleProduct(timesaleId))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }

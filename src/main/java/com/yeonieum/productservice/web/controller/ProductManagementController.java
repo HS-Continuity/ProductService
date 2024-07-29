@@ -10,6 +10,7 @@ import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,7 +47,8 @@ public class ProductManagementController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/normal", method = "POST")
     @PostMapping("/product/normal")
-    public ResponseEntity<ApiResponse> createNormalProduct(@RequestPart(value = "normalProduct") ProductManagementRequest.OfRegisterNormalProduct normalProduct,
+
+    public ResponseEntity<ApiResponse> createNormalProduct(@Valid @RequestPart(value = "normalProduct") ProductManagementRequest.OfRegisterNormalProduct normalProduct,
                                                            @RequestPart(value = "image") MultipartFile defaultImage,
                                                            @RequestPart(value = "detailImageList") List<MultipartFile> detailImageList) throws IOException {
         String imageUrl = s3UploadService.uploadImage(defaultImage);
@@ -65,7 +67,7 @@ public class ProductManagementController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/eco-friend", method = "POST")
     @PostMapping("/product/eco-friend")
-    public ResponseEntity<ApiResponse> createEcoFriendlyProduct(@RequestPart(value = "product") ProductManagementRequest.OfRegisterEcoFriendlyProduct ecoFriendlyProduct,
+    public ResponseEntity<ApiResponse> createEcoFriendlyProduct(@Valid @RequestPart(value = "product") ProductManagementRequest.OfRegisterEcoFriendlyProduct ecoFriendlyProduct,
                                                                 @RequestPart(value = "defaultImage") MultipartFile defaultImage,
                                                                 @RequestPart(value = "certificationImage") MultipartFile certificationImage,
                                                                 @RequestPart(value = "detailImageList") List<MultipartFile> detailImageList) throws IOException {
@@ -87,7 +89,7 @@ public class ProductManagementController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}", method = "PUT")
     @PutMapping("/product/{productId}")
     public ResponseEntity<ApiResponse> updateProductInformation(@PathVariable Long productId,
-                                                                @RequestBody ProductManagementRequest.OfModify productInformation) {
+                                                                @Valid @RequestBody ProductManagementRequest.OfModify productInformation) {
         Long customerId = 1L;
         productManagementService.modifyProduct(productId, customerId, productInformation);
 

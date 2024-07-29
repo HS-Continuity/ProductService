@@ -3,9 +3,10 @@ package com.yeonieum.productservice.domain.product.dto.customerservice;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
 import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
-import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.messaging.message.AdvertisementEventMessage;
-import lombok.Builder;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,9 +16,17 @@ public class AdvertisementRequest {
     @Getter
     @NoArgsConstructor
     public static class OfRegister {
+
         private Long productId;
+
+        @NotBlank(message = "상품이름은 필수입니다.")
+        @Size(max = 80, message = "상품이름은 최대 80자까지 가능합니다.")
         private String productName;
+
+        @NotNull(message = "광고 시작날짜 입력은 필수입니다.")
         private LocalDate startDate;
+
+        @NotNull(message = "광고 종료날짜 입력은 필수입니다.")
         private LocalDate endDate;
 
         public ProductAdvertisementService toEntity(Product product, ServiceStatus status) {
@@ -29,7 +38,6 @@ public class AdvertisementRequest {
                     .build();
         }
 
-
         public AdvertisementEventMessage toEventMessage() {
             return AdvertisementEventMessage.builder()
                     .productId(this.getProductId())
@@ -37,12 +45,5 @@ public class AdvertisementRequest {
                     .endDate(this.getEndDate())
                     .build();
         }
-    }
-
-
-    @Getter
-    @NoArgsConstructor
-    public static class OfModifyStatus {
-
     }
 }

@@ -8,6 +8,7 @@ import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class CategoryController {
     })
     @Role(role = {"ROLE_ADMIN"}, url = "/api/category", method = "POST")
     @PostMapping
-    public ResponseEntity<ApiResponse> registerProductCategory(@RequestBody ProductCategoryRequest.RegisterCategoryDto registerCategoryDto) {
+    public ResponseEntity<ApiResponse> registerProductCategory(@Valid @RequestBody ProductCategoryRequest.RegisterCategoryDto registerCategoryDto) {
 
         productCategoryService.registerCategory(registerCategoryDto);
 
@@ -64,7 +65,7 @@ public class CategoryController {
     @Role(role = {"ROLE_ADMIN"}, url = "/api/category/{productCategoryId}", method = "PATCH")
     @PatchMapping("/{productCategoryId}")
     public ResponseEntity<ApiResponse> modifyProductCategory(
-            @PathVariable Long productCategoryId, @RequestBody ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
+            @PathVariable Long productCategoryId, @Valid @RequestBody ProductCategoryRequest.ModifyCategoryDto modifyCategoryDto) {
 
         productCategoryService.modifyCategory(productCategoryId, modifyCategoryDto);
 

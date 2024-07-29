@@ -12,6 +12,7 @@ import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class ProductInventoryController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/inventory", method = "POST")
     @PostMapping
-    public ResponseEntity<ApiResponse> registerProductInventory(@RequestBody ProductInventoryManagementRequest.RegisterDto registerDto) {
+    public ResponseEntity<ApiResponse> registerProductInventory(@Valid  @RequestBody ProductInventoryManagementRequest.RegisterDto registerDto) {
         productInventoryManagementService.registerProductInventory(registerDto);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -101,7 +102,7 @@ public class ProductInventoryController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/inventory/{productInventoryId}", method = "PUT")
     @PutMapping("/{productInventoryId}")
     public ResponseEntity<ApiResponse> modifyProductInventory(@PathVariable Long productInventoryId,
-                                                              @RequestBody ProductInventoryManagementRequest.ModifyDto modifyDto) {
+                                                              @Valid @RequestBody ProductInventoryManagementRequest.ModifyDto modifyDto) {
         productInventoryManagementService.modifyProductInventory(productInventoryId, modifyDto);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
