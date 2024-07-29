@@ -3,6 +3,7 @@ package com.yeonieum.productservice.domain.productinventory.service;
 import com.yeonieum.productservice.cache.redis.StockRedisSetOperation;
 import com.yeonieum.productservice.cache.redis.StockUsageService;
 import com.yeonieum.productservice.domain.product.entity.Product;
+import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.service.ProductShelflifeCache;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
@@ -11,6 +12,7 @@ import com.yeonieum.productservice.domain.productinventory.dto.StockUsageDto;
 import com.yeonieum.productservice.domain.productinventory.repository.ProductInventoryRepository;
 import com.yeonieum.productservice.global.lock.Lock;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -90,21 +94,13 @@ public class StockSystemService {
 
             resultMap.put(productId, available > usage);
         }
-//        for(int i = 0; i < productIdList.size(); i++) {
-//            System.out.println("available.get(i) : " + available.get(i));
-//            if(available.get(i) == null) {
-//                resultList.add(false);
-//            }else
-//            resultList.add(available.get(i) > totalStockUsage.get(i));
-//        }
-
         return resultMap;
     }
 
     public int retrieveProductStockAmount(Long productId) {
         try {
             Product product = productRepository.findById(productId).orElseThrow(
-                    () -> new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.")
+                    () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND)
             );
 
             // 당일출고 기준시간 (조회해야함)

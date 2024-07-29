@@ -15,8 +15,6 @@ public enum ProductExceptionCode implements CustomExceptionCode {
     NO_PRODUCTS_IN_DETAIL_CATEGORY(2600, "해당 상세 카테고리 내의 상품이 없습니다."),
     NO_SEARCH_RESULTS(2700, "검색 결과가 없습니다. 다른 검색어를 입력해 주세요.");
 
-
-
     private final int code;
     private final String message;
 
