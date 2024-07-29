@@ -20,7 +20,7 @@ public class AdvertisementService {
 
     public List<AdvertisementResponse.OfRetrieve> retrieveAdvertisementProductList () {
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.IN_PROGRESS.getCode());
-        List<ProductAdvertisementService> advertisementProductList = productAdvertisementServiceRepository.findRandomActiveAdvertisements(ServiceStatusCode.IN_PROGRESS);
+        List<ProductAdvertisementService> advertisementProductList = productAdvertisementServiceRepository.findRandomActiveAdvertisements(ServiceStatusCode.IN_PROGRESS.getCode());
         return advertisementProductList.stream().map(productAdvertisementService ->
                 AdvertisementResponse.OfRetrieve.convertedBy(productAdvertisementService)).collect(Collectors.toList());
     }
