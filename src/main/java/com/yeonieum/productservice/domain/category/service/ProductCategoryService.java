@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_ALREADY_EXISTS;
+import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_NAME_ALREADY_EXISTS;
 import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_NOT_FOUND;
 
 @Service
@@ -31,7 +31,7 @@ public class ProductCategoryService {
     @Transactional
     public boolean registerCategory(ProductCategoryRequest.RegisterCategoryDto registerCategoryDto) {
         if (productCategoryRepository.existsByCategoryName(registerCategoryDto.getCategoryName())) {
-            throw new CategoryException(CATEGORY_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new CategoryException(CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
         }
 
         ProductCategory productCategory = ProductCategory.builder()
@@ -74,7 +74,7 @@ public class ProductCategoryService {
                 .orElseThrow(() -> new CategoryException(CATEGORY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (productCategoryRepository.existsByCategoryName(modifyCategoryDto.getCategoryName())) {
-            throw new CategoryException(CATEGORY_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new CategoryException(CATEGORY_NAME_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
         }
 
         existingCategory.changeCategoryName(modifyCategoryDto.getCategoryName());
