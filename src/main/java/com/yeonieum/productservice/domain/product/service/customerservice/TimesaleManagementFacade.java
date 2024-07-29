@@ -32,4 +32,16 @@ public class TimesaleManagementFacade {
 
         return timesaleManagementService.retrieveTimesaleProducts(pageable);
     }
+
+
+    @Transactional
+    public TimesaleResponseForMember.OfRetrieve retrieveTimesaleProduct(Long productTimesaleId) {
+        TimesaleResponseForMember.OfRetrieve result = timesaleManagementService.retrieveTimesaleProduct(productTimesaleId);
+        boolean isSoldOut = stockSystemService.checkAvailableOrderProduct(result.getProductId());
+        result.changeSoldOut(!isSoldOut);
+
+        return result;
+    }
+
+
 }
