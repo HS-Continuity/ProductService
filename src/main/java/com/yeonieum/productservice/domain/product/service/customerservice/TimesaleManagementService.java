@@ -114,4 +114,12 @@ public class TimesaleManagementService {
         Page<ProductTimesale> timesaleList = productTimesaleRepository.findAllTimesaleProduct(pageable);
         return timesaleList.map(timesale -> TimesaleResponseForMember.OfRetrieve.convertedBy(timesale));
     }
+
+    @Transactional
+    public TimesaleResponseForMember.OfRetrieve retrieveTimesaleProduct(Long timesaleId) {
+        ProductTimesale productTimesale = productTimesaleRepository.findById(timesaleId).orElseThrow(
+                () -> new ProductException(PRODUCT_TIME_SALE_NOT_FOUNT, HttpStatus.NOT_FOUND));
+
+        return TimesaleResponseForMember.OfRetrieve.convertedBy(productTimesale);
+    }
 }
