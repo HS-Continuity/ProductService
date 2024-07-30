@@ -263,12 +263,12 @@ public class ProductShoppingService {
      * @param productIdList
      * @return
      */
-    public List<ProductShoppingResponse.OfRetrieveOrderInformation> retrieveOrderInformation(List<Long> productIdList) {
-        List<Product> productList = productRepository.findAllByIdInWithCustomer(productIdList);
+    public Set<ProductShoppingResponse.OfRetrieveOrderInformation> retrieveOrderInformation(List<Long> productIdList) {
+        Set<Product> productList = productRepository.findAllByIdInWithCustomer(productIdList);
 
         return productList.stream()
                 .map(ProductShoppingResponse.OfRetrieveOrderInformation::convertedBy)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }
 
