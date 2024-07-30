@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/shopping/product")
@@ -176,7 +177,7 @@ public class ProductShoppingController {
 
     @GetMapping("/orders")
     public ResponseEntity<ApiResponse> retrieveOrderProductInformation(@RequestParam List<Long> productIdList) {
-        List<ProductShoppingResponse.OfRetrieveOrderInformation> orderProductInformation =
+        Set<ProductShoppingResponse.OfRetrieveOrderInformation> orderProductInformation =
                 productShoppingService.retrieveOrderInformation(productIdList);
 
         return new ResponseEntity<>(ApiResponse.builder()
