@@ -71,6 +71,7 @@ public class ProductShoppingResponse {
         private int productPrice;
         private int calculatedBasePrice;
         private ActiveStatus isRegularSale;
+        private String storeName;
         private Integer reviewCount;
         private Double averageScore;
         @Builder.Default
@@ -95,6 +96,7 @@ public class ProductShoppingResponse {
                     .isRegularSale(product.getIsRegularSale())
                     .reviewCount(product.getReviewCount())
                     .averageScore(product.getAverageScore())
+                    .storeName(product.getCustomer().getStoreName())
                     .build();
         }
     }
@@ -121,6 +123,7 @@ public class ProductShoppingResponse {
         private ActiveStatus isCertification;
         private Integer reviewCount;
         private Double averageScore;
+        private String storeName;
         @Builder.Default
         private boolean isSoldOut = false;
 
@@ -148,6 +151,7 @@ public class ProductShoppingResponse {
                     .isCertification(product.getIsCertification())
                     .reviewCount(product.getReviewCount())
                     .averageScore(product.getAverageScore())
+                    .storeName(product.getCustomer().getStoreName())
                     .build();
         }
     }
