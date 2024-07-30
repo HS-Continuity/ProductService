@@ -12,20 +12,22 @@ public class TimesaleResponseForMember {
     @Getter
     @Builder
     public static class OfRetrieve {
-        Long productTimesaleId;
-        Long customerId;
-        Long productId;
-        String productName;
-        String productImage;
-        int price;
-        int discountPrice;
-        int discountRate;
-        LocalDateTime startDateTime;
-        LocalDateTime endDateTime;
-        String serviceStatus;
+        private Long productTimesaleId;
+        private Long customerId;
+        private Long productId;
+        private String productName;
+        private String productImage;
+        private int price;
+        private int discountPrice;
+        private int discountRate;
+        private LocalDateTime startDateTime;
+        private LocalDateTime endDateTime;
+        private String serviceStatus;
         private double averageRating;
         private int reviewCount;
         private ActiveStatus isCertification;
+        private String storeName;
+        private int deliveryFee;
 
         @Builder.Default
         private boolean soldOut = false;
@@ -50,6 +52,8 @@ public class TimesaleResponseForMember {
                     .discountPrice(discountedPrice)
                     .serviceStatus(timesale.getServiceStatus().getStatusName())
                     .isCertification(timesale.getProduct().getIsCertification())
+                    .storeName(timesale.getProduct().getCustomer().getStoreName())
+                    .deliveryFee(timesale.getProduct().getCustomer().getDeliveryFee())
                     .build();
         }
 
