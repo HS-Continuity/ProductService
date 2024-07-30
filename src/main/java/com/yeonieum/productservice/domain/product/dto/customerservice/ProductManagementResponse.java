@@ -46,6 +46,7 @@ public class ProductManagementResponse {
         private Long productId;
         private String productName;
         private String productImage;
+        private String storeName;
         int originPrice;
         int finalPrice;
 
@@ -56,6 +57,7 @@ public class ProductManagementResponse {
                     .productImage(product.getProductImage())
                     .originPrice(product.getProductPrice())
                     .finalPrice(product.getCalculatedRegularPrice())
+                    .storeName(product.getCustomer().getStoreName())
                     .build();
         }
     }
