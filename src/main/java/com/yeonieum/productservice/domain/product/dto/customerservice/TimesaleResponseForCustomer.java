@@ -14,6 +14,7 @@ public class TimesaleResponseForCustomer {
     @Builder
     public static class OfRetrieve {
         Long productId;
+        Long timesaleId;
         String productName;
         int price;
         int discountRate;
@@ -29,6 +30,7 @@ public class TimesaleResponseForCustomer {
                     .endDateTime(productTimesale.getEndDatetime())
                     .discountRate(productTimesale.getDiscountRate())
                     .serviceStatus(productTimesale.getServiceStatus().getStatusName())
+                    .timesaleId(productTimesale.getProductTimesaleId())
                     .build();
         }
     }
