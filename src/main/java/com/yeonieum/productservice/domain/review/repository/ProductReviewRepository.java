@@ -13,10 +13,15 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, Lo
     @Query("SELECT COUNT(r) FROM ProductReview r " + "WHERE r.product.productId = :productId")
     int countByProductId(@Param("productId") Long productId);
 
-
     @Query("SELECT COALESCE(AVG(r.reviewScore), 0) FROM ProductReview r WHERE r.product.productId = :productId")
     double findAverageScoreByProductId(@Param("productId") Long productId);
 
     @Query("SELECT pr FROM ProductReview pr WHERE pr.product.productId = :productId")
     Page<ProductReview> findByProductId(@Param("productId") Long productId, Pageable pageable);
+
+    @Query("SELECT count(r) > 0 FROM ProductReview r WHERE r.product.productId = :productId AND r.memberId = :memberId")
+    boolean existsByProduct_IdAndMemberId(@Param("productId") Long productId, @Param("memberId") String memberId);
 }
+
+
+
