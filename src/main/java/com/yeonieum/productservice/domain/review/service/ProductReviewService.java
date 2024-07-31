@@ -42,7 +42,8 @@ public class ProductReviewService {
         Product product = productRepository.findById(ofRegisterProductReview.getProductId())
                 .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        if (productReviewRepository.existsByMemberId(ofRegisterProductReview.getMemberId())) {
+        // 상품 ID와 회원 ID로 리뷰 존재 여부 확인
+        if (productReviewRepository.existsByProduct_IdAndMemberId(product.getProductId(), ofRegisterProductReview.getMemberId())) {
             throw new ProductReviewException(REVIEW_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
