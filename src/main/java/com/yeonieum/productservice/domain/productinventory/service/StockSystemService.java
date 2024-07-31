@@ -1,7 +1,7 @@
 package com.yeonieum.productservice.domain.productinventory.service;
 
-import com.yeonieum.productservice.cache.redis.StockRedisSetOperation;
-import com.yeonieum.productservice.cache.redis.StockUsageService;
+import com.yeonieum.productservice.infrastructure.cache.redis.StockSetOperation;
+import com.yeonieum.productservice.infrastructure.cache.redis.StockUsageService;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.exception.ProductException;
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
@@ -32,9 +32,10 @@ import static com.yeonieum.productservice.domain.product.exception.ProductExcept
 public class StockSystemService {
     private final ProductShelflifeCache productShelflifeCache;
     private final StockUsageService stockUsageService;
-    private final StockRedisSetOperation stockRedisSetOperation;
+    //private final StockRedisSetOperation stockRedisSetOperation;
     private final ProductRepository productRepository;
     private final ProductInventoryRepository productInventoryRepository;
+    private final StockSetOperation stockSetOperation;
 
 
     /**
@@ -76,7 +77,8 @@ public class StockSystemService {
     @Transactional(readOnly = true)
     public boolean checkAvailableOrderProduct(Long productId) {
         int available = retrieveProductStockAmount(productId);
-        Integer totalStockUsage = stockRedisSetOperation.totalStockUsageCount(productId);
+        Long totalStockUsage = stockSetOperation.totalStockUsageCount(productId);
+        //Integer totalStockUsage = stockRedisSetOperation.totalStockUsageCount(productId);
 
         return available > totalStockUsage;
     }
@@ -86,11 +88,12 @@ public class StockSystemService {
         List<Boolean> resultList = new ArrayList<>();
         Map<Long, Boolean> resultMap = new HashMap<>();
         Map<Long, Integer> availableMap = bulkRetrieveProductStockAmount(productIdList);
-        Map<Long, Integer> totalStockUsage = stockRedisSetOperation.bulkTotalStockUsageCount(productIdList);
+        Map<Long, Long> totalStockUsage = stockSetOperation.bulkTotalStockUsageCount(productIdList);
+        // stockRedisSetOperation.bulkTotalStockUsageCount(productIdList);
 
         for(Long productId : productIdList) {
             Integer available = availableMap.getOrDefault(productId, 0);
-            Integer usage = totalStockUsage.getOrDefault(productId, 0);
+            Long usage = totalStockUsage.getOrDefault(productId, 0L);
 
             resultMap.put(productId, available > usage);
         }
@@ -136,7 +139,6 @@ public class StockSystemService {
             return 0;
         }
     }
-
 
     public Map<Long, Integer> bulkRetrieveProductStockAmount(List<Long> productId) {
         try {

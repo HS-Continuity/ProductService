@@ -1,4 +1,4 @@
-package com.yeonieum.productservice.messaging.message;
+package com.yeonieum.productservice.infrastructure.messaging.message;
 
 import lombok.Builder;
 import lombok.Getter;

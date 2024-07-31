@@ -13,7 +13,7 @@ import com.yeonieum.productservice.domain.product.repository.ProductAdvertisemen
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
 import com.yeonieum.productservice.global.enums.ServiceStatusCode;
-import com.yeonieum.productservice.messaging.message.AdvertisementEventMessage;
+import com.yeonieum.productservice.infrastructure.messaging.message.AdvertisementEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -66,7 +66,7 @@ public class AdvertisementManagementService {
         productAdvertisementServiceRepository.save(productAdvertisement);
 
         AdvertisementEventMessage advertisementEventMessage = registerRequest.toEventMessage();
-        kafkaTemplate.send("advertisement-topic", advertisementEventMessage);
+        //kafkaTemplate.send("advertisement-topic", advertisementEventMessage);
     }
 
     /**
