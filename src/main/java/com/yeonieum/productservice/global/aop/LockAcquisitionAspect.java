@@ -1,6 +1,5 @@
 package com.yeonieum.productservice.global.aop;
 
-import com.yeonieum.productservice.cache.redis.StockRedisSetOperation;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.domain.productinventory.dto.AvailableProductInventoryResponse;
 import com.yeonieum.productservice.domain.productinventory.service.StockSystemService;

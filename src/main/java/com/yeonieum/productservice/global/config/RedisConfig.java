@@ -39,12 +39,24 @@ public class RedisConfig {
     @Value("${spring.redisson.password}")
     private String redissonPassword;
 
-    @Bean
+    @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
+        //redisTemplate.setDefaultSerializer(RedisSerializer.string());
+
+        return redisTemplate;
+    }
+
+
+    @Bean(name = "stockRedisTemplate")
+    public RedisTemplate<String, Object> stockRedisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         //redisTemplate.setDefaultSerializer(RedisSerializer.string());
 
         return redisTemplate;
