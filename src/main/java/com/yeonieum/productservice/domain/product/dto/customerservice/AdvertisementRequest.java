@@ -3,7 +3,7 @@ package com.yeonieum.productservice.domain.product.dto.customerservice;
 import com.yeonieum.productservice.domain.product.entity.Product;
 import com.yeonieum.productservice.domain.product.entity.ProductAdvertisementService;
 import com.yeonieum.productservice.domain.product.entity.ServiceStatus;
-import com.yeonieum.productservice.messaging.message.AdvertisementEventMessage;
+import com.yeonieum.productservice.infrastructure.messaging.message.AdvertisementEventMessage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

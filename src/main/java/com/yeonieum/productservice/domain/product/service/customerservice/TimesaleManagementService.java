@@ -14,7 +14,7 @@ import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductTimesaleRepository;
 import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
 import com.yeonieum.productservice.global.enums.ServiceStatusCode;
-import com.yeonieum.productservice.messaging.message.TimesaleEventMessage;
+import com.yeonieum.productservice.infrastructure.messaging.message.TimesaleEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -83,7 +83,7 @@ public class TimesaleManagementService {
         productTimesaleRepository.save(productTimesale);
 
         TimesaleEventMessage timesaleEventMessage = registerRequest.toEventMessage();
-        kafkaTemplate.send("timesale-topic", timesaleEventMessage);
+        //kafkaTemplate.send("timesale-topic", timesaleEventMessage);
     }
 
     /**
