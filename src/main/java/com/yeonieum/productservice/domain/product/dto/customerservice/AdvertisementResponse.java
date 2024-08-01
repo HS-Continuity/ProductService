@@ -37,6 +37,9 @@ public class AdvertisementResponse {
         int price;
         int discountRate;
         String productImage;
+        LocalDate startDate;
+        LocalDate endDate;
+        String serviceStatus;
 
         public static OfRetrieve convertedBy(ProductAdvertisementService productAdvertisementService) {
             Product product = productAdvertisementService.getProduct();
@@ -46,6 +49,9 @@ public class AdvertisementResponse {
                     .discountRate(product.getBaseDiscountRate())
                     .price(product.getProductPrice())
                     .productImage(product.getProductImage())
+                    .startDate(productAdvertisementService.getStartDate())
+                    .endDate(productAdvertisementService.getEndDate())
+                    .serviceStatus(productAdvertisementService.getServiceStatus().getStatusName())
                     .build();
         }
     }
