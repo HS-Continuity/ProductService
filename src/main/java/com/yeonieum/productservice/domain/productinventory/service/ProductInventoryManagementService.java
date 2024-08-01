@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
 import static com.yeonieum.productservice.domain.productinventory.exception.ProductInventoryExceptionCode.PRODUCT_INVENTORY_NOT_FOUND;
@@ -60,11 +61,10 @@ public class ProductInventoryManagementService {
                 () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND)
         );
 
-        List<RetrieveProductInventoryResponse> productInventoryList =
+        List<ProductInventory> productInventoryList =
                 productInventoryRepository.findAllbyProductId(productId, pageable);
 
-        return productInventoryList;
-    }
+        return productInventoryList.stream().map(RetrieveProductInventoryResponse::toEntity).collect(Collectors.toList());    }
 
     /**
      * 등록한 상품재고 수정(폐기 시에도 사용 가능)
