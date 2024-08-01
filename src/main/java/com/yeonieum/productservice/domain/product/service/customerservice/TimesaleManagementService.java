@@ -48,7 +48,7 @@ public class TimesaleManagementService {
         Customer customer = customerRepository.findById(customerId).orElseThrow(
                 () -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        List<ProductTimesale> productTimesaleList = productRepository.findAllTimesaleByCustomerId(customerId);
+        List<ProductTimesale> productTimesaleList = productTimesaleRepository.findAllTimesaleByCustomerId(customerId);
         return productTimesaleList.stream().map(timesale -> {
                     ServiceStatus status = timesale.getServiceStatus();
                     return TimesaleResponseForCustomer.OfRetrieve.convertedBy(timesale);
