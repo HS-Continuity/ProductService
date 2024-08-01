@@ -40,8 +40,7 @@ public class StockSetOperation {
     @Transactional
     public Long getProductStock(Long productId) {
         String key = getStockUsageKey(productId);
-        Integer stockUsageCount = 0;
-        if(keyExists(key)) {
+        if(!keyExists(key)) {
             return fetchAndCacheProductStock(productId);
         }
         return stockRedisTemplate.opsForSet().size(key);

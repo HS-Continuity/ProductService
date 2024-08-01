@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 public interface ShippedStockRepository extends JpaRepository<ShippedStock, String> {
-    @Query(value = "SELECT product_id, order_detail_id, id FROM shipped_stock WHERE product_id = :productId AND shipped_date_time < :shippedTime", nativeQuery = true)
+
+    @Query("SELECT new com.yeonieum.productservice.infrastructure.cache.data.StockUsageCache(s.orderDetailId, s.productId, s.id) " +
+            "FROM ShippedStock s " +
+            "WHERE s.productId = :productId AND s.shippedDateTime < :shippedTime")
     Set<StockUsageCache> findShippedStockBeforeTodayShippedTime(@Param("productId") Long productId, @Param("shippedTime") LocalDateTime shippedTime);
     @Query(value = "SELECT id, product_id, shipped_date_time, id FROM shipped_stock WHERE product_id = :productId AND shipped_date_time >= :shippedTime", nativeQuery = true)
     List<ShippedStockDto> findShippedStockAfterTodayShippedTime(@Param("productId") Long productId, @Param("shippedTime") LocalDateTime shippedTime);
