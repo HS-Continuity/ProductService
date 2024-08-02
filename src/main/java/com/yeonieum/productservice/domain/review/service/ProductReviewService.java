@@ -35,7 +35,7 @@ public class ProductReviewService {
      * @throws ProductReviewException 해당 상품에 대한 회원의 리뷰가 이미 존재하는 경우
      */
     @Transactional
-    public boolean registerProductReview(ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview, @Nullable String imageUrl) {
+    public boolean registerProductReview(String memberId, ProductReviewRequest.OfRegisterProductReview ofRegisterProductReview, @Nullable String imageUrl) {
 
         //상품을 구매한 회원인지에 대한 로직 필요
 
@@ -43,11 +43,11 @@ public class ProductReviewService {
                 .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         // 상품 ID와 회원 ID로 리뷰 존재 여부 확인
-        if (productReviewRepository.existsByProduct_IdAndMemberId(product.getProductId(), ofRegisterProductReview.getMemberId())) {
+        if (productReviewRepository.existsByProduct_IdAndMemberId(product.getProductId(), memberId)) {
             throw new ProductReviewException(REVIEW_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
-        ProductReview productReview =  ofRegisterProductReview.toEntity(product, imageUrl);
+        ProductReview productReview =  ofRegisterProductReview.toEntity(memberId, product, imageUrl);
 
         productReviewRepository.save(productReview);
         return true;
@@ -60,9 +60,9 @@ public class ProductReviewService {
      * @return 성공 여부
      */
     @Transactional
-    public boolean deleteProductReview(Long productReviewId) {
+    public boolean deleteProductReview(String memberId, Long productReviewId) {
 
-        if (productReviewRepository.existsById(productReviewId)) {
+        if (productReviewRepository.existsByProductReviewIdAndMemberId(productReviewId, memberId)) {
             productReviewRepository.deleteById(productReviewId);
             return true;
         } else {

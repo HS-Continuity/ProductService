@@ -57,9 +57,11 @@ public class AdvertisementManagementService {
      * @return
      */
     @Transactional
-    public void registerAdvertisement(AdvertisementRequest.OfRegister registerRequest) {
-        Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
-                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
+    public void registerAdvertisement(Long customerId, AdvertisementRequest.OfRegister registerRequest) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
+        if(product == null) {
+            throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductAdvertisementService productAdvertisement = registerRequest.toEntity(product, status);

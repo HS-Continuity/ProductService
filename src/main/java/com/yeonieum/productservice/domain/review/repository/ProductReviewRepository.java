@@ -21,6 +21,7 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, Lo
 
     @Query("SELECT count(r) > 0 FROM ProductReview r WHERE r.product.productId = :productId AND r.memberId = :memberId")
     boolean existsByProduct_IdAndMemberId(@Param("productId") Long productId, @Param("memberId") String memberId);
+    boolean existsByProductReviewIdAndMemberId(Long productReviewId, String memberId);
 }
 
 

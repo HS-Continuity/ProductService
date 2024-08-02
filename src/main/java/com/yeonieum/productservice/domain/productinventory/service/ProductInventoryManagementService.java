@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -34,10 +35,12 @@ public class ProductInventoryManagementService {
      * @param registerDto
      * @return
      */
-    public void registerProductInventory(ProductInventoryManagementRequest.RegisterDto registerDto) {
-        Product product = productRepository.findById(registerDto.getProductId()).orElseThrow(
-                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND)
-        );
+    @Transactional
+    public void registerProductInventory(Long customerId, ProductInventoryManagementRequest.RegisterDto registerDto) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerDto.getProductId(), customerId);
+        if (product == null) {
+            throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
         // 출고가능한 유효기간만 입력할 수 있도록 체크하는 로직 추가 예정
         ProductInventory productInventory = ProductInventory.builder()
                 .product(product)
@@ -55,11 +58,12 @@ public class ProductInventoryManagementService {
      * @param pageable
      * @return
      */
-    public List<RetrieveProductInventoryResponse> retrieveProductInventorySummary(Long productId, Pageable pageable) {
-        // 고객아이디 조회 가능한지 여부 체크 로직 추가
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND)
-        );
+    @Transactional(readOnly = true)
+    public List<RetrieveProductInventoryResponse> retrieveProductInventorySummary(Long customerId, Long productId, Pageable pageable) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(productId, customerId);
+        if (product == null) {
+            throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
 
         List<ProductInventory> productInventoryList =
                 productInventoryRepository.findAllbyProductId(productId, pageable);
@@ -72,12 +76,17 @@ public class ProductInventoryManagementService {
      * @param modifyDto
      * @return
      */
-    public void modifyProductInventory(Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
+    @Transactional
+    public void modifyProductInventory(Long customerId, Long productInventoryId, ProductInventoryManagementRequest.ModifyDto modifyDto) {
         ProductInventory productInventory = productInventoryRepository.findById(productInventoryId).orElseThrow(
                 () -> new ProductInventoryException(PRODUCT_INVENTORY_NOT_FOUND, HttpStatus.NOT_FOUND)
         );
 
         Product product = productInventory.getProduct();
+        if(product == null || product.getCustomer().getCustomerId() !=customerId) {
+            throw new IllegalArgumentException("해당하는 상품이 존재하지 않습니다.");
+        }
+
         productInventory.changeQuantity(modifyDto.getQuantity());
     }
 
@@ -86,6 +95,7 @@ public class ProductInventoryManagementService {
      * 고객이 등록한 상품재고 summary 조회(상품별 재고수량 합계 조회)
       * @return
      */
+    @Transactional(readOnly = true)
     public Page<ProductInventorySummaryResponse> retrieveProductInventoryList(Long customerId, Pageable pageable) {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         Page<Object[]> productInventoryPage = productInventoryRepository.findInventorySumByProductsAndExpirations(customerId, today, pageable);

@@ -39,7 +39,7 @@ public class CartProductService {
      * @return 성공여부
      */
     @Transactional
-    public boolean registerCartProduct(CartProductRequest.OfRegisterProductCart ofRegisterProductCart) {
+    public boolean registerCartProduct(String memberId, CartProductRequest.OfRegisterProductCart ofRegisterProductCart) {
 
         Product product = productRepository.findById(ofRegisterProductCart.getProductId())
                 .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
@@ -47,7 +47,7 @@ public class CartProductService {
         CartType cartType = cartTypeRepository.findById(ofRegisterProductCart.getCartTypeId())
                 .orElseThrow(() -> new CartException(CART_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(ofRegisterProductCart.getMemberId(), ofRegisterProductCart.getCartTypeId());
+        List<CartProduct> cartProductList = cartProductRepository.findByMemberIdAndCartTypeIdWithProduct(memberId, ofRegisterProductCart.getCartTypeId());
 
         for (CartProduct existingCartProduct : cartProductList) {
             if (existingCartProduct.getProduct().getProductId().equals(ofRegisterProductCart.getProductId())) {
@@ -59,7 +59,7 @@ public class CartProductService {
         }
 
         // 장바구니에 같은 상품이 없으면 상품 등록
-        CartProduct cartProduct = ofRegisterProductCart.toEntity(product, cartType);
+        CartProduct cartProduct = ofRegisterProductCart.toEntity(memberId, product, cartType);
 
         cartProductRepository.save(cartProduct);
         return true;
@@ -111,8 +111,8 @@ public class CartProductService {
      * @return 성공 여부
      */
     @Transactional
-    public boolean deleteCartProduct(Long cartProductId) {
-        if(cartProductRepository.existsById(cartProductId)) {
+    public boolean deleteCartProduct(String memberId, Long cartProductId) {
+        if(cartProductRepository.existsByCartProductIdAndMemberId(cartProductId, memberId)) {
             cartProductRepository.deleteById(cartProductId);
             return true;
         } else {
@@ -129,9 +129,12 @@ public class CartProductService {
      * @return 성공 여부
      */
     @Transactional
-    public boolean modifyProductQuantity(Long cartProductId, int quantityDelta) {
-        CartProduct cartProduct = cartProductRepository.findById(cartProductId)
-                .orElseThrow(() -> new CartException(CART_NOT_FOUND, HttpStatus.NOT_FOUND));
+    public boolean modifyProductQuantity(String memberId, Long cartProductId, int quantityDelta) {
+        CartProduct cartProduct = cartProductRepository.findByCartProductIdAndMemberId(cartProductId, memberId);
+
+        if (cartProduct == null) {
+            throw new CartException(CART_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
 
         int newQuantity = cartProduct.getQuantity() + quantityDelta;
 
@@ -162,7 +165,7 @@ public class CartProductService {
      * @param memberId
      */
     @Transactional
-    public void deleteCartProductByMemberId(String memberId, Long cartTypeId) {
-        cartProductRepository.deleteByMemberIdAndCartType(memberId, cartTypeId);
+    public void deleteCartProductByMemberId(String memberId, Long cartTypeId, List<Long> cartIds) {
+        cartProductRepository.deleteByMemberIdAndCartType(memberId, cartTypeId, cartIds);
     }
 }

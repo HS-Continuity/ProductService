@@ -8,6 +8,7 @@ import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.paging.PageableUtil;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
+import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -41,12 +42,12 @@ public class ReviewController {
             @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException {
 
         String imageUrl = null;
-
+        String member = UserContextHolder.getContext().getUserId();
         if (imageFile != null && !imageFile.isEmpty()) {
             imageUrl = s3UploadService.uploadImage(imageFile);
         }
 
-        productReviewService.registerProductReview(ofRegisterProductReview, imageUrl);
+        productReviewService.registerProductReview(member, ofRegisterProductReview, imageUrl);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -62,8 +63,8 @@ public class ReviewController {
     @Role(role = {"ROLE_MEMBER"}, url = "/api/product-review/{productReviewId}", method = "DELETE")
     @DeleteMapping("/{productReviewId}")
     public ResponseEntity<ApiResponse> deleteProductReview(@PathVariable Long productReviewId) {
-
-        productReviewService.deleteProductReview(productReviewId);
+        String member = UserContextHolder.getContext().getUserId();
+        productReviewService.deleteProductReview(member, productReviewId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
