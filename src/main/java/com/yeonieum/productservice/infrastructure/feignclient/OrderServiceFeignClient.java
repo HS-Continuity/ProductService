@@ -23,6 +23,4 @@ public interface OrderServiceFeignClient {
 
     @GetMapping("/orderservice/api/order/ranking/order-type")
     ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> getAllProductsByOrderType(@RequestParam Long customerId, @RequestParam OrderType orderType);
-
-
 }

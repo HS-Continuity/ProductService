@@ -130,6 +130,8 @@ public class ProductManagementResponse {
         // 0 ~ 99사
         private int personalizedDiscountRate;
 
+        private String image;
+
         public static OfRetrieveDetails convertedBy(Product product) {
 
             return OfRetrieveDetails.builder()
@@ -145,6 +147,7 @@ public class ProductManagementResponse {
                     .regularDiscountRate(product.getRegularDiscountRate())
                     .isPageVisibility(product.getIsPageVisibility().getCode())
                     .isRegularSale(product.getIsRegularSale().getCode())
+                    .image(product.getProductImage())
                     .build();
         }
     }
