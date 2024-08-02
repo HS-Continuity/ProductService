@@ -71,9 +71,9 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void registerProduct(ProductManagementRequest.OfRegister registerRequest, MultipartFile defaultImage, List<MultipartFile> detailImageList) throws RuntimeException {
+    public void registerProduct(Long customerId, ProductManagementRequest.OfRegister registerRequest, MultipartFile defaultImage, List<MultipartFile> detailImageList) throws RuntimeException {
         try {
-            Customer customer = customerRepository.findById(registerRequest.getCustomerId()).orElseThrow(
+            Customer customer = customerRepository.findById(customerId).orElseThrow(
                             () -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             ProductCategory productCategory = productCategoryRepository.findById(registerRequest.getMainCategoryId()).orElseThrow(
@@ -138,7 +138,7 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      * @return
      */
     @Override
-    public void deleteProduct(Long productId, Long customerId) {
+    public void deleteProduct(Long customerId, Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         // delete 매핑이라 customerId가 product의 소유자인지 검증
@@ -193,9 +193,12 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      * @return
      */
     @Override
-    public ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long productId) {
+    public ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long customerId, Long productId) {
         Product product = productRepository.findProductWithCategoryInfoByProductId(productId).orElseThrow(
                 () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
+        if(product.getCustomer().getCustomerId() != customerId) {
+            throw new IllegalArgumentException("해당 상품의 소유자가 아닙니다.");
+        }
         return ProductManagementResponse.OfRetrieveDetails.convertedBy(product);
     }
 
@@ -207,11 +210,12 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void uploadProductImageUrl(Long productId, String imageUrl) {
+    public void uploadProductImageUrl(Long productId, Long customerId ,String imageUrl) {
         try {
-            Product product = productRepository.findById(productId).orElseThrow(
-                    () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
-
+            Product product = productRepository.findByProductIdAndCustomer_CustomerId(productId, customerId);
+            if(product == null) {
+                throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
             product.changeProductImage(imageUrl);
             productRepository.save(product);
         } catch (Exception e) {
@@ -229,11 +233,13 @@ public class ProductManagementServiceImpl implements ProductManagementService{
     @Override
     @Transactional
     public void uploadProductDetailImages(Long productId,
-                                             ProductManagementRequest.OfDeleteDetailImageList deleteList,
-                                             List<String> imageUrlList) {
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
-
+                                          Long customerId,
+                                          ProductManagementRequest.OfDeleteDetailImageList deleteList,
+                                          List<String> imageUrlList) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(productId, customerId);
+        if(product == null) {
+            throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
         for(Long detailImageIdList : deleteList.getDetailImageList()) {
             productDetailImageRepository.deleteById(detailImageIdList);
         }

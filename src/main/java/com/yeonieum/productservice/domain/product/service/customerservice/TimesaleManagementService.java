@@ -62,8 +62,15 @@ public class TimesaleManagementService {
      * @return
      */
     @Transactional
-    public TimesaleResponseForCustomer.OfRetrieve retrieveCustomersTimesale(Long timesaleId) {
+    public TimesaleResponseForCustomer.OfRetrieve retrieveCustomersTimesale(Long customerId, Long timesaleId) {
         ProductTimesale productTimesale = productTimesaleRepository.findByIdWithProduct(timesaleId);
+        if(productTimesale == null) {
+            throw new IllegalArgumentException("존재하지 않는 타임세일입니다.");
+        }
+        Product product = productTimesale.getProduct();
+        if (product == null || product.getCustomer().getCustomerId() != customerId) {
+            throw new IllegalArgumentException("존재하지 않는 상품입니다.");
+        }
         return TimesaleResponseForCustomer.OfRetrieve.convertedBy(productTimesale);
     }
 
@@ -74,9 +81,11 @@ public class TimesaleManagementService {
      * @return
      */
     @Transactional
-    public void registerTimesale(TimesaleRequestForCustomer.OfRegister registerRequest) {
-        Product product = productRepository.findById(registerRequest.getProductId()).orElseThrow(
-                () -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
+    public void registerTimesale(Long customerId, TimesaleRequestForCustomer.OfRegister registerRequest) {
+        Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
+        if(product == null) {
+            throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductTimesale productTimesale = registerRequest.toEntity(product, status);
@@ -91,9 +100,16 @@ public class TimesaleManagementService {
      * @param timesaleId
      */
     @Transactional
-    public void cancelTimesale(Long timesaleId) {
-        ProductTimesale productTimesale = productTimesaleRepository.findById(timesaleId).orElseThrow(
-                () -> new ProductException(PRODUCT_TIME_SALE_NOT_FOUNT, HttpStatus.NOT_FOUND));
+    public void cancelTimesale(Long customerId, Long timesaleId) {
+        ProductTimesale productTimesale = productTimesaleRepository.findByIdWithProduct(timesaleId);
+        if(productTimesale == null) {
+                throw new ProductException(PRODUCT_TIME_SALE_NOT_FOUNT, HttpStatus.NOT_FOUND);
+        }
+
+        Product product = productTimesale.getProduct();
+        if (product == null || product.getCustomer().getCustomerId() != customerId) {
+            throw new IllegalArgumentException("존재하지 않는 상품입니다.");
+        }
 
         if(productTimesale.getServiceStatus().getStatusName() != ServiceStatusCode.PENDING.getCode()) {
             throw new ProductException(PRODUCT_TIME_SALE_CANNOT_BE_CANCELED, HttpStatus.CONFLICT);

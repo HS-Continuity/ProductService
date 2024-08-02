@@ -7,6 +7,7 @@ import com.yeonieum.productservice.domain.product.service.memberservice.Advertis
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
+import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -41,7 +42,8 @@ public class AdvertisementController {
     public ResponseEntity getAdvertisement(@RequestParam int startPage,
                                            @RequestParam int pageSize,
                                            @RequestParam long customerId) {
-        List<AdvertisementResponse.OfRetrieve> advertisementProduct = advertisementManagementService.retrieveAppliedProduct(customerId);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        List<AdvertisementResponse.OfRetrieve> advertisementProduct = advertisementManagementService.retrieveAppliedProduct(customer);
 
         return new ResponseEntity(ApiResponse.builder()
                 .result(advertisementProduct)
@@ -57,7 +59,8 @@ public class AdvertisementController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/advertisement/product", method = "POST")
     @PostMapping("/product")
     public ResponseEntity registerAdvertisement(@Valid @RequestBody AdvertisementRequest.OfRegister registerRequest) {
-        advertisementManagementService.registerAdvertisement(registerRequest);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        advertisementManagementService.registerAdvertisement(customer, registerRequest);
 
         return new ResponseEntity(ApiResponse.builder()
                 .result(null)

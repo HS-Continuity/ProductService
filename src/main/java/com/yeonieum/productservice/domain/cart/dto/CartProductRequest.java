@@ -17,11 +17,11 @@ public class CartProductRequest {
         private String memberId;
         private int quantity;
 
-        public CartProduct toEntity(Product product, CartType cartType) {
+        public CartProduct toEntity(String memberId, Product product, CartType cartType) {
             return CartProduct.builder()
                     .product(product)
                     .cartType(cartType)
-                    .memberId(this.memberId)
+                    .memberId(memberId)
                     .quantity(this.quantity)
                     .build();
         }

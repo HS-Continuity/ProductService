@@ -22,5 +22,15 @@ public interface ProductAdvertisementServiceRepository extends JpaRepository<Pro
             "JOIN product p ON pts.product_id = p.id " +
             "WHERE p.customer_id = :customerId", nativeQuery = true)
     List<ProductAdvertisementService> findAllAdvertisementProduct(@Param("customerId") Long customerId);
+
+    // Product와 fetchjoin을 통해 가져옴, productAdvertiesementId와 customerId로 조회
+    @Query("SELECT pas " +
+            "FROM ProductAdvertisementService pas " +
+            "JOIN FETCH pas.product p " +
+            "WHERE pas.productAdvertisementServiceId = :productAdvertisementId " +
+            "AND p.customer.customerId = :customerId")
+    ProductAdvertisementService findByIdAndCustomerId(@Param("productAdvertisementId") Long productAdvertisementId, @Param("customerId") Long customerId);
+
+
 }
 

@@ -8,6 +8,7 @@ import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
+import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -51,7 +52,8 @@ public class ProductManagementController {
                                                            @RequestPart(value = "image") MultipartFile defaultImage,
                                                            @RequestPart(value = "detailImageList") List<MultipartFile> detailImageList) throws IOException {
         String imageUrl = s3UploadService.uploadImage(defaultImage);
-        productManagementService.registerProduct(normalProduct, defaultImage, detailImageList);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        productManagementService.registerProduct(customer, normalProduct, defaultImage, detailImageList);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -71,8 +73,9 @@ public class ProductManagementController {
                                                                 @RequestPart(value = "certificationImage") MultipartFile certificationImage,
                                                                 @RequestPart(value = "detailImageList") List<MultipartFile> detailImageList) throws IOException {
 
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         ((ProductManagementRequest.OfRegisterEcoFriendlyProduct)(ecoFriendlyProduct)).getCertification().setImage(certificationImage);
-        productManagementService.registerProduct((ProductManagementRequest.OfRegisterEcoFriendlyProduct) ecoFriendlyProduct, defaultImage, detailImageList);
+        productManagementService.registerProduct(customer, (ProductManagementRequest.OfRegisterEcoFriendlyProduct) ecoFriendlyProduct, defaultImage, detailImageList);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -89,8 +92,8 @@ public class ProductManagementController {
     @PutMapping("/product/{productId}")
     public ResponseEntity<ApiResponse> updateProductInformation(@PathVariable Long productId,
                                                                 @Valid @RequestBody ProductManagementRequest.OfModify productInformation) {
-        Long customerId = 1L;
-        productManagementService.modifyProduct(productId, customerId, productInformation);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        productManagementService.modifyProduct(productId, customer, productInformation);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -117,10 +120,10 @@ public class ProductManagementController {
                                                               @RequestParam(required = false) Integer regularDiscountRate,
                                                               @RequestParam(defaultValue = "1") int startPage,
                                                               @RequestParam(defaultValue = "10") int pageSize) {
-        Long customerId = 1L;  // 고객 id 시큐리티 컨텍스트에서 조회
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         Pageable pageable = PageRequest.of(startPage, pageSize);
         Page<ProductManagementResponse.OfRetrieve> productList =
-                productManagementService.retrieveCustomersProducts(customerId, isEcoFriend, productId, productName, detailCategoryName, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
+                productManagementService.retrieveCustomersProducts(customer, isEcoFriend, productId, productName, detailCategoryName, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(productList)
                 .successCode(SuccessCode.SELECT_SUCCESS)
@@ -135,7 +138,8 @@ public class ProductManagementController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}/details", method = "GET")
     @GetMapping("/product/{productId}/details")
     public ResponseEntity<ApiResponse> getProductDetail(@PathVariable Long productId) {
-        ProductManagementResponse.OfRetrieveDetails productDetail = productManagementService.retrieveProductDetail(productId);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        ProductManagementResponse.OfRetrieveDetails productDetail = productManagementService.retrieveProductDetail(customer, productId);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(productDetail)
@@ -151,8 +155,8 @@ public class ProductManagementController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}", method = "DELETE")
     @DeleteMapping("/product/{productId}")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long productId) {
-        Long customerId = 1L;
-        productManagementService.deleteProduct(productId, customerId);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        productManagementService.deleteProduct(productId, customer);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
@@ -160,7 +164,7 @@ public class ProductManagementController {
                 .build(), HttpStatus.OK);
     }
 
-    @Operation(summary = "상품 상세이미지 등록", description = "고객(seller)의 상품 상세이미지를 업로드합니다..")
+    @Operation(summary = "상품 이미지 등록", description = "고객(seller)의 상품 상세이미지를 업로드합니다..")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
@@ -168,9 +172,10 @@ public class ProductManagementController {
     @PostMapping("/product/{productId}/default-image")
     public ResponseEntity<ApiResponse> uploadDefaultImage(@PathVariable Long productId,
                                                           @RequestPart(value = "image")  MultipartFile defaultImage) throws IOException {
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         String imageUrl = s3UploadService.uploadImage(defaultImage);
         try {
-            productManagementService.uploadProductImageUrl(productId, imageUrl);
+            productManagementService.uploadProductImageUrl(productId, customer, imageUrl);
         } catch (RuntimeException e) {
             s3UploadService.deleteImageFromS3(imageUrl);
             throw new RuntimeException();
@@ -192,13 +197,15 @@ public class ProductManagementController {
     public ResponseEntity<ApiResponse> uploadProductDetailImage(@PathVariable Long productId,
                                                                 @RequestPart(value = "deleteList") ProductManagementRequest.OfDeleteDetailImageList deleteOfDeleteDetailImageList,
                                                                 @RequestPart(value = "imageList") List<MultipartFile> uploadImageList) throws IOException {
+
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         List<String> imageUrlList = new ArrayList<>();
         for(MultipartFile uploadFile : uploadImageList) {
             String imageUrl = s3UploadService.uploadImage(uploadFile);
             imageUrlList.add(imageUrl);
         }
 
-        productManagementService.uploadProductDetailImages(productId, deleteOfDeleteDetailImageList, imageUrlList);
+        productManagementService.uploadProductDetailImages(productId, customer, deleteOfDeleteDetailImageList, imageUrlList);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.INSERT_SUCCESS)
@@ -212,5 +219,4 @@ public class ProductManagementController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     };
-
 }

@@ -10,6 +10,7 @@ import com.yeonieum.productservice.domain.productinventory.service.StockSystemSe
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
+import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -68,7 +69,8 @@ public class ProductInventoryController {
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/inventory", method = "POST")
     @PostMapping
     public ResponseEntity<ApiResponse> registerProductInventory(@Valid  @RequestBody ProductInventoryManagementRequest.RegisterDto registerDto) {
-        productInventoryManagementService.registerProductInventory(registerDto);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        productInventoryManagementService.registerProductInventory(customer, registerDto);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.INSERT_SUCCESS)
@@ -86,9 +88,10 @@ public class ProductInventoryController {
                                                                   @RequestParam(defaultValue = "0") int startPage,
                                                                   @RequestParam(defaultValue = "10") int pageSize) {
         Pageable pageable = PageRequest.of(startPage, pageSize);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
 
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(productInventoryManagementService.retrieveProductInventorySummary(productId, pageable))
+                .result(productInventoryManagementService.retrieveProductInventorySummary(customer, productId, pageable))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
@@ -103,7 +106,8 @@ public class ProductInventoryController {
     @PutMapping("/{productInventoryId}")
     public ResponseEntity<ApiResponse> modifyProductInventory(@PathVariable Long productInventoryId,
                                                               @Valid @RequestBody ProductInventoryManagementRequest.ModifyDto modifyDto) {
-        productInventoryManagementService.modifyProductInventory(productInventoryId, modifyDto);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        productInventoryManagementService.modifyProductInventory(customer, productInventoryId, modifyDto);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.UPDATE_SUCCESS)
@@ -123,8 +127,9 @@ public class ProductInventoryController {
                                                                        @RequestParam(defaultValue = "0") int startPage,
                                                                        @RequestParam(defaultValue = "10") int pageSize) {
         Pageable pageable = PageRequest.of(startPage, pageSize);
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(productInventoryManagementService.retrieveProductInventorySummary(customerId, pageable))
+                .result(productInventoryManagementService.retrieveProductInventoryList(customer, pageable))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }

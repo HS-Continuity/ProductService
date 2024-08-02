@@ -14,17 +14,16 @@ import java.util.Map;
 
 public interface ProductManagementService {
     boolean checkCertificationValidation(Long serialNumber);
-    void registerProduct(ProductManagementRequest.OfRegister registerRequestDto, MultipartFile defaultImage, List<MultipartFile> detailImageList);
-    void  deleteProduct(Long productId, Long customerId);
+    void registerProduct(Long customerId, ProductManagementRequest.OfRegister registerRequestDto, MultipartFile defaultImage, List<MultipartFile> detailImageList);
+    void  deleteProduct(Long customerId, Long productId);
     void modifyProduct(Long productId, Long customerId, ProductManagementRequest.OfModify ofModify);
     Page<ProductManagementResponse.OfRetrieve> retrieveCustomersProducts(Long customerId, ActiveStatus isEcoFriend, Long productId, String productName, String description, String origin, Integer price, ActiveStatus isPageVisibility, ActiveStatus isRegularSale, Integer baseDiscountRate, Integer regularDiscountRate, Pageable pageable);
-    ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long productId);
-    void uploadProductImageUrl(Long productId, String imageUrl);
-    void uploadProductDetailImages(Long productId, ProductManagementRequest.OfDeleteDetailImageList deleteList, List<String> imageUrlList);
+    ProductManagementResponse.OfRetrieveDetails retrieveProductDetail(Long customerId, Long productId);
+    void uploadProductImageUrl(Long productId, Long customerId, String imageUrl);
+    void uploadProductDetailImages(Long productId, Long customerId, ProductManagementRequest.OfDeleteDetailImageList deleteList, List<String> imageUrlList);
     void uploadCertificationImage(Long productId, String imageUrl , ProductManagementRequest.Certification certification) throws IOException;
     List<ProductManagementResponse.OfRetrieveDetailImage> retrieveDetailImage(Long productId);
     ProductManagementResponse.OfRetrieveProductOrder retrieveProductInformation(Long productId);
     Map<Long, ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformation(List<Long> productIdList);
-
     List<ProductManagementResponse.OfOrderInformation> retrieveOrderInformation(StockUsageRequest.IncreaseStockUsageList increaseStockUsageList);
 }

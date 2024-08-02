@@ -28,10 +28,10 @@ public class ProductReviewRequest {
 
         private double reviewScore;
 
-        public ProductReview toEntity(Product product, String reviewImageUrl) {
+        public ProductReview toEntity(String memberId, Product product, String reviewImageUrl) {
             return ProductReview.builder()
                     .product(product)
-                    .memberId(this.memberId)
+                    .memberId(memberId)
                     .createDate(this.createDate)
                     .reviewContent(this.reviewContent)
                     .reviewImage(reviewImageUrl)
