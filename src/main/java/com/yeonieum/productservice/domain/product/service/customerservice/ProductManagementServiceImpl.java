@@ -21,15 +21,21 @@ import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.SaleTypeRepository;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.global.enums.Gender;
+import com.yeonieum.productservice.global.responses.ApiResponse;
+import com.yeonieum.productservice.infrastructure.feignclient.OrderServiceFeignClient;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +56,7 @@ public class ProductManagementServiceImpl implements ProductManagementService{
     private final SaleTypeRepository saleTypeRepository;
     private final ProductDetailImageRepository productDetailImageRepository;
     private final S3UploadService s3UploadService;
+    private final OrderServiceFeignClient orderServiceFeignClient;
 
     /**
      * 친환경 인증서 시리얼넘버 유효성 검증 메서드
@@ -319,4 +326,49 @@ public class ProductManagementServiceImpl implements ProductManagementService{
         productCertificationRepository.save(productCertification);
     }
 
+    /**
+     * 고객의 성별 TOP3 상품 조회
+     * @param customerId
+     * @param gender
+     * @return 상품 정보
+     */
+    @Override
+    @Transactional
+    public List<ProductManagementResponse.OfGenderRank> rankOfGender(Long customerId, Gender gender) {
+
+        ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> productOrderCounts = null;
+        List<ProductManagementResponse.ProductOrderCount> productOrderCountList = null;
+
+        try {
+            productOrderCounts = orderServiceFeignClient.getOrderGenderTop3(customerId, gender);
+        } catch (FeignException e) {
+            e.printStackTrace();
+        }
+
+        if (productOrderCounts != null && productOrderCounts.getBody() != null) {
+            //상품 ID, 상품 판매량을 담고있는 리스트
+            productOrderCountList = productOrderCounts.getBody().getResult();
+        } else {
+            return new ArrayList<>();
+        }
+
+        //반환값 (상품 정보)
+        List<ProductManagementResponse.OfGenderRank> genderRanks = new ArrayList<>();
+
+        for(ProductManagementResponse.ProductOrderCount productOrderCount : productOrderCountList){
+            Product targetProduct = productRepository.findById(productOrderCount.getProductId())
+                    .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+            ProductManagementResponse.OfGenderRank genderRank = ProductManagementResponse.OfGenderRank.builder()
+                            .productId(productOrderCount.getProductId())
+                    .productName(targetProduct.getProductName())
+                    .image(targetProduct.getProductImage())
+                    .orderCount(productOrderCount.getOrderCount())
+                    .averageScore(targetProduct.getAverageScore())
+                    .build();
+
+            genderRanks.add(genderRank);
+        }
+        return genderRanks;
+    }
 }

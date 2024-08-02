@@ -165,4 +165,21 @@ public class ProductManagementResponse {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    public static class ProductOrderCount  {
+        private Long productId;
+        private Long orderCount;
+    }
+
+    @Getter
+    @Builder
+    public static class OfGenderRank {
+        private Long productId;
+        private String productName;
+        private String image;
+        private Long orderCount;
+        private double averageScore;
+    }
 }
