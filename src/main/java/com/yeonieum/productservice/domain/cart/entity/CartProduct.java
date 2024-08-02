@@ -21,7 +21,7 @@ public class CartProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_type_id", nullable = false)
     private CartType cartType;
 
@@ -29,5 +29,9 @@ public class CartProduct {
     private String memberId;
 
     private int quantity;
+
+    public void changeProductQuantity(int productQuantity) {
+        this.quantity = productQuantity;
+    }
 
 }
