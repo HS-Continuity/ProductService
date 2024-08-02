@@ -12,21 +12,21 @@ import java.util.Arrays;
 public class CorsConfig implements WebMvcConfigurer {
     @Value("${cors.allowed.origin}")
     private String CORS_ALLOWED_ORIGIN;
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedHeaders(Arrays.asList("Content-Type", "application/json", "Authorization", "Bearer"));
-        corsConfiguration.addExposedHeader("Bearer");
-        corsConfiguration.addExposedHeader("provider");
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "http://localhost:3000",CORS_ALLOWED_ORIGIN));
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
-
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", CORS_ALLOWED_ORIGIN)
-                .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS")
-                .allowedHeaders("Content-Type", "application/json", "Authorization", "Bearer")
-                .exposedHeaders("Bearer", "provider")
-                .allowCredentials(true);
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        CorsConfiguration corsConfiguration = new CorsConfiguration();
+//        corsConfiguration.setAllowCredentials(true);
+//        corsConfiguration.setAllowedHeaders(Arrays.asList("Content-Type", "application/json", "Authorization", "Bearer"));
+//        corsConfiguration.addExposedHeader("Bearer");
+//        corsConfiguration.addExposedHeader("provider");
+//        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "http://localhost:3000",CORS_ALLOWED_ORIGIN));
+//        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
+//
+//        registry.addMapping("/**")
+//                .allowedOrigins("http://localhost:3000", CORS_ALLOWED_ORIGIN)
+//                .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS")
+//                .allowedHeaders("Content-Type", "application/json", "Authorization", "Bearer")
+//                .exposedHeaders("Bearer", "provider")
+//                .allowCredentials(true);
+//    }
 }
