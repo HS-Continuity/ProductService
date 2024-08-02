@@ -87,7 +87,7 @@ public class CustomerController {
     @Role(role = {"*"}, url = "/api/customer/auth/{businessNumber}", method = "GET")
     @GetMapping("/auth/{businessNumber}")
     public ResponseEntity<ApiResponse> retrieveDetailForAuth(@PathVariable("businessNumber") String businessNumber) {
-
+        System.out.println("들어왔다.");
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(customerService.retrieveCustomerForAuth(businessNumber))
                 .successCode(SuccessCode.SELECT_SUCCESS)
