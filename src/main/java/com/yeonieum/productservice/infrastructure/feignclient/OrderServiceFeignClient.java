@@ -16,4 +16,7 @@ public interface OrderServiceFeignClient {
 
     @GetMapping("/orderservice/api/order/ranking/gender")
     ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> getOrderGenderTop3(@RequestParam Long customerId, @RequestParam Gender gender);
+
+    @GetMapping("/orderservice/api/order/ranking/age-range")
+    ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> getOrderAgeRangeTop3(@RequestParam Long customerId, @RequestParam int ageRange);
 }

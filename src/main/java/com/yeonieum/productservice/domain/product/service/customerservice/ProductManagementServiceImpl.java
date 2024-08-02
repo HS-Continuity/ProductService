@@ -43,8 +43,7 @@ import java.util.stream.Collectors;
 import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.CATEGORY_NOT_FOUND;
 import static com.yeonieum.productservice.domain.category.exception.CategoryExceptionCode.DETAIL_CATEGORY_NOT_FOUND;
 import static com.yeonieum.productservice.domain.customer.exception.CustomerExceptionCode.CUSTOMER_NOT_FOUND;
-import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.NOT_PRODUCT_OWNER;
-import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.PRODUCT_NOT_FOUND;
+import static com.yeonieum.productservice.domain.product.exception.ProductExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -327,22 +326,30 @@ public class ProductManagementServiceImpl implements ProductManagementService{
     }
 
     /**
-     * 고객의 성별 TOP3 상품 조회
+     * 고객의 성별 및 연령별 TOP3 상품 조회
      * @param customerId
      * @param gender
+     * @param ageRange
      * @return 상품 정보
      */
     @Override
     @Transactional
-    public List<ProductManagementResponse.OfGenderRank> rankOfGender(Long customerId, Gender gender) {
+    public List<ProductManagementResponse.OfGenderRank> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange) {
 
         ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> productOrderCounts = null;
         List<ProductManagementResponse.ProductOrderCount> productOrderCountList = null;
 
         try {
-            productOrderCounts = orderServiceFeignClient.getOrderGenderTop3(customerId, gender);
+            if (gender != null && ageRange == null) {
+                productOrderCounts = orderServiceFeignClient.getOrderGenderTop3(customerId, gender);
+            } else if (ageRange != null && gender == null) {
+                productOrderCounts = orderServiceFeignClient.getOrderAgeRangeTop3(customerId, ageRange);
+            } else {
+                throw new ProductException(INVALID_PARAMETERS, HttpStatus.BAD_REQUEST);
+            }
         } catch (FeignException e) {
             e.printStackTrace();
+            return new ArrayList<>();
         }
 
         if (productOrderCounts != null && productOrderCounts.getBody() != null) {
