@@ -6,6 +6,7 @@ import com.yeonieum.productservice.domain.product.dto.customerservice.ProductMan
 import com.yeonieum.productservice.domain.product.service.customerservice.ProductManagementService;
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
+import com.yeonieum.productservice.global.enums.Gender;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import com.yeonieum.productservice.global.usercontext.UserContextHolder;
@@ -218,5 +219,20 @@ public class ProductManagementController {
                 .result(productManagementService.bulkRetrieveProductInformation(productIdList))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
-    };
+    }
+
+    @Operation(summary = "고객의 성별 및 연령별 TOP3 상품정보 조회", description = "고객의 성별 및 연령별 TOP3 상품을 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상품 정보 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 정보 조회 실패")
+    })
+    @GetMapping("/ranking/gender-product")
+    public ResponseEntity<ApiResponse> getProductByCondition(@RequestParam Long customerId,
+                                                        @RequestParam(required = false) Gender gender,
+                                                        @RequestParam(required = false) Integer ageRange) {
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(productManagementService.retrieveTopProductsByCondition(customerId, gender, ageRange))
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }

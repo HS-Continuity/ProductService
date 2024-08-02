@@ -3,8 +3,10 @@ package com.yeonieum.productservice.global.responses;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class ApiResponse<T> {
     private T result;
 
