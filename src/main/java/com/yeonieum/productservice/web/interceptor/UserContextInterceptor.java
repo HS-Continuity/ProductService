@@ -26,5 +26,9 @@ public class UserContextInterceptor implements RequestInterceptor {
         if (context.getServiceId() != null) {
             template.header(UserContext.SERVICE_ID, context.getServiceId());
         }
+
+        if (context.getUniqueId() != null) {
+            template.header(UserContext.UNIQUE_ID, context.getUniqueId());
+        }
     }
 }
