@@ -118,7 +118,7 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 수 조회 실패")
     })
     @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/count", method = "GET")
-    @GetMapping("count")
+    @GetMapping("/count")
     public ResponseEntity<ApiResponse> countCartProduct(
             @RequestParam("memberId") String memberId,
             @RequestParam(value = "cartTypeId", required = false) Long cartTypeId) {
@@ -138,7 +138,7 @@ public class CartController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "장바구니 상품 일괄 삭제 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "장바구니 상품 일괄 삭제 실패")
     })
-    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product/bulk", method = "DELETE")
+    @Role(role = {"ROLE_MEMBER"}, url = "/api/cart-product", method = "DELETE")
     @DeleteMapping
     public ResponseEntity<ApiResponse> deleteAllCartProduct(@RequestParam("cartTypeId") Long cartTypeId, @RequestParam("cartIds") List<Long> cartIds) {
         String member = UserContextHolder.getContext().getUserId();
