@@ -1,9 +1,9 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:891376922202:task-definition/t4-productservice-task-definition:5",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:891376922202:task-definition/t4-productservice-task-definition:6",
     "containerDefinitions": [
         {
             "name": "t4-productservice-container",
-            "image": "891376922202.dkr.ecr.ap-northeast-2.amazonaws.com/t4-productservice-ecr:1eb4fc3a668f6020473d6067da95404bde966cf3",
+            "image": "891376922202.dkr.ecr.ap-northeast-2.amazonaws.com/t4-productservice-ecr:9fdc58f8e6942efce2922589f8cfbdc7d8a1c751",
             "cpu": 0,
             "portMappings": [
                 {
@@ -34,7 +34,7 @@
     "taskRoleArn": "arn:aws:iam::891376922202:role/t4-back-AmazonECSTaskExecutionRolePolicy",
     "executionRoleArn": "arn:aws:iam::891376922202:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 5,
+    "revision": 6,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -80,7 +80,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-08-02T11:22:11.767Z",
+    "registeredAt": "2024-08-02T11:34:47.274Z",
     "registeredBy": "arn:aws:iam::891376922202:user/fms-kosa-tema4",
     "tags": []
 }
