@@ -22,6 +22,7 @@ import com.yeonieum.productservice.domain.product.repository.SaleTypeRepository;
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.enums.Gender;
+import com.yeonieum.productservice.global.enums.OrderType;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.infrastructure.feignclient.OrderServiceFeignClient;
 import feign.FeignException;
@@ -340,22 +341,23 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional
-    public List<ProductManagementResponse.OfGenderRank> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange) {
+    public List<ProductManagementResponse.OfGenderRank> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange, OrderType orderType) {
 
         ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> productOrderCounts = null;
         List<ProductManagementResponse.ProductOrderCount> productOrderCountList = null;
 
         try {
-            if (gender != null && ageRange == null) {
+            if (gender != null) {
                 productOrderCounts = orderServiceFeignClient.getOrderGenderTop3(customerId, gender);
-            } else if (ageRange != null && gender == null) {
+            } else if (ageRange != null) {
                 productOrderCounts = orderServiceFeignClient.getOrderAgeRangeTop3(customerId, ageRange);
+            } else if (orderType != null) {
+                productOrderCounts = orderServiceFeignClient.getAllProductsByOrderType(customerId, orderType);
             } else {
                 throw new ProductException(INVALID_PARAMETERS, HttpStatus.BAD_REQUEST);
             }
         } catch (FeignException e) {
             e.printStackTrace();
-            return new ArrayList<>();
         }
 
         if (productOrderCounts != null && productOrderCounts.getBody() != null) {

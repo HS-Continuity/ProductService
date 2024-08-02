@@ -5,6 +5,7 @@ import com.yeonieum.productservice.domain.product.dto.customerservice.ProductMan
 import com.yeonieum.productservice.domain.productinventory.dto.StockUsageRequest;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.enums.Gender;
+import com.yeonieum.productservice.global.enums.OrderType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,5 +28,5 @@ public interface ProductManagementService {
     ProductManagementResponse.OfRetrieveProductOrder retrieveProductInformation(Long productId);
     Map<Long, ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformation(List<Long> productIdList);
     List<ProductManagementResponse.OfOrderInformation> retrieveOrderInformation(StockUsageRequest.IncreaseStockUsageList increaseStockUsageList);
-    List<ProductManagementResponse.OfGenderRank> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange);
+    List<ProductManagementResponse.OfGenderRank> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange, OrderType orderType);
 }

@@ -7,6 +7,7 @@ import com.yeonieum.productservice.domain.product.service.customerservice.Produc
 import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.enums.ActiveStatus;
 import com.yeonieum.productservice.global.enums.Gender;
+import com.yeonieum.productservice.global.enums.OrderType;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import com.yeonieum.productservice.global.usercontext.UserContextHolder;
@@ -228,10 +229,11 @@ public class ProductManagementController {
     })
     @GetMapping("/ranking/gender-product")
     public ResponseEntity<ApiResponse> getProductByCondition(@RequestParam Long customerId,
-                                                        @RequestParam(required = false) Gender gender,
-                                                        @RequestParam(required = false) Integer ageRange) {
+                                                             @RequestParam(required = false) Gender gender,
+                                                             @RequestParam(required = false) Integer ageRange,
+                                                             @RequestParam(required = false) OrderType orderType) {
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(productManagementService.retrieveTopProductsByCondition(customerId, gender, ageRange))
+                .result(productManagementService.retrieveTopProductsByCondition(customerId, gender, ageRange, orderType))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
