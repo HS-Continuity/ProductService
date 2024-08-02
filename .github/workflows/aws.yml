@@ -2,7 +2,7 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "KAN-543--test/상품서비스-자동배포-테스트" ]
+    branches: [ "main" ]
 
 
 env:
