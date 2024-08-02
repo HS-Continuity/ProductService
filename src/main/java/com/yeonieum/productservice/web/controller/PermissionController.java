@@ -16,7 +16,7 @@ public class PermissionController {
     private final RoleMetaDataCollector roleMetaDataCollector;
 
     @GetMapping("/api/permissions")
-    public @ResponseBody ResponseEntity<?> retrieveProductReviews(Long productId) {
+    public @ResponseBody ResponseEntity<?> getPermissions() {
         return new ResponseEntity<>(roleMetaDataCollector.getRoleMetadata(), HttpStatus.OK);
     }
 }
