@@ -84,6 +84,7 @@ public class CustomerController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "인증용 고객 정보 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "인증용 고객 정보 조회 실패")
     })
+    @Role(role = {"*"}, url = "/api/customer/auth/{businessNumber}", method = "GET")
     @GetMapping("/auth/{businessNumber}")
     public ResponseEntity<ApiResponse> retrieveDetailForAuth(@PathVariable("businessNumber") String businessNumber) {
 
