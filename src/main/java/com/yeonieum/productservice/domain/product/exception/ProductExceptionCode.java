@@ -13,7 +13,8 @@ public enum ProductExceptionCode implements CustomExceptionCode {
     PRODUCT_TIME_SALE_CANNOT_BE_CANCELED(4006, "취소할 수 없는 상태입니다."),
     NO_PRODUCTS_IN_CATEGORY(4007, "해당 카테고리 내의 상품이 없습니다."),
     NO_PRODUCTS_IN_DETAIL_CATEGORY(4008, "해당 상세 카테고리 내의 상품이 없습니다."),
-    NO_SEARCH_RESULTS(4009, "검색 결과가 없습니다. 다른 검색어를 입력해 주세요.");
+    NO_SEARCH_RESULTS(4009, "검색 결과가 없습니다. 다른 검색어를 입력해 주세요."),
+    INVALID_PARAMETERS(40010, "잘못된 매개변수 입니다.");
 
     private final int code;
     private final String message;

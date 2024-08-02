@@ -28,5 +28,5 @@ public interface ProductManagementService {
     Map<Long, ProductManagementResponse.OfRetrieveProductOrder> bulkRetrieveProductInformation(List<Long> productIdList);
 
     List<ProductManagementResponse.OfOrderInformation> retrieveOrderInformation(StockUsageRequest.IncreaseStockUsageList increaseStockUsageList);
-    List<ProductManagementResponse.OfGenderRank> rankOfGender(Long customerId, Gender gender);
+    List<ProductManagementResponse.OfGenderRank> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange);
 }
