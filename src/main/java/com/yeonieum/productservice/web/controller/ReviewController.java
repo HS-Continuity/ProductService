@@ -77,7 +77,7 @@ public class ReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 리뷰 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 리뷰 조회 실패")
     })
-    @Role(role = {"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_CUSTOMER","ROLE_ANONYMOUS"}, url = "/api/product-review/{productId}", method = "GET")
+    @Role(role = {"*"}, url = "/api/product-review/{productId}", method = "GET")
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveProductReviews(
             @PathVariable Long productId,
