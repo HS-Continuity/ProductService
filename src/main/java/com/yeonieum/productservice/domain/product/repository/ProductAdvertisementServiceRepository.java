@@ -17,9 +17,10 @@ public interface ProductAdvertisementServiceRepository extends JpaRepository<Pro
             "ORDER BY FUNCTION('RAND')")
     List<ProductAdvertisementService> findRandomActiveAdvertisements(@Param("statusName") String statusName);
 
-    @Query(value = "SELECT pas" +
-            "FROM ProductAdvertisementService pas " +
-            "JOIN product p ON pts.product_id = p.id " +
+
+    @Query(value = "SELECT pas.* " +
+            "FROM product_advertisement_service pas " +
+            "JOIN product p ON pas.product_id = p.product_id " +
             "WHERE p.customer_id = :customerId", nativeQuery = true)
     List<ProductAdvertisementService> findAllAdvertisementProduct(@Param("customerId") Long customerId);
 
