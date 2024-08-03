@@ -178,9 +178,10 @@ public class ProductManagementResponse {
 
     @Getter
     @Builder
-    public static class OfGenderRank {
+    public static class OfStatisticsProduct {
         private Long productId;
         private String productName;
+        private String categoryName;
         private String image;
         private Long orderCount;
         private double averageScore;
