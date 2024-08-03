@@ -341,7 +341,7 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional
-    public List<ProductManagementResponse.OfGenderRank> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange, OrderType orderType) {
+    public List<ProductManagementResponse.OfStatisticsProduct> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange, OrderType orderType) {
 
         ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> productOrderCounts = null;
         List<ProductManagementResponse.ProductOrderCount> productOrderCountList = null;
@@ -368,15 +368,16 @@ public class ProductManagementServiceImpl implements ProductManagementService{
         }
 
         //반환값 (상품 정보)
-        List<ProductManagementResponse.OfGenderRank> genderRanks = new ArrayList<>();
+        List<ProductManagementResponse.OfStatisticsProduct> genderRanks = new ArrayList<>();
 
         for(ProductManagementResponse.ProductOrderCount productOrderCount : productOrderCountList){
             Product targetProduct = productRepository.findById(productOrderCount.getProductId())
                     .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-            ProductManagementResponse.OfGenderRank genderRank = ProductManagementResponse.OfGenderRank.builder()
+            ProductManagementResponse.OfStatisticsProduct genderRank = ProductManagementResponse.OfStatisticsProduct.builder()
                             .productId(productOrderCount.getProductId())
                     .productName(targetProduct.getProductName())
+                    .categoryName(targetProduct.getProductDetailCategory().getDetailCategoryName())
                     .image(targetProduct.getProductImage())
                     .orderCount(productOrderCount.getOrderCount())
                     .averageScore(targetProduct.getAverageScore())
