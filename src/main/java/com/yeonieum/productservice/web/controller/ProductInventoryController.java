@@ -47,6 +47,7 @@ public class ProductInventoryController {
                 .build());
     }
 
+    @Role(role = {"ROLE_ADMIN", "ROLE_MEMBER"}, url = "/api/inventory/regular-order/stock-usage", method = "POST")
     @PostMapping("/regular-order/stock-usage")
     public ResponseEntity<List<ProductManagementResponse.OfOrderInformation>> getAvailableRegularDelivery(@RequestBody StockUsageRequest.IncreaseStockUsageList increaseStockUsageList) {
         List<ProductManagementResponse.OfOrderInformation> responseList = productManagementService.retrieveOrderInformation(increaseStockUsageList);

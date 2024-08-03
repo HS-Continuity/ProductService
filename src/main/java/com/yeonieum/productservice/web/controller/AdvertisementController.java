@@ -68,12 +68,12 @@ public class AdvertisementController {
                 .build(), HttpStatus.OK);
     }
 
-    @Operation(summary = "고객들의 상품 상단광고 신청내역 조회", description = "관리자용 상단광고 신청내역 조회입니다.")
+    @Operation(summary = "회원용 상단광고 조회", description = "회원용 상단광고 신청내역 조회입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상단광고 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @Role(role = {"ROLE_ADMIN"}, url = "/api/advertisement/product/list", method = "GET")
+    @Role(role = {"*"}, url = "/api/advertisement/product/list", method = "GET")
     @GetMapping("/product/list")
     public ResponseEntity getAdvertisementProduct(@RequestParam int startPage,
                                                   @RequestParam int pageSize) {

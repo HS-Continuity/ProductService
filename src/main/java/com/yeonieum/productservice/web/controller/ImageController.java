@@ -26,7 +26,7 @@ public class ImageController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 상세 이미지 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 상세 이미지 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/product-image/{productId}", method = "GET")
+    @Role(role = {"*"}, url = "/api/product-image/{productId}", method = "GET")
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveProductReviews(@PathVariable Long productId) {
 
@@ -43,7 +43,7 @@ public class ImageController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 인증서 정보 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 인증서 정보 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/product-image/certification/{productId}", method = "GET")
+    @Role(role = {"*"}, url = "/api/product-image/certification/{productId}", method = "GET")
     @GetMapping("/certification/{productId}")
     public ResponseEntity<ApiResponse> retrieveProductCertification(@PathVariable Long productId) {
 

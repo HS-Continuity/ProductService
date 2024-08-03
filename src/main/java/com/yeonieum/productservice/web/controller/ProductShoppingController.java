@@ -33,7 +33,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "카테고리 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "카테고리 상품 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/shopping/product/category/{categoryId}", method = "GET")
+    @Role(role = {"*"}, url = "/api/shopping/product/category/{categoryId}", method = "GET")
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<ApiResponse> retrieveCategoryWithProducts(@PathVariable Long categoryId,
                                                                     @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
@@ -58,7 +58,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상세 카테고리 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상세 카테고리 상품 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/shopping/product/detail-category/{detailCategoryId}", method = "GET")
+    @Role(role = {"*"}, url = "/api/shopping/product/detail-category/{detailCategoryId}", method = "GET")
     @GetMapping("/detail-category/{detailCategoryId}")
     public ResponseEntity<ApiResponse> retrieveDetailCategoryWithProducts(@PathVariable Long detailCategoryId,
                                                                           @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
@@ -84,7 +84,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 상세 정보 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 상세 정보 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER",  "ROLE_ANONYMOUS"}, url = "/api/shopping/product/{productId}", method = "GET")
+    @Role(role ={"*"}, url = "/api/shopping/product/{productId}", method = "GET")
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> retrieveDetailProduct(@PathVariable Long productId) {
 
@@ -102,7 +102,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "필터링 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "필터링 상품 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/shopping/product/search", method = "GET")
+    @Role(role = {"*"}, url = "/api/shopping/product/search", method = "GET")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse> retrieveSearchFilterProduct(@RequestParam(required = false) String keyword,
                                                                     @RequestParam(value = "isCertification", required = false) ActiveStatus isCertification,
@@ -127,7 +127,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "업체 상품 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "업체 상품 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER",  "ROLE_ANONYMOUS"}, url = "/api/shopping/product/customer/{customerId}", method = "GET")
+    @Role(role = {"*"}, url = "/api/shopping/product/customer/{customerId}", method = "GET")
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<ApiResponse> retrieveSearchCustomerProduct(@PathVariable Long customerId,
                                                                      @RequestParam(required = false) Long detailCategoryId,
@@ -152,7 +152,7 @@ public class ProductShoppingController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "키워드 검색 순위 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "키워드 검색 순위 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_GUEST", "ROLE_ANONYMOUS"}, url = "/api/shopping/product/ranking", method = "GET")
+    @Role(role = {"*"}, url = "/api/shopping/product/ranking", method = "GET")
     @GetMapping("/ranking")
     public ResponseEntity<ApiResponse> retrieveSearchRank() {
 
@@ -164,6 +164,7 @@ public class ProductShoppingController {
                 .build(), HttpStatus.OK);
     }
 
+    @Role(role = {"*"}, url = "/api/shopping/product/order/{productId}", method = "GET")
     @GetMapping("/order/{productId}")
     public ResponseEntity<ApiResponse> retrieveOrderProductInformation(@PathVariable Long productId) {
         ProductShoppingResponse.OfRetrieveOrderInformation orderProductInformation =
@@ -174,7 +175,7 @@ public class ProductShoppingController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
-
+    @Role(role = {"*"}, url = "/api/shopping/product/orders", method = "GET")
     @GetMapping("/orders")
     public ResponseEntity<ApiResponse> retrieveOrderProductInformation(@RequestParam List<Long> productIdList) {
         Set<ProductShoppingResponse.OfRetrieveOrderInformation> orderProductInformation =

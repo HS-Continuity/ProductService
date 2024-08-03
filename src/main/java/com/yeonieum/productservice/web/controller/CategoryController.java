@@ -45,7 +45,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 카테고리 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 카테고리 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/category", method = "GET")
+    @Role(role = {"*"}, url = "/api/category", method = "GET")
     @GetMapping
     public ResponseEntity<ApiResponse> retrieveProductCategoryList() {
 
@@ -97,7 +97,7 @@ public class CategoryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 하위 카테고리 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 하위 카테고리 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MEMBER", "ROLE_ANONYMOUS"}, url = "/api/category/{productCategoryId}/detail", method = "GET")
+    @Role(role = {"*"}, url = "/api/category/{productCategoryId}/detail", method = "GET")
     @GetMapping("/{productCategoryId}/detail")
     public ResponseEntity<ApiResponse> RetrieveCategoryWithDetails(@PathVariable Long productCategoryId) {
 
