@@ -4,6 +4,7 @@ import com.yeonieum.productservice.global.usercontext.UserContext;
 import com.yeonieum.productservice.global.usercontext.UserContextHolder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import org.springframework.http.HttpHeaders;
 
 public class UserContextInterceptor implements RequestInterceptor {
 
@@ -17,6 +18,10 @@ public class UserContextInterceptor implements RequestInterceptor {
 
         if (context.getAuthToken() != null) {
             template.header(UserContext.AUTH_TOKEN, context.getAuthToken());
+        }
+
+        if (context.getAuthToken() != null) {
+            template.header(HttpHeaders.AUTHORIZATION, context.getAuthToken());
         }
 
         if (context.getUserId() != null) {
