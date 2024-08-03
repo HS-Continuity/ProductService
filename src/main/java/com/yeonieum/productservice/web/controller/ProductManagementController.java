@@ -122,10 +122,10 @@ public class ProductManagementController {
                                                               @RequestParam(required = false) Integer regularDiscountRate,
                                                               @RequestParam(defaultValue = "1") int startPage,
                                                               @RequestParam(defaultValue = "10") int pageSize) {
-        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
+        //Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         Pageable pageable = PageRequest.of(startPage, pageSize);
         Page<ProductManagementResponse.OfRetrieve> productList =
-                productManagementService.retrieveCustomersProducts(customer, isEcoFriend, productId, productName, detailCategoryName, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
+                productManagementService.retrieveCustomersProducts(1L, isEcoFriend, productId, productName, detailCategoryName, origin, price, isPageVisibility, isRegularSale, baseDiscountRate, regularDiscountRate, pageable);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(productList)
                 .successCode(SuccessCode.SELECT_SUCCESS)

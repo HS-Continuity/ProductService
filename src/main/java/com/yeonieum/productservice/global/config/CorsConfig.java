@@ -23,7 +23,7 @@ public class CorsConfig implements WebMvcConfigurer {
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
 
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", CORS_ALLOWED_ORIGIN)
+                .allowedOrigins("http://localhost:5173", "http://localhost:3000", CORS_ALLOWED_ORIGIN)
                 .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS")
                 .allowedHeaders("Content-Type", "application/json", "Authorization", "Bearer")
                 .exposedHeaders("Bearer", "provider")

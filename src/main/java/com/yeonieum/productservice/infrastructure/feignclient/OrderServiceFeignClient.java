@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "orderservice", configuration = FeignConfig.class)
+@FeignClient(name = "orderservice", url = "localhost:8040", configuration = FeignConfig.class)
 public interface OrderServiceFeignClient {
 
     @GetMapping("/orderservice/api/order/ranking/gender")
