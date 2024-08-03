@@ -31,7 +31,7 @@ public interface ProductInventoryRepository extends JpaRepository<ProductInvento
                     "COALESCE(SUM(pi.quantity), 0) AS totalQuantity " +
                     "FROM product_inventory pi " +
                     "JOIN product p ON pi.product_id = p.product_id " +
-                    "WHERE pi.customer_id = :customerId " +
+                    "WHERE p.customer_id = :customerId " +
                     "AND pi.expiration_date > :today " +
                     "GROUP BY p.product_id, p.product_name",
             nativeQuery = true
