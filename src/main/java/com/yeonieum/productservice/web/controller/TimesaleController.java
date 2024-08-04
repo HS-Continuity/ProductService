@@ -122,7 +122,7 @@ public class TimesaleController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "타임세일 상품 목록 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @Role(role = {"*"}, url = "/api/time-sale/product/list", method = "GET")
+    @Role(role = {"*"}, url = "/api/time-sale/product", method = "GET")
     @GetMapping("/{timesaleId}/product")
     public ResponseEntity<ApiResponse> getTimesaleProductForMember(@PathVariable Long timesaleId) {
         return new ResponseEntity<>(ApiResponse.builder()

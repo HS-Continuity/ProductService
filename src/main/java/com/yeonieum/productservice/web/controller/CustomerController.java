@@ -50,7 +50,7 @@ public class CustomerController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "고객 상세 정보 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "고객 상세 정보 조회 실패")
     })
-    @Role(role = {"ROLE_ADMIN"}, url = "/api/customer/{customerId}", method = "GET")
+    @Role(role = {"*"}, url = "/api/customer/{customerId}", method = "GET")
     @GetMapping("/{customerId}")
     public ResponseEntity<ApiResponse> retrieveDetailCustomer(@PathVariable("customerId") Long customerId) {
 
