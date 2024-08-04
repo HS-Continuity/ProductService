@@ -111,7 +111,7 @@ public class TimesaleManagementService {
             throw new IllegalArgumentException("존재하지 않는 상품입니다.");
         }
 
-        if(productTimesale.getServiceStatus().getStatusName().equals(ServiceStatusCode.PENDING.getCode())) {
+        if(!productTimesale.getServiceStatus().getStatusName().equals(ServiceStatusCode.PENDING.getCode())) {
             throw new ProductException(PRODUCT_TIME_SALE_CANNOT_BE_CANCELED, HttpStatus.CONFLICT);
         }
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.CANCELED.getCode());
