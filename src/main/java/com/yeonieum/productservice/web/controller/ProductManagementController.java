@@ -171,6 +171,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "일반상품등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}/default-image", method = "POST")
     @PostMapping("/product/{productId}/default-image")
     public ResponseEntity<ApiResponse> uploadDefaultImage(@PathVariable Long productId,
                                                           @RequestPart(value = "image")  MultipartFile defaultImage) throws IOException {
@@ -195,6 +196,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상세이미지 등록 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}/detail-image", method = "POST")
     @PostMapping("/product/{productId}/detail-image")
     public ResponseEntity<ApiResponse> uploadProductDetailImage(@PathVariable Long productId,
                                                                 @RequestPart(value = "deleteList") ProductManagementRequest.OfDeleteDetailImageList deleteOfDeleteDetailImageList,
@@ -214,6 +216,12 @@ public class ProductManagementController {
                 .build(), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "외부서비스 호출 API", description = "외부서비스 호출 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @Role(role = {"ROLE_CUSTOMER", "ROLE_MEMBER"}, url = "/api/management/products", method = "GET")
     @GetMapping("/products")
     public ResponseEntity<ApiResponse> bulkRetrieveProductInformation(@RequestParam List<Long> productIdList) {
         return new ResponseEntity<>(ApiResponse.builder()
@@ -227,6 +235,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "상품 정보 조회 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "상품 정보 조회 실패")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/ranking/statistics-product", method = "GET")
     @GetMapping("/ranking/statistics-product")
     public ResponseEntity<ApiResponse> getProductByCondition(@RequestParam Long customerId,
                                                              @RequestParam(required = false) Gender gender,
