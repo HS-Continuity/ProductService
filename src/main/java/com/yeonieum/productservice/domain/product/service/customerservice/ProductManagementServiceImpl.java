@@ -341,21 +341,13 @@ public class ProductManagementServiceImpl implements ProductManagementService{
      */
     @Override
     @Transactional
-    public List<ProductManagementResponse.OfStatisticsProduct> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange, OrderType orderType) {
+    public List<ProductManagementResponse.OfStatisticsProduct> retrieveTopProductsByCondition(Long customerId, Gender gender, Integer ageRange, OrderType orderType, Integer month) {
 
         ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> productOrderCounts = null;
         List<ProductManagementResponse.ProductOrderCount> productOrderCountList = null;
 
         try {
-            if (gender != null) {
-                productOrderCounts = orderServiceFeignClient.getOrderGenderTop3(customerId, gender);
-            } else if (ageRange != null) {
-                productOrderCounts = orderServiceFeignClient.getOrderAgeRangeTop3(customerId, ageRange);
-            } else if (orderType != null) {
-                productOrderCounts = orderServiceFeignClient.getAllProductsByOrderType(customerId, orderType);
-            } else {
-                throw new ProductException(INVALID_PARAMETERS, HttpStatus.BAD_REQUEST);
-            }
+            productOrderCounts = orderServiceFeignClient.getAllProductsByCondition(customerId, gender, ageRange, orderType, month);
         } catch (FeignException e) {
             e.printStackTrace();
         }

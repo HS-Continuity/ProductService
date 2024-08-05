@@ -240,9 +240,11 @@ public class ProductManagementController {
     public ResponseEntity<ApiResponse> getProductByCondition(@RequestParam Long customerId,
                                                              @RequestParam(required = false) Gender gender,
                                                              @RequestParam(required = false) Integer ageRange,
-                                                             @RequestParam(required = false) OrderType orderType) {
+                                                             @RequestParam(required = false) OrderType orderType,
+                                                             @RequestParam(required = false) Integer month) {
+        Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         return new ResponseEntity<>(ApiResponse.builder()
-                .result(productManagementService.retrieveTopProductsByCondition(customerId, gender, ageRange, orderType))
+                .result(productManagementService.retrieveTopProductsByCondition(customer, gender, ageRange, orderType, month))
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
