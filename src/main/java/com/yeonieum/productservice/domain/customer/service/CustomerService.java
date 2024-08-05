@@ -67,7 +67,7 @@ public class CustomerService {
      */
     @Transactional
     public CustomerResponse.OfRetrieveForAuth retrieveCustomerForAuth(String businessNumber) {
-        Customer targetCustomer = customerRepository.findById(Long.valueOf(businessNumber))
+        Customer targetCustomer = customerRepository.findByStoreBusinessNumber(businessNumber)
                 .orElseThrow(() -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         return CustomerResponse.OfRetrieveForAuth.convertedBy(targetCustomer);
