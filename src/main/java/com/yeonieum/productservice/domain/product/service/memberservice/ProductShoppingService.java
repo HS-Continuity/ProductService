@@ -172,7 +172,7 @@ public class ProductShoppingService {
             // 키워드를 띄어쓰기로 분할
             List<String> keywords = splitKeywords(keyword);
 
-            // 모든 키워드에 대해 데이터베이스에서 검색
+            // 모든 키워드에 대해 검색
             Page<Product> productsPage = productRepositoryCustomImpl.findByKeywords(keywords, pageable);
 
             // 검색 결과가 존재하는 경우에만 검색어 점수 증가
