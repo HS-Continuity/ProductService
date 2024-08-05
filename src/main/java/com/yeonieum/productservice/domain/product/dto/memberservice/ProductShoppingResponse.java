@@ -118,7 +118,6 @@ public class ProductShoppingResponse {
         private int productPrice;
         private int calculatedBasePrice;
         private int calculatedRegularPrice;
-        private int calculatedPersonalizedPrice;
         private ActiveStatus isRegularSale;
         private ActiveStatus isCertification;
         private Integer reviewCount;
@@ -146,7 +145,6 @@ public class ProductShoppingResponse {
                     .productPrice(product.getProductPrice())
                     .calculatedBasePrice(product.getCalculatedBasePrice())
                     .calculatedRegularPrice(product.getCalculatedRegularPrice())
-                    .calculatedPersonalizedPrice(product.getCalculatedPersonalizedPrice())
                     .isRegularSale(product.getIsRegularSale())
                     .isCertification(product.getIsCertification())
                     .reviewCount(product.getReviewCount())

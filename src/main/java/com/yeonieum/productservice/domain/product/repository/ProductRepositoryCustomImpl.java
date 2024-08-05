@@ -36,8 +36,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
         // WHERE 절 동적 생성
         BooleanExpression predicate = keywords.stream()
-                .map(k -> product.productName.like("%" + k + "%")
-                        .or(category.detailCategoryName.like("%" + k + "%"))
+                .map(k -> product.productName.contains(k)
+                        .or(category.detailCategoryName.contains(k))
                         .and(product.isPageVisibility.eq(ActiveStatus.ACTIVE)))
                 .reduce(BooleanExpression::or)
                 .orElse(null);
