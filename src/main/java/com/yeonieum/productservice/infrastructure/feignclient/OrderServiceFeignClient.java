@@ -15,12 +15,11 @@ import java.util.List;
 @FeignClient(name = "orderservice", configuration = FeignConfig.class)
 public interface OrderServiceFeignClient {
 
-    @GetMapping("/orderservice/api/order/ranking/gender")
-    ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> getOrderGenderTop3(@RequestParam Long customerId, @RequestParam Gender gender);
+    @GetMapping("/orderservice/api/order/ranking/statistics")
+    ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> getAllProductsByCondition(@RequestParam Long customerId,
+                                                                                                             @RequestParam(required = false) Gender gender,
+                                                                                                             @RequestParam(required = false) Integer ageRange,
+                                                                                                             @RequestParam(required = false) OrderType orderType,
+                                                                                                             @RequestParam(required = false) Integer month);
 
-    @GetMapping("/orderservice/api/order/ranking/age-range")
-    ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> getOrderAgeRangeTop3(@RequestParam Long customerId, @RequestParam int ageRange);
-
-    @GetMapping("/orderservice/api/order/ranking/order-type")
-    ResponseEntity<ApiResponse<List<ProductManagementResponse.ProductOrderCount>>> getAllProductsByOrderType(@RequestParam Long customerId, @RequestParam OrderType orderType);
 }
