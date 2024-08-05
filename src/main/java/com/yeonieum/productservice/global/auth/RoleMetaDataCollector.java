@@ -27,7 +27,10 @@ public class RoleMetaDataCollector {
     public void collectRoleMetadata() {
         // 모든 @RestController 또는 @Controller 빈 가져오기
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(RestController.class);
-
+        roleMetadata.put("/actuator/refresh", RoleMetaData.builder()
+                .roles(Arrays.asList("*"))
+                .Methods("POST")
+                .build());
         for (Object bean : beans.values()) {
             Class<?> beanClass = bean.getClass();
             Method[] methods = beanClass.getDeclaredMethods();
