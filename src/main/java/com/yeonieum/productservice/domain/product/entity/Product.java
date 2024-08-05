@@ -71,9 +71,6 @@ public class Product {
     @Column(name = "calculated_regular_price")
     private int calculatedRegularPrice;
 
-    @Column(name = "calculated_personalized_price")
-    private int calculatedPersonalizedPrice;
-
     @ColumnDefault("0")
     @Column(name = "review_count")
     @Builder.Default
