@@ -2,6 +2,8 @@ package com.yeonieum.productservice.domain.product.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yeonieum.productservice.domain.category.entity.QProductDetailCategory;
 import com.yeonieum.productservice.domain.product.entity.Product;
@@ -43,6 +45,13 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .orElse(null);
 
         query.where(predicate).distinct();
+
+        // CASE 문을 사용하여 상품 이름 검색 결과에 높은 우선순위를 부여
+        NumberExpression<Integer> sortOrder = new CaseBuilder()
+                .when(product.productName.contains(keywords.get(0))).then(1)
+                .otherwise(2);
+
+        query.orderBy(sortOrder.asc(), product.productName.asc());
 
         // 쿼리 결과 가져오기 및 페이징 처리
         List<Product> productList = query
