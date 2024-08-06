@@ -35,7 +35,6 @@ public class AdvertisementManagementService {
     private final ProductRepository productRepository;
     private final ProductAdvertisementServiceRepository productAdvertisementServiceRepository;
     private final ServiceStatusRepository serviceStatusRepository;
-    private final ProductEventProducer productEventProducer;
 
     /**
      * 상당노출신청상품리스트 조회
@@ -59,7 +58,7 @@ public class AdvertisementManagementService {
      * @return
      */
     @Transactional
-    public void registerAdvertisement(Long customerId, AdvertisementRequest.OfRegister registerRequest) throws JsonProcessingException {
+    public Long registerAdvertisement(Long customerId, AdvertisementRequest.OfRegister registerRequest) throws JsonProcessingException {
         Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
         if(product == null) {
             throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -67,10 +66,9 @@ public class AdvertisementManagementService {
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductAdvertisementService productAdvertisement = registerRequest.toEntity(product, status);
-        productAdvertisementServiceRepository.save(productAdvertisement);
+        ProductAdvertisementService savedEntity =  productAdvertisementServiceRepository.save(productAdvertisement);
 
-        AdvertisementEventMessage advertisementEventMessage = registerRequest.toEventMessage();
-        productEventProducer.sendMessage(advertisementEventMessage);
+        return savedEntity.getProductAdvertisementServiceId();
     }
 
     /**

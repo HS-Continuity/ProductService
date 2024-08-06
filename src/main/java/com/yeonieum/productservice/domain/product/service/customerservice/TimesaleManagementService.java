@@ -38,7 +38,6 @@ public class TimesaleManagementService {
     private final ProductRepository productRepository;
     private final ProductTimesaleRepository productTimesaleRepository;
     private final ServiceStatusRepository serviceStatusRepository;
-    private final ProductEventProducer productEventProducer;
 
     /**
      * 고객의 등록타임세일 목록 조회
@@ -83,7 +82,7 @@ public class TimesaleManagementService {
      * @return
      */
     @Transactional
-    public void registerTimesale(Long customerId, TimesaleRequestForCustomer.OfRegister registerRequest) throws JsonProcessingException {
+    public Long registerTimesale(Long customerId, TimesaleRequestForCustomer.OfRegister registerRequest) throws JsonProcessingException {
         Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
         if(product == null) {
             throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -91,10 +90,9 @@ public class TimesaleManagementService {
 
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductTimesale productTimesale = registerRequest.toEntity(product, status);
-        productTimesaleRepository.save(productTimesale);
+        ProductTimesale savedEntity = productTimesaleRepository.save(productTimesale);
 
-        TimesaleEventMessage timesaleEventMessage = registerRequest.toEventMessage();
-        productEventProducer.sendMessage(timesaleEventMessage);
+        return savedEntity.getProductTimesaleId();
     }
 
     /**

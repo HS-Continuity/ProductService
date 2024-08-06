@@ -9,6 +9,8 @@ import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import com.yeonieum.productservice.global.usercontext.UserContextHolder;
+import com.yeonieum.productservice.infrastructure.messaging.ProductEventProducer;
+import com.yeonieum.productservice.infrastructure.messaging.message.AdvertisementEventMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -26,6 +28,8 @@ public class AdvertisementController {
 
     private final AdvertisementManagementService advertisementManagementService;
     private final AdvertisementService advertisementService;
+    private final ProductEventProducer productEventProducer;
+
 
     /**
      * 상품광고서비스 신청
@@ -61,8 +65,10 @@ public class AdvertisementController {
     @PostMapping("/product")
     public ResponseEntity registerAdvertisement(@Valid @RequestBody AdvertisementRequest.OfRegister registerRequest) throws JsonProcessingException {
         Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
-        advertisementManagementService.registerAdvertisement(customer, registerRequest);
+        Long id= advertisementManagementService.registerAdvertisement(customer, registerRequest);
 
+        AdvertisementEventMessage advertisementEventMessage = registerRequest.toEventMessage(id);
+        productEventProducer.sendMessage(advertisementEventMessage);
         return new ResponseEntity(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.INSERT_SUCCESS)
