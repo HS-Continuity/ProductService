@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.web.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementRequest;
 import com.yeonieum.productservice.domain.product.dto.customerservice.AdvertisementResponse;
 import com.yeonieum.productservice.domain.product.service.customerservice.AdvertisementManagementService;
@@ -58,7 +59,7 @@ public class AdvertisementController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/advertisement/product", method = "POST")
     @PostMapping("/product")
-    public ResponseEntity registerAdvertisement(@Valid @RequestBody AdvertisementRequest.OfRegister registerRequest) {
+    public ResponseEntity registerAdvertisement(@Valid @RequestBody AdvertisementRequest.OfRegister registerRequest) throws JsonProcessingException {
         Long customer = Long.valueOf(UserContextHolder.getContext().getUniqueId());
         advertisementManagementService.registerAdvertisement(customer, registerRequest);
 

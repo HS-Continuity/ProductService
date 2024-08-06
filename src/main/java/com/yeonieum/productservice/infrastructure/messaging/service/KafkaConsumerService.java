@@ -22,7 +22,6 @@ public class KafkaConsumerService {
     @KafkaListener(id = "shipped-order-consumer", topics = "shipped-order-topic", groupId = "shipped-order-group", autoStartup = "true")
     public void listenApproveEvent(@Payload String message) {
         try {
-            System.out.println("adfadfsdf");
             List<ShippedEventMessage> shippedStockEventMessages = objectMapper.readValue(message, new TypeReference<List<ShippedEventMessage>>(){});
             for(ShippedEventMessage shippedEventMessage : shippedStockEventMessages) {
                 List<StockUsageCache>  stockUsageCaches = new ArrayList<>();
