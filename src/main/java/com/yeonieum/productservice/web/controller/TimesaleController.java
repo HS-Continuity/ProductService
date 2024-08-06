@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.web.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleRequestForCustomer;
 import com.yeonieum.productservice.domain.product.dto.customerservice.TimesaleResponseForCustomer;
 import com.yeonieum.productservice.domain.product.dto.memberservice.TimesaleResponseForMember;
@@ -56,7 +57,7 @@ public class TimesaleController {
     })
     @Role(role = {"ROLE_CUSTOMER"}, url = "/api/time-sale", method = "POST")
     @PostMapping
-    public ResponseEntity<ApiResponse> registerTimesale(@Valid @RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) {
+    public ResponseEntity<ApiResponse> registerTimesale(@Valid @RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) throws JsonProcessingException {
         Long customer = Long.valueOf(UserContextHolder.getContext().getUserId());
         timesaleManagementService.registerTimesale(customer, registerRequest);
 

@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.domain.product.service.customerservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.exception.CustomerException;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
@@ -13,6 +14,7 @@ import com.yeonieum.productservice.domain.product.repository.ProductAdvertisemen
 import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
 import com.yeonieum.productservice.global.enums.ServiceStatusCode;
+import com.yeonieum.productservice.infrastructure.messaging.ProductEventProducer;
 import com.yeonieum.productservice.infrastructure.messaging.message.AdvertisementEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,7 +35,7 @@ public class AdvertisementManagementService {
     private final ProductRepository productRepository;
     private final ProductAdvertisementServiceRepository productAdvertisementServiceRepository;
     private final ServiceStatusRepository serviceStatusRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ProductEventProducer productEventProducer;
 
     /**
      * 상당노출신청상품리스트 조회
@@ -57,7 +59,7 @@ public class AdvertisementManagementService {
      * @return
      */
     @Transactional
-    public void registerAdvertisement(Long customerId, AdvertisementRequest.OfRegister registerRequest) {
+    public void registerAdvertisement(Long customerId, AdvertisementRequest.OfRegister registerRequest) throws JsonProcessingException {
         Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
         if(product == null) {
             throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -68,7 +70,7 @@ public class AdvertisementManagementService {
         productAdvertisementServiceRepository.save(productAdvertisement);
 
         AdvertisementEventMessage advertisementEventMessage = registerRequest.toEventMessage();
-        //kafkaTemplate.send("advertisement-topic", advertisementEventMessage);
+        productEventProducer.sendMessage(advertisementEventMessage);
     }
 
     /**

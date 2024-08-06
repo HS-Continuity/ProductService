@@ -1,5 +1,6 @@
 package com.yeonieum.productservice.domain.product.service.customerservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yeonieum.productservice.domain.customer.entity.Customer;
 import com.yeonieum.productservice.domain.customer.exception.CustomerException;
 import com.yeonieum.productservice.domain.customer.repository.CustomerRepository;
@@ -14,6 +15,7 @@ import com.yeonieum.productservice.domain.product.repository.ProductRepository;
 import com.yeonieum.productservice.domain.product.repository.ProductTimesaleRepository;
 import com.yeonieum.productservice.domain.product.repository.ServiceStatusRepository;
 import com.yeonieum.productservice.global.enums.ServiceStatusCode;
+import com.yeonieum.productservice.infrastructure.messaging.ProductEventProducer;
 import com.yeonieum.productservice.infrastructure.messaging.message.TimesaleEventMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +38,7 @@ public class TimesaleManagementService {
     private final ProductRepository productRepository;
     private final ProductTimesaleRepository productTimesaleRepository;
     private final ServiceStatusRepository serviceStatusRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ProductEventProducer productEventProducer;
 
     /**
      * 고객의 등록타임세일 목록 조회
@@ -81,7 +83,7 @@ public class TimesaleManagementService {
      * @return
      */
     @Transactional
-    public void registerTimesale(Long customerId, TimesaleRequestForCustomer.OfRegister registerRequest) {
+    public void registerTimesale(Long customerId, TimesaleRequestForCustomer.OfRegister registerRequest) throws JsonProcessingException {
         Product product = productRepository.findByProductIdAndCustomer_CustomerId(registerRequest.getProductId(), customerId);
         if(product == null) {
             throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -92,7 +94,7 @@ public class TimesaleManagementService {
         productTimesaleRepository.save(productTimesale);
 
         TimesaleEventMessage timesaleEventMessage = registerRequest.toEventMessage();
-        //kafkaTemplate.send("timesale-topic", timesaleEventMessage);
+        productEventProducer.sendMessage(timesaleEventMessage);
     }
 
     /**
