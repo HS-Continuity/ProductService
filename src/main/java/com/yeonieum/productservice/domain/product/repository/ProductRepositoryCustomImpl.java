@@ -48,7 +48,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
         // CASE 문을 사용하여 상품 이름 검색 결과에 높은 우선순위를 부여
         NumberExpression<Integer> sortOrder = new CaseBuilder()
-                .when(product.productName.contains(keywords.get(0))).then(1)
+                .when(keywords.stream().map(k -> product.productName.contains(k))
+                        .reduce(BooleanExpression::or).orElse(null)).then(1)
                 .otherwise(2);
 
         query.orderBy(sortOrder.asc(), product.productName.asc());
