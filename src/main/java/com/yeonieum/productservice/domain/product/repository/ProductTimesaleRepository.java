@@ -17,13 +17,20 @@ public interface ProductTimesaleRepository extends JpaRepository<ProductTimesale
     ProductTimesale findByIdWithProduct(@Param("timesaleId") Long productTimesaleId);
 
     @Query("SELECT pts FROM ProductTimesale pts " +
-            "JOIN FETCH pts.product p")
+            "JOIN FETCH pts.product p where pts.serviceStatus.statusName = 'IN_PROGRESS'")
     Page<ProductTimesale> findAllTimesaleProduct(Pageable pageable);
 
     @Query("SELECT pts FROM ProductTimesale pts " +
             "JOIN FETCH pts.product p " +
             "WHERE pts.productTimesaleId = :productTimesaleId")
     Optional<ProductTimesale> findByProductTimesaleId(@Param("productTimesaleId") Long productTimesaleId);
+
+    // productId 중에서 servicestatus가 pending혹은 active인 것이 존재하는지 확인한는 쿼리
+    @Query("SELECT COUNT(pts) > 0 FROM ProductTimesale pts " +
+            "JOIN pts.product p " +
+            "WHERE p.productId = :productId " +
+            "AND pts.serviceStatus.statusName IN ('PENDING', 'APPROVE', 'IN_PROGRESS')")
+    boolean existsByProductIdAndServiceStatus(@Param("productId") Long productId);
 
     @Query(value = "SELECT pts " +
             "FROM ProductTimesale  pts " +
