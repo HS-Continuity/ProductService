@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = RedissonAutoConfiguration.class)
 @EnableFeignClients
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @EnableScheduling
 public class ProductserviceApplication {
 	public static void main(String[] args) {
