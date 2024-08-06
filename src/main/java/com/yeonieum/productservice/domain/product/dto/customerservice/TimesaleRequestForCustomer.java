@@ -39,11 +39,11 @@ public class TimesaleRequestForCustomer {
                     .build();
         }
 
-        public TimesaleEventMessage toEventMessage() {
+        public TimesaleEventMessage toEventMessage(Long id) {
             return TimesaleEventMessage.builder()
                     .startDateTime(this.getStartTime())
                     .endDateTime(this.getEndTime())
-                    .productId(this.getProductId())
+                    .productId(id)
                     .build();
         }
     }

@@ -38,9 +38,9 @@ public class AdvertisementRequest {
                     .build();
         }
 
-        public AdvertisementEventMessage toEventMessage() {
+        public AdvertisementEventMessage toEventMessage(Long id) {
             return AdvertisementEventMessage.builder()
-                    .productId(this.getProductId())
+                    .productId(id)
                     .startDate(this.getStartDate())
                     .endDate(this.getEndDate())
                     .build();

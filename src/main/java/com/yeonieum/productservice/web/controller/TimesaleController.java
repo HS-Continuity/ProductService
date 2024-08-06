@@ -10,6 +10,8 @@ import com.yeonieum.productservice.global.auth.Role;
 import com.yeonieum.productservice.global.responses.ApiResponse;
 import com.yeonieum.productservice.global.responses.code.SuccessCode;
 import com.yeonieum.productservice.global.usercontext.UserContextHolder;
+import com.yeonieum.productservice.infrastructure.messaging.ProductEventProducer;
+import com.yeonieum.productservice.infrastructure.messaging.message.TimesaleEventMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -29,6 +31,8 @@ import java.util.List;
 public class TimesaleController {
     private final TimesaleManagementService timesaleManagementService;
     private final TimesaleManagementFacade timesaleManagementFacade;
+    private final ProductEventProducer productEventProducer;
+
 
     // TimesaleService의 메서드를 바탕으로 타임세일 조회, 등록, 타임세일 상품 조회를 구현해주세요.
     // 타임세일 조회, 등록, 타임세일 상품 조회를 위한 API를 구현해주세요.
@@ -59,8 +63,9 @@ public class TimesaleController {
     @PostMapping
     public ResponseEntity<ApiResponse> registerTimesale(@Valid @RequestBody TimesaleRequestForCustomer.OfRegister registerRequest) throws JsonProcessingException {
         Long customer = Long.valueOf(UserContextHolder.getContext().getUserId());
-        timesaleManagementService.registerTimesale(customer, registerRequest);
-
+        Long id = timesaleManagementService.registerTimesale(customer, registerRequest);
+        TimesaleEventMessage timesaleEventMessage = registerRequest.toEventMessage(id);
+        productEventProducer.sendMessage(timesaleEventMessage);
         return new ResponseEntity<>(ApiResponse.builder()
                 .result(null)
                 .successCode(SuccessCode.INSERT_SUCCESS)
