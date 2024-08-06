@@ -255,6 +255,7 @@ public class ProductManagementController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
+    @Role(role = {"ROLE_CUSTOMER"}, url = "/api/management/product/{productId}", method = "GET")
     @GetMapping("/product/{productId}")
     public ResponseEntity<ApiResponse> getProductName(@PathVariable Long productId) {
         String productName = productManagementService.getProductNameById(productId);
