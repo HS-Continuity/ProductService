@@ -72,4 +72,17 @@ public class CustomerService {
 
         return CustomerResponse.OfRetrieveForAuth.convertedBy(targetCustomer);
     }
+
+    /**
+     * 인증용 고객 정보 조회
+     * @param
+     * @return 저장된 고객 정보
+     */
+    @Transactional
+    public CustomerResponse.OfRetrieveForAuth retrieveForAuthId(Long customerId) {
+        Customer targetCustomer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerException(CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        return CustomerResponse.OfRetrieveForAuth.convertedBy(targetCustomer);
+    }
 }

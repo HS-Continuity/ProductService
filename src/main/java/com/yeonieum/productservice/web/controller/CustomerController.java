@@ -93,4 +93,20 @@ public class CustomerController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+
+    @Operation(summary = "인증용 고객 정보 조회", description = "인증용 고객 정보를 조회하는 기능입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "인증용 고객 정보 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "인증용 고객 정보 조회 실패")
+    })
+    @Role(role = {"*"}, url = "/api/customer/auth/id/{customerId}", method = "GET")
+    @GetMapping("/auth/id/{customerId}")
+    public ResponseEntity<ApiResponse> retrieveDetailForAuthId(@PathVariable("customerId") Long customerId) {
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(customerService.retrieveForAuthId(customerId))
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }
