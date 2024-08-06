@@ -88,6 +88,10 @@ public class TimesaleManagementService {
             throw new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
+        if(productTimesaleRepository.existsByProductIdAndServiceStatus(registerRequest.getProductId())) {
+            throw new IllegalArgumentException("이미 타임세일이 진행중인 상품입니다.");
+        }
+
         ServiceStatus status = serviceStatusRepository.findByStatusName(ServiceStatusCode.PENDING.getCode());
         ProductTimesale productTimesale = registerRequest.toEntity(product, status);
         ProductTimesale savedEntity = productTimesaleRepository.save(productTimesale);
