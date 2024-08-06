@@ -379,4 +379,17 @@ public class ProductManagementServiceImpl implements ProductManagementService{
         }
         return genderRanks;
     }
+
+    /***
+     * 고객의 상품 ID로 상품명 조회
+     * @param productId
+     * @return 상품명
+     */
+    @Override
+    @Transactional
+    public String getProductNameById(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
+        return product.getProductName();
+    }
 }
