@@ -248,4 +248,19 @@ public class ProductManagementController {
                 .successCode(SuccessCode.SELECT_SUCCESS)
                 .build(), HttpStatus.OK);
     }
+
+    @Operation(summary = "상품 이름 조회", description = "상품 ID로 상품 이름을 조회합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "상품 이름 조회 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<ApiResponse> getProductName(@PathVariable Long productId) {
+        String productName = productManagementService.getProductNameById(productId);
+        return new ResponseEntity<>(ApiResponse.builder()
+                .result(productName)
+                .successCode(SuccessCode.SELECT_SUCCESS)
+                .build(), HttpStatus.OK);
+    }
 }
